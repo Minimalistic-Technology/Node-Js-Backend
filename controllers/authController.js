@@ -61,6 +61,13 @@ exports.login = async (req, res) => {
   }
 };
 
+
+
+exports.userProfile = (req, res) => {
+  // Only accessible if the user is logged in (auth middleware ensures this)
+  res.json({ message: 'This is your private profile data', user: req.user });
+};
+
 exports.refreshToken = (req, res) => {
   const token = req.cookies.refreshToken;
 
