@@ -9,6 +9,7 @@ const courseRoutes = require('./routes/courseRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const cookieParser = require('cookie-parser');
 const goldRoutes = require('./routes/goldpriceRoutes');
+const blogRoutes = require('./routes/blogRoutes');
 
 const app = express();
 const PORT = 5000;
@@ -19,7 +20,7 @@ app.use('/courses', courseRoutes);
 app.use('/contact', contactRoutes);
 app.use(cookieParser());
 app.use('/gold', goldRoutes);
-
+app.use('/blogs', blogRoutes);
 
 app.get('/hello', (req, res) => {
     res.json({message: 'Hello World!'});
