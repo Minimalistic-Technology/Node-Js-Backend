@@ -4,7 +4,7 @@ require('dotenv').config();
 const sendEmail = async (name, email, message) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: "mail.minimalistictechnology.com", 
+      host: "mail.MinimalisticTechnology.com", 
       port: 465,
       secure: true, 
       auth: {
