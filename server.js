@@ -8,7 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 const cookieParser = require('cookie-parser');
-const goldRoutes = require('./routes/goldpriceRoutes');
+const goldRoutes = require('./routes/goldPriceRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 
 const app = express();
