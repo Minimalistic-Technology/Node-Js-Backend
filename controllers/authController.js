@@ -30,6 +30,18 @@ exports.signup = async (req, res) => {
   }
 };
 
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password'); // hide password
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json(user);
+  } catch (err) {
+    console.error('Get user error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 

@@ -10,6 +10,7 @@ const contactRoutes = require('./routes/contactRoutes');
 const cookieParser = require('cookie-parser');
 const goldRoutes = require('./routes/goldpriceRoutes');
 
+
 const app = express();
 const PORT = 5000;
 
