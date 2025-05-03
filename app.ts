@@ -8,7 +8,7 @@ const goldRoutes = require('./routes/goldPriceRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const quoteRoutes = require('./routes/quoteBlogRoutes');
 
-const App = express();
+const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
