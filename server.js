@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser');
 const goldRoutes = require('./routes/goldPriceRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 
+
 const app = express();
 const PORT = 5000;
 
