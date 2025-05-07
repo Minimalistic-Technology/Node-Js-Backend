@@ -1,13 +1,42 @@
-require('dotenv').config();
-const http = require('http');
-const App = require('./app');
-const ConnectDB = require('./db');
+import { v2 as cloudinary } from "cloudinary";
+import http from "http";
+import connectDB from "./utils/db";
+// import { initSocketServer } from "./socketServer";
+import { app } from "./app";
 
-const PORT = process.env.PORT || 5000;
+require("dotenv").config();
 
-ConnectDB();
+const cluster = require("cluster");
+const numCPUs = require("os").cpus().length;
+console.log("numCPUs", numCPUs);
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`);
 
-const server = http.createServer(App);
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+  // Fork workers.
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on("exit", (worker: any, code: any, signal: any) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+} else {
+  // Workers can share any TCP connection
+  // In this case it is an HTTP server
+  const server = http.createServer(app);
+
+  // cloudinary config
+  cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_API_KEY,
+    api_secret: process.env.CLOUD_SECRET_KEY,
+  });
+
+  // initSocketServer(server);
+
+  // create server
+  server.listen(process.env.PORT, () => {
+    console.log(`Server is connected with port ${process.env.PORT}`);
+    connectDB();
+  });
+}
