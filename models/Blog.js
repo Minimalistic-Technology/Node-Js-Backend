@@ -7,7 +7,10 @@ const blogSchema = new mongoose.Schema({
     image: { type: String },
     date: { type: String, required: true },
     author: { type: String },
-    tags: [{ type: String }]
+    tags: [{ type: String }],
+    rating: { type: Number, default: 0 }
 });
 
 module.exports = mongoose.model('Blog', blogSchema);
+
+
