@@ -5,21 +5,21 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
-import courseRouter from "./routes/course.route";
-import orderRouter from "./routes/order.route";
-import notificationRouter from "./routes/notification.route";
-import analyticsRouter from "./routes/analytics.route";
-import layoutRouter from "./routes/layout.route";
+// import courseRouter from "./routes/course.route";
+// import orderRouter from "./routes/order.route";
+// import notificationRouter from "./routes/notification.route";
+// import analyticsRouter from "./routes/analytics.route";
+// import layoutRouter from "./routes/layout.route";
 import { rateLimit } from 'express-rate-limit'
-import CouponCodeModel from "./models/coupon.models";
-import { couponRouter } from "./routes/coupon.router";
-import { maintenanceRouter } from "./routes/maintenance.route";
-import certificateRouter from "./routes/certificatePdf.router";
-import quizRouter from "./routes/quiz.route";
-import progressRouter from "./routes/progress.router";
-import AWS from 'aws-sdk'
-import taskRouter from "./routes/task.route";
-import { TaskModel } from "./models/task.models";
+// import CouponCodeModel from "./models/coupon.models";
+// import { couponRouter } from "./routes/coupon.router";
+// import { maintenanceRouter } from "./routes/maintenance.route";
+// import certificateRouter from "./routes/certificatePdf.router";
+// import quizRouter from "./routes/quiz.route";
+// import progressRouter from "./routes/progress.router";
+// import AWS from 'aws-sdk'
+// import taskRouter from "./routes/task.route";
+// import { TaskModel } from "./models/task.models";
 import crypto from 'crypto'
 import Razorpay from 'razorpay'
 
@@ -73,17 +73,17 @@ app.use(apiLogger)
 app.use(
   "/api/v1",
   userRouter,
-  orderRouter,
-  courseRouter,
-  notificationRouter,
-  analyticsRouter,
-  layoutRouter,
-  couponRouter,
-  maintenanceRouter,
-  certificateRouter,
-  quizRouter,
-  progressRouter,
-  taskRouter,
+  // orderRouter,
+  // courseRouter,
+  // notificationRouter,
+  // analyticsRouter,
+  // layoutRouter,
+  // couponRouter,
+  // maintenanceRouter,
+  // certificateRouter,
+  // quizRouter,
+  // progressRouter,
+  // taskRouter,
 );
 
 // testing api
