@@ -68,7 +68,7 @@ const limiter = rateLimit({
 
 // middleware calls
 app.use(limiter);
-app.use(apiLogger)
+// app.use(apiLogger)
 // routes
 app.use(
   "/api/v1",
