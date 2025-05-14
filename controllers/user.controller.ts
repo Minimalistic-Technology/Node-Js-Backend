@@ -324,7 +324,7 @@ export const updateAccessToken = CatchAsyncError(
         }
       );
 
-      req.user = user;
+      req .user = user;
 
       res.cookie("access_token", accessToken, accessTokenOptions);
       res.cookie("refresh_token", refreshToken, refreshTokenOptions);
