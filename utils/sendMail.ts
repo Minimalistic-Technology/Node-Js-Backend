@@ -12,8 +12,16 @@ interface EmailOptions{
 
 const sendMail = async (options: EmailOptions):Promise <void> => {
     const transporter: Transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || '587'),
+    service: 'Godaddy',
+    host: "smtpout.secureserver.net",  
+    secure: true,
+    secureConnection: false, // TLS requires secureConnection to be false
+    tls: {
+        ciphers:'SSLv3'
+    },
+    requireTLS:true,
+    port: 465,
+    debug: true,
         // service: process.env.SMTP_SERVICE,
         auth:{
             user: process.env.SMTP_MAIL,
