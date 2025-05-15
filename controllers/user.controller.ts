@@ -8,24 +8,25 @@ import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import ejs from "ejs";
 import path from "path";
-// import sendMail from "../utils/sendMail";
-// import {
-//   accessTokenOptions,
-//   refreshTokenOptions,
-//   sendToken,
-// } from "../utils/jwt";
-// import { redis } from "../utils/redis";
-// import {
-//   getAllUsersService,
-//   getUserById,
-//   updateUserRoleService,
-// } from "../services/user.service";
+import sendMail from "../utils/sendMail";
+import {
+  accessTokenOptions,
+  refreshTokenOptions,
+  sendToken,
+} from "../utils/jwt";
+import { redis } from "../utils/redis";
+import {
+  getAllUsersService,
+  getUserById,
+  updateUserRoleService,
+} from "../services/user.service";
+
 import cloudinary from "cloudinary";
-// import CourseModel from "../models/course.model";
+import CourseModel from "../models/course.model";
 import crypto from "crypto";
-// import { ProgressModal } from "../models/progress.models";
+import { ProgressModal } from "../models/progress.models";
 import { AnyLengthString } from "aws-sdk/clients/comprehendmedical";
-// import { QuizResultModel } from "../models/quizResult.models";
+import { QuizResultModel } from "../models/quizResult.models";
 import { createHash, randomBytes } from "crypto";
 
 // register user
@@ -60,18 +61,18 @@ export const registrationUser = CatchAsyncError(
       const activationCode = activationToken.activationCode;
 
       const data = { user: { name: user.name }, activationCode };
-      // const html = await ejs.renderFile(
-      //   path.join(__dirname, "../mails/activation-mail.ejs"),
-      //   data
-      // );
+      const html = await ejs.renderFile(
+        path.join(__dirname, "../mails/activation-mail.ejs"),
+        data
+      );
 
       try {
-        // await sendMail({
-        //   email: user.email,
-        //   subject: "Activate your account",
-        //   template: "activation-mail.ejs",
-        //   data,
-        // });
+        await sendMail({
+          email: user.email,
+          subject: "Activate your account",
+          template: "activation-mail.ejs",
+          data,
+        });
 
         res.status(201).json({
           success: true,
@@ -324,7 +325,7 @@ export const updateAccessToken = CatchAsyncError(
         }
       );
 
-      req .user = user;
+      req.user = user;
 
       res.cookie("access_token", accessToken, accessTokenOptions);
       res.cookie("refresh_token", refreshToken, refreshTokenOptions);
