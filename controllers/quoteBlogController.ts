@@ -1,16 +1,17 @@
-const QuoteBlog = require('../models/QuoteBlog');
+import { Request, Response } from 'express';
+import QuoteBlog from '../models/QuoteBlog';
 
-exports.createQuote = async (req, res) => {
+export const createQuote = async (req: Request, res: Response): Promise<void> => {
   try {
     const quote = new QuoteBlog(req.body);
     await quote.save();
     res.status(201).json(quote);
-  } catch (err) {
+  } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
 };
 
-exports.getLatestQuotes = async (req, res) => {
+export const getLatestQuotes = async (req: Request, res: Response): Promise<void> => {
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
@@ -20,7 +21,7 @@ exports.getLatestQuotes = async (req, res) => {
     }).sort({ createdAt: -1 });
 
     res.json(quotes);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 };

@@ -22,6 +22,10 @@ import { rateLimit } from 'express-rate-limit'
 // import { TaskModel } from "./models/task.models";
 import crypto from 'crypto'
 import Razorpay from 'razorpay'
+import otpRouter from "./routes/otpRoutes";
+
+
+
 
 require('dotenv').config();
 const apiLogger = require('./controllers/apiLogger');
@@ -32,6 +36,8 @@ const bodyParser = require('body-parser');
 
 // cookie parser
 app.use(cookieParser());
+
+app.use("/api/otp", otpRouter);
 
 // cors => cross origin resource sharing
 app.use(
@@ -70,6 +76,15 @@ const limiter = rateLimit({
 app.use(limiter);
 // app.use(apiLogger)
 // routes
+
+const ml = ""
+const mt = ""
+const mc = ""
+const ms = ""
+const mml = ""
+const mp = ""
+const mn = ""
+
 app.use(
   "/api/v1",
   userRouter,
