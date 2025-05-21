@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
-import { Types } from 'mongoose';
+import sendMail from '../utils/sendMail';
 
 interface JwtPayload {
   userID: string;
@@ -17,22 +17,45 @@ const generateRefreshToken = (userID: string): string => {
 };
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
-  const { username, email, password } = req.body;
+  const { name, email, password, phone, institute } = req.body;
 
-  if (!username || !email || !password) {
-    res.status(400).json({ error: "Username, email, and password are required" });
+  if (!name || !email || !password) {
+    res.status(400).json({ error: "Name, email, and password are required" });
     return;
   }
 
   try {
-    const userExists = await User.findOne({ $or: [{ username }, { email }] });
+    const userExists = await User.findOne({ $or: [{ username: name }, { email }] });
     if (userExists) {
-      res.status(400).json({ error: 'Username or email already registered' });
+      res.status(400).json({ error: 'Name or email already registered' });
       return;
     }
 
-    const newUser = new User({ username, email, password });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      username: name,
+      email,
+      password: hashedPassword,
+      phone,
+      institute
+    });
     await newUser.save();
+
+    if (email && typeof email === 'string' && email.trim() !== '') {
+      try {
+        await sendMail({
+          email,
+          subject: 'Welcome to Our App!',
+          template: 'welcome.ejs',
+          data: { username: name }
+        });
+      } catch (mailError) {
+        console.error("Error sending welcome email:", mailError);
+        // Email failure should not prevent signup
+      }
+    }
+
     res.status(201).json({ message: 'User created successfully' });
   } catch (err) {
     console.error("Signup error:", err);
