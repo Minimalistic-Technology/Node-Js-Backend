@@ -11,22 +11,26 @@ const generateRefreshToken = (userId) => {
 };
 
 exports.signup = async (req, res) => {
-  const { username, email, password } = req.body;
-
-  if (!username || !email || !password) {
-    return res.status(400).json({ error: "Username, email, and password are required" });
-  }
-
   try {
-    const userExists = await User.findOne({ $or: [{ username }, { email }] });
-    if (userExists) return res.status(400).json({ error: 'Username or email already registered' });
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
+    // Check user existence
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(409).json({ message: "Username or email already exists" });
+    }
+
+    // Create and save user
     const newUser = new User({ username, email, password });
     await newUser.save();
-    res.status(201).json({ message: 'User created successfully' });
-  } catch (err) {
-    console.error("Signup error:", err);
-    res.status(500).json({ error: 'Signup failed' });
+
+    res.status(201).json({ message: "Signup successful" });
+  } catch (error) {
+    console.log("Signup Error:", error);
+    res.status(500).json({ message: "An error occurred during signup. Please try again." });
   }
 };
 
@@ -49,7 +53,7 @@ exports.login = async (req, res) => {
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -70,7 +74,7 @@ exports.refreshToken = (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-    const accessToken = generateAccessToken(decoded.userID);
+    const accessToken = generateAccessToken(decoded.userId);
     res.json({ accessToken });
   } catch (err) {
     console.error("Refresh token error:", err);
@@ -79,9 +83,28 @@ exports.refreshToken = (req, res) => {
 };
 
 exports.logout = (req, res) => {
-  res.clearCookie('refershToken');
+  res.clearCookie('refreshToken');
   res.json({ message: 'Logged out successfully' });
 };
 
+exports.getUser = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authorization header missing or invalid' });
+    }
 
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userID).select('username email');
 
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ username: user.username, email: user.email });
+  } catch (err) {
+    console.error("Get user error:", err);
+    res.status(401).json({ error: 'Invalid or expired token' });
+  }
+};
