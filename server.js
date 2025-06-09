@@ -20,6 +20,8 @@ const stockRoutes = require('./routes/stockRoutes');
 const collectionRoutes = require('./routes/collectionRoutes');
 const productToolRoutes = require('./routes/stocks/productToolRoutes');
 const topStockRoutes = require('./routes/topStockRoutes');
+const email=require('./routes/figma/email');
+const event=require('./routes/figma/event');
 const app = express();
 const PORT = 5000;
 
@@ -38,6 +40,8 @@ app.use('/api/stocks', stockRoutes);
 app.use('/api/collections', collectionRoutes);
 app.use('/api/stocks/producttools', productToolRoutes);
 app.use('/api/topstocks', topStockRoutes);
+app.use('/api/contact', email);
+app.use('/api/event', event);
 
 
 

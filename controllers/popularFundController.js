@@ -10,7 +10,6 @@ exports.addTopStocks = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 // Get all top stocks (only selected fields)
 exports.getTopStocks = async (req, res) => {
   try {
