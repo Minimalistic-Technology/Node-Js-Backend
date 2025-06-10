@@ -3,32 +3,31 @@ import express, { NextFunction, Request, Response } from "express";
 export const app = express();
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { ErrorMiddleware } from "./middleware/error";
-import userRouter from "./routes/user.route";
-// import courseRouter from "./routes/course.route";
+import errorMiddleware from "./middleware/error";
+// import userRouter from "./routes/user.routes";
+// import courseRouter from "./routes/course.routes";
 // import orderRouter from "./routes/order.route";
 // import notificationRouter from "./routes/notification.route";
 // import analyticsRouter from "./routes/analytics.route";
 // import layoutRouter from "./routes/layout.route";
 import { rateLimit } from 'express-rate-limit'
+const authRoutes = require('./routes/authRoutes');
 // import CouponCodeModel from "./models/coupon.models";
 // import { couponRouter } from "./routes/coupon.router";
 // import { maintenanceRouter } from "./routes/maintenance.route";
 // import certificateRouter from "./routes/certificatePdf.router";
 // import quizRouter from "./routes/quiz.route";
 // import progressRouter from "./routes/progress.router";
-// import AWS from 'aws-sdk'
+import AWS from 'aws-sdk'
 // import taskRouter from "./routes/task.route";
 // import { TaskModel } from "./models/task.models";
 import crypto from 'crypto'
 import Razorpay from 'razorpay'
-import otpRouter from "./routes/otpRoutes";
-
-
-
+import mongoose from 'mongoose'
 
 require('dotenv').config();
-const apiLogger = require('./controllers/apiLogger');
+// const apiLogger = require('./controllers/apiLogger');
+
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
@@ -86,8 +85,8 @@ const mp = ""
 const mn = ""
 
 app.use(
-  "/api/v1",
-  userRouter,
+  "/api/v1/auth", authRoutes,
+  // userRouter,
   // orderRouter,
   // courseRouter,
   // notificationRouter,
@@ -108,7 +107,20 @@ app.get("/test", async (req: Request, res: Response, next: NextFunction) => {
     message: "GET API is working",
   });
 });
-
+app.get("/test-db", async (req: Request, res: Response) => {
+  try {
+    await mongoose.connection.db.admin().ping();
+    res.status(200).json({ message: "MongoDB is connected" });
+  } catch (err) {
+    res.status(500).json({ error: "MongoDB connection failed", details: err });
+  }
+});
+if (!process.env.MONGO_URI) {
+  throw new Error('MONGO_URI is not defined in environment variables');
+}
+mongoose.connect(process.env.MONGO_URI as string)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 app.post("/order", async (req: Request, res: Response, next: NextFunction) => {
   try{
 
@@ -177,4 +189,4 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 });
 
 
-app.use(ErrorMiddleware);
+app.use(errorMiddleware);
