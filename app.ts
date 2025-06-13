@@ -24,10 +24,25 @@ import AWS from 'aws-sdk'
 import crypto from 'crypto'
 import Razorpay from 'razorpay'
 import mongoose from 'mongoose'
+import productRoutes from './routes/productRoutes';
+import productPriceRoutes from './routes/productPriceRoutes';
+import projectRoutes from './routes/projectRoutes';
+import profileRoutes from './routes/profileRoutes';
+import contactFormRoutes from './routes/contactFormRoutes';
+import workoutRoutes from './routes/workoutRoutes';
+import workoutProgressRoutes from './routes/workoutProgressRoutes';
+import otpRouter from './routes/otpRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
 
+app.use('/api/products', productRoutes);
+app.use('/api/prices', productPriceRoutes);
+app.use('/api', projectRoutes);
+app.use('/api', profileRoutes);
+app.use('/api', contactFormRoutes);
+app.use('/api', workoutRoutes);
+app.use('/api', workoutProgressRoutes);
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
@@ -36,7 +51,7 @@ const bodyParser = require('body-parser');
 // cookie parser
 app.use(cookieParser());
 
-app.use("/api/otp", otpRouter);
+app.use('/api/otp', otpRouter);
 
 // cors => cross origin resource sharing
 app.use(
