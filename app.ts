@@ -32,6 +32,8 @@ import contactFormRoutes from './routes/contactFormRoutes';
 import workoutRoutes from './routes/workoutRoutes';
 import workoutProgressRoutes from './routes/workoutProgressRoutes';
 import otpRouter from './routes/otpRoutes';
+import propertyRoutes from './routes/propertyRoutes';
+
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -43,6 +45,8 @@ app.use('/api', profileRoutes);
 app.use('/api', contactFormRoutes);
 app.use('/api', workoutRoutes);
 app.use('/api', workoutProgressRoutes);
+app.use('/api', propertyRoutes);
+
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
