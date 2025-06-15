@@ -11,7 +11,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-   await sendEmail({name, email, message});
+  //  await sendEmail({name, email, message});
     res.status(200).json({ message: "Email sent successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to send email" });

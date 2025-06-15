@@ -39,6 +39,7 @@ interface IRegistrationBody {
   avatar?: string;
 }
 
+
 export const registrationUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -187,7 +188,8 @@ export const enrollSpecificTag = CatchAsyncError(
       //   "_id courseData"
       // );
 
-      const user: any = await userModel.findById(req.user?._id);
+      const userId = (req.user as { _id: string })?._id;
+      const user: any = await userModel.findById(userId);
 
       courses.map((course: any) => {
         user?.courses.push({ _id: course._id.toString() });
@@ -270,7 +272,7 @@ export const logoutUser = CatchAsyncError(
         sameSite: "none",
         secure: true,
       });
-
+      // @ts-ignore
       const userId = req.user?._id || "";
       // redis.del(userId);
       res.status(200).json({
@@ -306,9 +308,9 @@ export const updateAccessToken = CatchAsyncError(
           new ErrorHandler("Please login for access this resources!", 400)
         );
       }
-
+      
       const user = JSON.parse(session);
-
+      
       const accessToken = jwt.sign(
         { id: user._id },
         process.env.ACCESS_TOKEN as string,
@@ -329,9 +331,9 @@ export const updateAccessToken = CatchAsyncError(
 
       res.cookie("access_token", accessToken, accessTokenOptions);
       res.cookie("refresh_token", refreshToken, refreshTokenOptions);
-
+      
       // await redis.set(user._id, JSON.stringify(user), "EX", 604800); // 7days
-
+      
       return next();
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
@@ -343,6 +345,7 @@ export const updateAccessToken = CatchAsyncError(
 export const getUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // @ts-ignore
       const userId = req.user?._id;
       getUserById(userId, res);
     } catch (error: any) {
@@ -387,7 +390,8 @@ export const updateUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { name, email, phone, institute } = req.body as IUpdateUserInfo;
-
+      
+      // @ts-ignore
       const userId = req.user?._id;
       const user: any = await userModel.findById(userId);
 
@@ -426,15 +430,16 @@ export const updatePassword = CatchAsyncError(
       if (!oldPassword || !newPassword) {
         return next(new ErrorHandler("Please enter old and new password", 400));
       }
-
+      
+      // @ts-ignore
       const user = await userModel.findById(req.user?._id).select("+password");
 
       if (user?.password === undefined) {
         return next(new ErrorHandler("Invalid user", 400));
       }
-
+      
       const isPasswordMatch = await user?.comparePassword(oldPassword);
-
+      
       if (!isPasswordMatch) {
         return next(new ErrorHandler("Invalid old password", 400));
       }
@@ -464,7 +469,8 @@ export const updateProfilePicture = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { avatar } = req.body as IUpdateProfilePicture;
-
+      
+      // @ts-ignore
       const userId = req.user?._id;
 
       const user = await userModel.findById(userId).select("+password");

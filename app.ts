@@ -36,7 +36,7 @@ const bodyParser = require('body-parser');
 // cookie parser
 app.use(cookieParser());
 
-app.use("/api/otp", otpRouter);
+// app.use("/api/otp", otpRouter);
 
 // cors => cross origin resource sharing
 app.use(
