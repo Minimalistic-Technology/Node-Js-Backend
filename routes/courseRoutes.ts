@@ -1,7 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const courseController = require('../controllers/courseController');
-const authenticateToken = require('../middleware/authMiddleware');
+import express, { Router } from 'express';
+import * as courseController from '../controllers/courseController';
+import {authenticateToken} from '../middleware/authMiddleware';
+
+const router: Router = express.Router();
 
 router.get('/', courseController.getAllCourses);
 router.get('/:id', courseController.getCourseById);
@@ -10,4 +11,4 @@ router.post('/', authenticateToken, courseController.createCourse);
 router.put('/:id', authenticateToken, courseController.updateCourse);
 router.delete('/:id', authenticateToken, courseController.deleteCourse);
 
-module.exports = router;
+export default router;

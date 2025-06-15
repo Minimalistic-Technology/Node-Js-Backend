@@ -36,6 +36,8 @@ const bodyParser = require('body-parser');
 // cookie parser
 app.use(cookieParser());
 
+app.use("/api/otp", otpRouter);
+
 // cors => cross origin resource sharing
 app.use(
   cors({
@@ -73,6 +75,15 @@ const limiter = rateLimit({
 app.use(limiter);
 // app.use(apiLogger)
 // routes
+
+const ml = ""
+const mt = ""
+const mc = ""
+const ms = ""
+const mml = ""
+const mp = ""
+const mn = ""
+
 app.use(
   "/api/v1/auth", authRoutes,
   // userRouter,
