@@ -33,7 +33,13 @@ import workoutRoutes from './routes/workoutRoutes';
 import workoutProgressRoutes from './routes/workoutProgressRoutes';
 import otpRouter from './routes/otpRoutes';
 import propertyRoutes from './routes/propertyRoutes';
-
+import bmiRoutes from './routes/bmi.routes';
+const reviewRoutes = require('./routes/hospital/review');
+import loginroutes from './routes/hospital/login';
+import productToolRoutes from './routes/stocks/productToolRoutes';
+import doctorreview from './routes/hospital/doctorreview';
+import cartRoutes from './routes/cart.routes';
+import feedbackRoutes from './routes/feedback.routes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -46,7 +52,13 @@ app.use('/api', contactFormRoutes);
 app.use('/api', workoutRoutes);
 app.use('/api', workoutProgressRoutes);
 app.use('/api', propertyRoutes);
-
+app.use('/api', bmiRoutes);
+app.use('/api/hospital', reviewRoutes);
+app.use('/api/login', loginroutes);
+app.use('/api/producttools', productToolRoutes);
+app.use('/api/doctorreview', doctorreview);
+app.use('/api', cartRoutes);
+app.use('/api', feedbackRoutes);
 
 // body parser
 app.use(express.json({ limit: "50mb" }));

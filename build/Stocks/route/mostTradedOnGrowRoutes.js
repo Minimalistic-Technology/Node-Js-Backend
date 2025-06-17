@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const { Router } = require('express');
+const mostTradedOnGrowController_1 = require("../../controllers/stocks/mostTradedOnGrowController");
+Router.post('/mosttradedongrow', mostTradedOnGrowController_1.addMostTradedOnGrow);
+Router.get('/mosttradedongrow', mostTradedOnGrowController_1.getAllMostTradedOnGrow);
+Router.get('/mosttradedongrow/:id', mostTradedOnGrowController_1.getMostTradedOnGrowById);
+Router.put('/mosttradedongrow/:id', mostTradedOnGrowController_1.updateMostTradedOnGrow);
+Router.delete('/mosttradedongrow/:id', mostTradedOnGrowController_1.deleteMostTradedOnGrow);
+exports.default = Router;
