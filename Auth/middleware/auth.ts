@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { CatchAsyncError } from "./catchAsyncErrors";
+import { CatchAsyncError } from "../../middleware/catchAsyncErrors";
 import ErrorHandler from "../../utils/ErrorHandler";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { redis } from "../../utils/redis";
-import { updateAccessToken } from "../../controllers/user.controller";
-import userModel from "../../models/user.model";
+import { updateAccessToken } from "../controllers/authController";
+import userModel from "../models/User";
+
 
 // authenticated user
 export const isAuthenticated = CatchAsyncError(
@@ -26,7 +27,7 @@ export const isAuthenticated = CatchAsyncError(
     // check if the access token is expired
     if (decoded.exp && decoded.exp <= Date.now() / 1000) {
       try {
-        await updateAccessToken(req, res, next);
+        await updateAccessToken(req, res);
       } catch (error) {
         return next(error);
       }
@@ -58,5 +59,5 @@ export const authorizeRoles = (...roles: string[]) => {
       );
     }
     next();
-  };
+  };
 };

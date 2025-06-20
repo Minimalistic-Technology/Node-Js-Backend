@@ -11,7 +11,7 @@ import errorMiddleware from "./middleware/error";
 // import analyticsRouter from "./routes/analytics.route";
 // import layoutRouter from "./routes/layout.route";
 import { rateLimit } from 'express-rate-limit'
-const authRoutes = require('./routes/authRoutes');
+import authRoutes from './Auth/routes/authRoutes';
 // import CouponCodeModel from "./models/coupon.models";
 // import { couponRouter } from "./routes/coupon.router";
 // import { maintenanceRouter } from "./routes/maintenance.route";
@@ -24,22 +24,31 @@ import AWS from 'aws-sdk'
 import crypto from 'crypto'
 import Razorpay from 'razorpay'
 import mongoose from 'mongoose'
-import productRoutes from './routes/productRoutes';
-import productPriceRoutes from './routes/productPriceRoutes';
-import projectRoutes from './routes/projectRoutes';
-import profileRoutes from './routes/profileRoutes';
-import contactFormRoutes from './routes/contactFormRoutes';
-import workoutRoutes from './routes/workoutRoutes';
-import workoutProgressRoutes from './routes/workoutProgressRoutes';
-import otpRouter from './routes/otpRoutes';
-import propertyRoutes from './routes/propertyRoutes';
-import bmiRoutes from './routes/bmi.routes';
-const reviewRoutes = require('./routes/hospital/review');
-import loginroutes from './routes/hospital/login';
-import productToolRoutes from './routes/stocks/productToolRoutes';
-import doctorreview from './routes/hospital/doctorreview';
-import cartRoutes from './routes/cart.routes';
-import feedbackRoutes from './routes/feedback.routes';
+import productRoutes from './Product/routes/productRoutes';
+import productPriceRoutes from './Product/routes/productPriceRoutes';
+import projectRoutes from './Project/routes/projectRoutes';
+import profileRoutes from './Profile/routes/profileRoutes';
+import contactFormRoutes from './Contact/routes/contactFormRoutes';
+import workoutRoutes from './Fitness/routes/workoutRoutes';
+import workoutProgressRoutes from './Fitness/routes/workoutProgressRoutes';
+import otpRouter from './OTP/routes/otpRoutes';
+import propertyRoutes from './Property/routes/propertyRoutes';
+import bmiRoutes from './Fitness/routes/bmiRoutes';
+import login from './Education/routes/loginRoutes';
+import cartRoutes from './Product/routes/cartRoutes';
+import feedbackRoutes from './Product/routes/feedbackRoutes';
+import examSettingRoutes from './Education/routes/examSettingRoutes';
+import schedule from './Education/routes/scheduleRoutes';
+import document from './Education/routes/documentRoutes';
+import productToolRoutes from './Stocks/routes/stockroutes';
+import doctorreview from './Hospital/routes/doctorreview';
+import hospitalroutes from './Hospital/routes/hospitalroutes';
+import blogRoutes from './Blog/routes/blogRoutes';
+import quoteBlogRoutes from './Blog/routes/quoteBlogRoutes';
+import collectionRoutes from './Collection/routes/collectionRoutes';
+import contactRoutes from './Contact/routes/contactRoutes';
+import courseRoutes from './Course/routes/courseRoutes';
+import messageRoutes from './Message/routes/messageRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -53,12 +62,21 @@ app.use('/api', workoutRoutes);
 app.use('/api', workoutProgressRoutes);
 app.use('/api', propertyRoutes);
 app.use('/api', bmiRoutes);
-app.use('/api/hospital', reviewRoutes);
-app.use('/api/login', loginroutes);
-app.use('/api/producttools', productToolRoutes);
-app.use('/api/doctorreview', doctorreview);
+app.use('/api/hospital', hospitalroutes);
+app.use('/api/login', login);
 app.use('/api', cartRoutes);
 app.use('/api', feedbackRoutes);
+app.use('/api', examSettingRoutes);
+app.use('/api/schedule', schedule);
+app.use('/api/document', document);
+app.use('/api/producttools', productToolRoutes);
+app.use('/api/doctorreview', doctorreview);
+app.use('/api/blogs', blogRoutes);
+app.use('/api/quotes', quoteBlogRoutes);
+app.use('/api/collections', collectionRoutes);
+app.use('/api/contact', contactRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/messages', messageRoutes);
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
@@ -189,15 +207,15 @@ app.post("/order", async (req: Request, res: Response, next: NextFunction) => {
 })
 
 app.post("/verify", async (req: Request, res: Response, next: NextFunction) => {
-  try{
-    const { razorPay_order_id, razorPay_payment_id, razorPay_signature } = req.body
+    try {
+      const { razorPay_order_id, razorPay_payment_id, razorPay_signature } = req.body;
 
-    const sign = razorPay_order_id + "|" + razorPay_payment_id
-    // @ts-ignore
-    const expectedSign = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET ).update(sign.toString()).digest("hex")
-    
-    if( razorPay_signature === expectedSign ){
-      return res.status(200).json({ success :true, message:"Payment Verify Successfully!" })
+      const sign = razorPay_order_id + "|" + razorPay_payment_id;
+      // @ts-ignore
+      const expectedSign = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET ).update(sign.toString()).digest("hex");
+
+      if( razorPay_signature === expectedSign ){
+        return res.status(200).json({ success :true, message:"Payment Verify Successfully!" });
     }else{
       return res.status(400).json({ success :false, message:"Invalid Signature !" })
     }

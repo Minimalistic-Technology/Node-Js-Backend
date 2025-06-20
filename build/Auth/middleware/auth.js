@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authorizeRoles = exports.isAuthenticated = void 0;
-const catchAsyncErrors_1 = require("./catchAsyncErrors");
+const catchAsyncErrors_1 = require("../../middleware/catchAsyncErrors");
 const ErrorHandler_1 = __importDefault(require("../../utils/ErrorHandler"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const user_controller_1 = require("../../controllers/user.controller");
-const user_model_1 = __importDefault(require("../../models/user.model"));
+const authController_1 = require("../controllers/authController");
+const User_1 = __importDefault(require("../models/User"));
 // authenticated user
 exports.isAuthenticated = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, res, next) => {
     const access_token = req.cookies.access_token;
@@ -22,14 +22,14 @@ exports.isAuthenticated = (0, catchAsyncErrors_1.CatchAsyncError)(async (req, re
     // check if the access token is expired
     if (decoded.exp && decoded.exp <= Date.now() / 1000) {
         try {
-            await (0, user_controller_1.updateAccessToken)(req, res, next);
+            await (0, authController_1.updateAccessToken)(req, res);
         }
         catch (error) {
             return next(error);
         }
     }
     else {
-        const user = await user_model_1.default.findOne({ _id: decoded.id });
+        const user = await User_1.default.findOne({ _id: decoded.id });
         // await redis.get(decoded.id);
         if (!user) {
             return next(new ErrorHandler_1.default("Please login to access this resource", 400));
