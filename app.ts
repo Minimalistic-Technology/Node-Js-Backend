@@ -49,6 +49,10 @@ import collectionRoutes from './Collection/routes/collectionRoutes';
 import contactRoutes from './Contact/routes/contactRoutes';
 import courseRoutes from './Course/routes/courseRoutes';
 import messageRoutes from './Message/routes/messageRoutes';
+import imageRoutes from './Fitness/routes/imageRoutes';
+import templateRoutes from './Template/routes/templateRoutes';
+import taskRoutes from './CRM/routes/taskRoutes';
+
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -77,6 +81,9 @@ app.use('/api/collections', collectionRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/images', imageRoutes);
+app.use('/api/templates', templateRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
