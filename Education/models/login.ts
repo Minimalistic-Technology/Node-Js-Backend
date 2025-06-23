@@ -25,7 +25,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-const User = mongoose.model<IUser>('User', userSchema);
+const User = mongoose.models.User as mongoose.Model<IUser> || mongoose.model<IUser>('User', userSchema);
 
 // Seed dummy users
 export const seedUsers = async (): Promise<void> => {
