@@ -1,5 +1,6 @@
 require("dotenv").config();
 import express, { NextFunction, Request, Response } from "express";
+
 export const app = express();
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -24,8 +25,8 @@ import AWS from 'aws-sdk'
 import crypto from 'crypto'
 import Razorpay from 'razorpay'
 import mongoose from 'mongoose'
-import productRoutes from './Product/routes/productRoutes';
-import productPriceRoutes from './Product/routes/productPriceRoutes';
+import productRoutes from './E-Commerce/routes/productRoutes';
+import productPriceRoutes from './E-Commerce/routes/productPriceRoutes';
 import projectRoutes from './Project/routes/projectRoutes';
 import profileRoutes from './Profile/routes/profileRoutes';
 import contactFormRoutes from './Contact/routes/contactFormRoutes';
@@ -35,8 +36,8 @@ import otpRouter from './OTP/routes/otpRoutes';
 import propertyRoutes from './Property/routes/propertyRoutes';
 import bmiRoutes from './Fitness/routes/bmiRoutes';
 import login from './Education/routes/loginRoutes';
-import cartRoutes from './Product/routes/cartRoutes';
-import feedbackRoutes from './Product/routes/feedbackRoutes';
+import cartRoutes from './E-Commerce/routes/cartRoutes';
+import feedbackRoutes from './E-Commerce/routes/feedbackRoutes';
 import examSettingRoutes from './Education/routes/examSettingRoutes';
 import schedule from './Education/routes/scheduleRoutes';
 import document from './Education/routes/documentRoutes';
@@ -52,7 +53,9 @@ import messageRoutes from './Message/routes/messageRoutes';
 import imageRoutes from './Fitness/routes/imageRoutes';
 import templateRoutes from './Template/routes/templateRoutes';
 import taskRoutes from './CRM/routes/taskRoutes';
-
+import campaignRoutes from './CRM/routes/campaignRoutes'; 
+import favoriteRoutes from './E-Commerce/routes/favoriteRoutes';
+import checkoutRoutes from './E-Commerce/routes/checkoutRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -84,6 +87,9 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/campaigns', campaignRoutes);
+app.use('/api', favoriteRoutes);
+app.use('/api', checkoutRoutes);
 
 // body parser
 app.use(express.json({ limit: "50mb" }));
@@ -213,7 +219,7 @@ app.post("/order", async (req: Request, res: Response, next: NextFunction) => {
   }
 })
 
-app.post("/verify", async (req: Request, res: Response, next: NextFunction) => {
+app.post("/verify", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { razorPay_order_id, razorPay_payment_id, razorPay_signature } = req.body;
 
@@ -222,9 +228,9 @@ app.post("/verify", async (req: Request, res: Response, next: NextFunction) => {
       const expectedSign = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET ).update(sign.toString()).digest("hex");
 
       if( razorPay_signature === expectedSign ){
-        return res.status(200).json({ success :true, message:"Payment Verify Successfully!" });
+         res.status(200).json({ success :true, message:"Payment Verify Successfully!" });
     }else{
-      return res.status(400).json({ success :false, message:"Invalid Signature !" })
+       res.status(400).json({ success :false, message:"Invalid Signature !" })
     }
   }
   catch(error){
