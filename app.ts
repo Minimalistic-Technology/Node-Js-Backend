@@ -59,6 +59,7 @@ import favoriteRoutes from './E-Commerce/routes/favoriteRoutes';
 import checkoutRoutes from './E-Commerce/routes/checkoutRoutes';
 import paymentRoutes from './E-Commerce/routes/paymentRoutes';
 import navigationCategoryRoutes from './Clothing/routes/navigationcategoryRoutes';
+import AgarbattiproductRoutes from './Agarbatti Products/routes/AgarbattiproductRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -95,6 +96,7 @@ app.use('/api', favoriteRoutes);
 app.use('/api', checkoutRoutes);
 app.use('/api', paymentRoutes);
 app.use('/api/navigation', navigationCategoryRoutes);
+app.use('/api/agarbatti', AgarbattiproductRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
