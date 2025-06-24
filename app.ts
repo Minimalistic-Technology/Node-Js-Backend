@@ -2,6 +2,7 @@ require("dotenv").config();
 import express, { NextFunction, Request, Response } from "express";
 
 export const app = express();
+app.use(express.json({ limit: "50mb" }));
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import errorMiddleware from "./middleware/error";
@@ -92,7 +93,6 @@ app.use('/api', favoriteRoutes);
 app.use('/api', checkoutRoutes);
 
 // body parser
-app.use(express.json({ limit: "50mb" }));
 const bodyParser = require('body-parser');
 
 // cookie parser
