@@ -57,6 +57,8 @@ import taskRoutes from './CRM/routes/taskRoutes';
 import campaignRoutes from './CRM/routes/campaignRoutes'; 
 import favoriteRoutes from './E-Commerce/routes/favoriteRoutes';
 import checkoutRoutes from './E-Commerce/routes/checkoutRoutes';
+import paymentRoutes from './E-Commerce/routes/paymentRoutes';
+import navigationCategoryRoutes from './Clothing/routes/navigationcategoryRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -91,6 +93,8 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api', favoriteRoutes);
 app.use('/api', checkoutRoutes);
+app.use('/api', paymentRoutes);
+app.use('/api/navigation', navigationCategoryRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
