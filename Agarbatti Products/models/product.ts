@@ -20,7 +20,7 @@ const productSchema = new Schema<IProduct>(
     category: { type: String, required: true, trim: true },
     related: [{ type: String, ref: 'Product' }],
   },
-  { timestamps: true }
+  { timestamps: true, }
 );
 
 export const ProductModel = mongoose.models.Product || mongoose.model<IProduct>('Product', productSchema);

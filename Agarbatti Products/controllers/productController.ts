@@ -1,37 +1,31 @@
 import { Request, Response } from "express";
 import { ProductModel } from "../models/product";
 
-export const createProduct = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+// CREATE product
+export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = new ProductModel(req.body);
     await product.save();
     res.status(201).json(product);
   } catch (err) {
-    console.error(err);
+    console.error("Create Error:", err);
     res.status(400).json({ error: "Failed to create product" });
   }
 };
 
-export const getAllProducts = async (
-  _req: Request,
-  res: Response
-): Promise<void> => {
+// READ: Get all products
+export const getAllProducts = async (_req: Request, res: Response): Promise<void> => {
   try {
     const products = await ProductModel.find();
     res.json(products);
   } catch (err) {
-    console.error(err);
+    console.error("Fetch All Error:", err);
     res.status(500).json({ error: "Failed to fetch products" });
   }
 };
 
-export const getProductById = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+// READ: Get product by _id
+export const getProductById = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await ProductModel.findById(req.params.id);
     if (!product) {
@@ -40,65 +34,63 @@ export const getProductById = async (
     }
     res.json(product);
   } catch (err) {
-    console.error(err);
+    console.error("Fetch By ID Error:", err);
     res.status(500).json({ error: "Failed to get product" });
   }
 };
 
-export const getRelatedProducts = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+// READ: Get related products by product's `related` field
+export const getRelatedProducts = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await ProductModel.findById(req.params.id);
     if (!product) {
       res.status(404).json({ error: "Product not found" });
       return;
     }
-    const related = await ProductModel.find({
-      productId: { $in: product.related },
+
+    const relatedProducts = await ProductModel.find({
+      productId: { $in: product.related }
     });
-    res.json(related);
+
+    res.json(relatedProducts);
   } catch (err) {
-    console.error(err);
+    console.error("Get Related Error:", err);
     res.status(500).json({ error: "Failed to get related products" });
   }
 };
 
-export const updateProduct = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+// UPDATE product by _id
+export const updateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const updated = await ProductModel.findByIdAndUpdate(
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
-    if (!updated) {
+
+    if (!updatedProduct) {
       res.status(404).json({ error: "Product not found" });
       return;
     }
-    res.json(updated);
+
+    res.json(updatedProduct);
   } catch (err) {
-    console.error(err);
+    console.error("Update Error:", err);
     res.status(400).json({ error: "Failed to update product" });
   }
 };
 
-export const deleteProduct = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+// DELETE product by _id
+export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const deleted = await ProductModel.findByIdAndDelete(req.params.id);
-    if (!deleted) {
+    const deletedProduct = await ProductModel.findByIdAndDelete(req.params.id);
+    if (!deletedProduct) {
       res.status(404).json({ error: "Product not found" });
       return;
     }
     res.json({ message: "Product deleted" });
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: "Failed to delete product" });
-  }
+    console.error("Delete Error:", err);
+    res.status(400).json({ error: "Failed to delete product" });
+  }
 };

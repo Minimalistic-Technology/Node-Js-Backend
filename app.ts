@@ -64,6 +64,18 @@ import crmcontactRoutes from './CRM/routes/crmcontactRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
+// cors => cross origin resource sharing
+app.use(
+  cors({
+    
+    // make sure you don't have / in last 
+    // Do "http://localhost:3000"
+    // Don't "http://localhost:3000/"
+
+    origin: ["http://localhost:3000"],
+    credentials: true,
+  })
+);
 
 app.use('/api/products', productRoutes);
 app.use('/api/prices', productPriceRoutes);
@@ -107,19 +119,6 @@ const bodyParser = require('body-parser');
 app.use(cookieParser());
 
 app.use('/api/otp', otpRouter);
-
-// cors => cross origin resource sharing
-app.use(
-  cors({
-    
-    // make sure you don't have / in last 
-    // Do "http://localhost:3000"
-    // Don't "http://localhost:3000/"
-
-    origin: ["http://localhost:3000"],
-    credentials: true,
-  })
-);
 
 // api requests limit
 // const limiter = rateLimit({
