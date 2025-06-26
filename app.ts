@@ -3,7 +3,6 @@ import express, { NextFunction, Request, Response } from "express";
 
 export const app = express();
 app.use(express.json({ limit: "50mb" }));
-app.use(express.json({ limit: "50mb" }));
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import errorMiddleware from "./middleware/error";
@@ -228,7 +227,7 @@ app.post("/order", async (req: Request, res: Response, next: NextFunction) => {
   }
 })
 
-app.post("/verify", async (req: Request, res: Response, next: NextFunction) => {
+app.post("/verify", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try{
     const { razorPay_order_id, razorPay_payment_id, razorPay_signature } = req.body
 
@@ -237,7 +236,7 @@ app.post("/verify", async (req: Request, res: Response, next: NextFunction) => {
     const expectedSign = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET ).update(sign.toString()).digest("hex")
     
     if( razorPay_signature === expectedSign ){
-      return res.status(200).json({ success :true, message:"Payment Verify Successfully!" })
+      res.status(200).json({ success :true, message:"Payment Verify Successfully!" })
     }else{
        res.status(400).json({ success :false, message:"Invalid Signature !" })
     }
