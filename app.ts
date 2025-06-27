@@ -61,6 +61,11 @@ import paymentRoutes from './E-Commerce/routes/paymentRoutes';
 import navigationCategoryRoutes from './Clothing/routes/navigationcategoryRoutes';
 import AgarbattiproductRoutes from './Agarbatti Products/routes/AgarbattiproductRoutes';
 import crmcontactRoutes from './CRM/routes/crmcontactRoutes';
+import categoryRoutes from './Agarbatti Products/routes/categoryRoutes';
+import studyMaterialRoutes from './Education/routes/studyMaterialRoutes';
+import studentProfileRoutes from './Education/routes/studentProfileRoutes';
+import adminProfileRoutes from './Education/routes/adminProfileRoutes';
+import helpSupportRoutes from './Education/routes/helpSupportRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -111,6 +116,11 @@ app.use('/api', paymentRoutes);
 app.use('/api/navigation', navigationCategoryRoutes);
 app.use('/api/agarbatti', AgarbattiproductRoutes);
 app.use('/api', crmcontactRoutes);
+app.use('/api', categoryRoutes);
+app.use('/api', studyMaterialRoutes);
+app.use('/api', studentProfileRoutes);
+app.use('/api', adminProfileRoutes);
+app.use('/api', helpSupportRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
