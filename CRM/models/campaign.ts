@@ -6,6 +6,7 @@ export interface ICampaign extends Document {
   status: string;
   budget: string;
   expectedRevenue: string;
+  actualRevenue: string; 
   startDate: Date;
   endDate: Date;
 }
@@ -17,6 +18,7 @@ const CampaignSchema = new Schema<ICampaign>(
     status: { type: String, required: true },
     budget: { type: String, required: true },
     expectedRevenue: { type: String, required: true },
+    actualRevenue: { type: String, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
   },
