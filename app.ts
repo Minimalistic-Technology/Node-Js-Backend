@@ -66,6 +66,12 @@ import studyMaterialRoutes from './Education/routes/studyMaterialRoutes';
 import studentProfileRoutes from './Education/routes/studentProfileRoutes';
 import adminProfileRoutes from './Education/routes/adminProfileRoutes';
 import helpSupportRoutes from './Education/routes/helpSupportRoutes';
+import dealRoutes from './CRM/routes/dealRoutes';
+import accountRoutes from './CRM/routes/accountRoutes';
+import meetingRoutes from './CRM/routes/meetingRoutes';
+import leadRoutes from './CRM/routes/leadRoutes';
+import dashboardRoutes from "./CRM/routes/dashboardRoutes";
+import homepageRoutes from './BookStore/routes/homepageRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -121,6 +127,12 @@ app.use('/api', studyMaterialRoutes);
 app.use('/api', studentProfileRoutes);
 app.use('/api', adminProfileRoutes);
 app.use('/api', helpSupportRoutes);
+app.use('/api', dealRoutes);
+app.use('/api', accountRoutes);
+app.use('/api', meetingRoutes);
+app.use('/api', leadRoutes);
+app.use('/api', dashboardRoutes);
+app.use('/api', homepageRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
