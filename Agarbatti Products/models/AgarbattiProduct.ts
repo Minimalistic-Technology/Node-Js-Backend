@@ -23,4 +23,4 @@ const productSchema = new Schema<IProduct>(
   { timestamps: true, }
 );
 
-export const ProductModel = mongoose.models.Product || mongoose.model<IProduct>('Product', productSchema);
+export const ProductModel = mongoose.models.AgarbattiProduct || mongoose.model<IProduct>('AgarbattiProduct', productSchema);

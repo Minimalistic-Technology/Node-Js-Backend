@@ -72,6 +72,7 @@ import meetingRoutes from './CRM/routes/meetingRoutes';
 import leadRoutes from './CRM/routes/leadRoutes';
 import dashboardRoutes from "./CRM/routes/dashboardRoutes";
 import homepageRoutes from './BookStore/routes/homepageRoutes';
+import userRoutes from './Agarbatti Products/routes/userRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -133,6 +134,7 @@ app.use('/api', meetingRoutes);
 app.use('/api', leadRoutes);
 app.use('/api', dashboardRoutes);
 app.use('/api', homepageRoutes);
+app.use('/api', userRoutes);
 
 // body parser
 const bodyParser = require('body-parser');

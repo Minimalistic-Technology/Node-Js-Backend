@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ProductModel } from "../models/product";
+import { ProductModel } from "../models/AgarbattiProduct";
 
 // CREATE product
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
