@@ -74,6 +74,7 @@ import dashboardRoutes from "./CRM/routes/dashboardRoutes";
 import homepageRoutes from './BookStore/routes/homepageRoutes';
 import userRoutes from './Agarbatti Products/routes/userRoutes';
 import orderRoutes from './Agarbatti Products/routes/orderRoutes';
+import notificationRoutes from './CRM/routes/notificationRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -137,6 +138,7 @@ app.use('/api', dashboardRoutes);
 app.use('/api', homepageRoutes);
 app.use('/api', userRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api', notificationRoutes);
 
 // body parser
 const bodyParser = require('body-parser');

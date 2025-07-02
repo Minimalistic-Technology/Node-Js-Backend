@@ -1,11 +1,19 @@
 import { Request, Response } from "express";
 import { MeetingModel } from "../models/meeting";
+import { NotificationModel } from "../models/notification";
 
 // Create
 export const createMeeting = async (req: Request, res: Response): Promise<void> => {
   try {
     const meeting = new MeetingModel(req.body);
     await meeting.save();
+
+    await NotificationModel.create({
+      userId: req.body.owner || "system",
+      message: `New meeting "${meeting.name}" created.`,
+      type: "Meeting",
+    });
+
     res.status(201).json(meeting);
   } catch (err) {
     res.status(400).json({ error: "Failed to create meeting" });
@@ -36,10 +44,18 @@ export const getMeetingById = async (req: Request, res: Response): Promise<void>
 // Update
 export const updateMeeting = async (req: Request, res: Response): Promise<void> => {
   try {
-    const updated = await MeetingModel.findByIdAndUpdate(req.params.id, req.body, {
-      new: true
+    const updated = await MeetingModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) {
+      res.status(404).json({ error: "Meeting not found" });
+      return;
+    }
+
+    await NotificationModel.create({
+      userId: req.body.owner || "system",
+      message: `Meeting "${updated.name}" updated.`,
+      type: "Meeting",
     });
-    if (!updated)  res.status(404).json({ error: "Meeting not found" });
+
     res.json(updated);
   } catch (err) {
     res.status(400).json({ error: "Failed to update meeting" });
@@ -50,7 +66,17 @@ export const updateMeeting = async (req: Request, res: Response): Promise<void> 
 export const deleteMeeting = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await MeetingModel.findByIdAndDelete(req.params.id);
-    if (!deleted)  res.status(404).json({ error: "Meeting not found" });
+    if (!deleted) {
+      res.status(404).json({ error: "Meeting not found" });
+      return;
+    }
+
+    await NotificationModel.create({
+      userId: "system",
+      message: `Meeting "${deleted.name}" deleted.`,
+      type: "Meeting",
+    });
+
     res.json({ message: "Meeting deleted" });
   } catch (err) {
     res.status(400).json({ error: "Failed to delete meeting" });
