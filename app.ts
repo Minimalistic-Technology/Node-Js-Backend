@@ -138,7 +138,7 @@ app.use('/api', leadRoutes);
 app.use('/api', dashboardRoutes);
 app.use('/api', homepageRoutes);
 app.use('/api', userRoutes);
-app.use('/api/orders', orderRoutes);
+app.use('/api', orderRoutes);
 app.use('/api', notificationRoutes);
 app.use('/api', userProfileRoutes);
 

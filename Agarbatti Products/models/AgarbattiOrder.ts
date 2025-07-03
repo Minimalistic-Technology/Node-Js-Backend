@@ -24,7 +24,7 @@ export interface IOrder extends Document {
   user: User;
   paymentMethod: 'card' | 'upi';
   paymentDetails: PaymentDetailsCard | PaymentDetailsUPI | null;
-  items: any[]; 
+  items: any[];
   subtotal: number;
   status: string;
 }
@@ -45,4 +45,4 @@ const OrderSchema: Schema = new Schema({
   status: { type: String, default: 'Pending' },
 }, { timestamps: true });
 
-export default mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema);
+export const OrderModel = mongoose.models.AgarbattiOrder || mongoose.model<IOrder>('AgarbattiOrder', OrderSchema);
