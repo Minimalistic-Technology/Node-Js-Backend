@@ -77,6 +77,8 @@ import orderRoutes from './Agarbatti Products/routes/orderRoutes';
 import notificationRoutes from './CRM/routes/notificationRoutes';
 import userProfileRoutes from './CRM/routes/userProfileRoutes';
 import adminUserRoutes from './Education/routes/adminUserRoutes';
+import testimonialRoutes from './Testimonial/routes/testimonialRoutes';
+import teamRoutes from './Team/routes/teamRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -143,6 +145,8 @@ app.use('/api', orderRoutes);
 app.use('/api', notificationRoutes);
 app.use('/api', userProfileRoutes);
 app.use('/api', adminUserRoutes);
+app.use('/api', testimonialRoutes);
+app.use('/api', teamRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
