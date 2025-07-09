@@ -1,21 +1,33 @@
 import { Request, Response } from "express";
-import { TeamModel } from "../models/team";
+import Team from "../models/team";
 
-// Create
 export const createTeamMember = async (req: Request, res: Response): Promise<void> => {
   try {
-    const member = new TeamModel(req.body);
-    await member.save();
-    res.status(201).json(member);
-  } catch (err) {
-    res.status(400).json({ error: "Failed to create team member" });
+    const { name, position, imageUrl } = req.body;
+    console.log("Creating team member:", { name, position, imageUrl });
+    if (!imageUrl) res.status(400).json({ error: "Image URL required" });
+    
+    const newMember = new Team({
+      name,
+      position,
+      imageUrl,
+    });
+
+    await newMember.save();
+    res.status(201).json(newMember);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create team member" });
   }
 };
 
+
 // Get All
-export const getAllTeamMembers = async (_req: Request, res: Response): Promise<void> => {
+export const getAllTeamMembers = async (
+  _req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const members = await TeamModel.find();
+    const members = await Team.find();
     res.json(members);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch team members" });
@@ -23,10 +35,13 @@ export const getAllTeamMembers = async (_req: Request, res: Response): Promise<v
 };
 
 // Get By ID
-export const getTeamMemberById = async (req: Request, res: Response): Promise<void> => {
+export const getTeamMemberById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const member = await TeamModel.findById(req.params.id);
-    if (!member)  res.status(404).json({ error: "Team member not found" });
+    const member = await Team.findById(req.params.id);
+    if (!member) res.status(404).json({ error: "Team member not found" });
     res.json(member);
   } catch (err) {
     res.status(500).json({ error: "Error fetching team member" });
@@ -34,10 +49,15 @@ export const getTeamMemberById = async (req: Request, res: Response): Promise<vo
 };
 
 // Update
-export const updateTeamMember = async (req: Request, res: Response): Promise<void> => {
+export const updateTeamMember = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const updated = await TeamModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated)  res.status(404).json({ error: "Team member not found" });
+    const updated = await Team.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    if (!updated) res.status(404).json({ error: "Team member not found" });
     res.json(updated);
   } catch (err) {
     res.status(400).json({ error: "Failed to update team member" });
@@ -45,10 +65,13 @@ export const updateTeamMember = async (req: Request, res: Response): Promise<voi
 };
 
 // Delete
-export const deleteTeamMember = async (req: Request, res: Response): Promise<void> => {
+export const deleteTeamMember = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const deleted = await TeamModel.findByIdAndDelete(req.params.id);
-    if (!deleted)  res.status(404).json({ error: "Team member not found" });
+    const deleted = await Team.findByIdAndDelete(req.params.id);
+    if (!deleted) res.status(404).json({ error: "Team member not found" });
     res.json({ message: "Team member deleted" });
   } catch (err) {
     res.status(400).json({ error: "Failed to delete team member" });

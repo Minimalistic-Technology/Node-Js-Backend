@@ -1,18 +1,9 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose from "mongoose";
 
-export interface ITeamMember extends Document {
-  name: string;
-  position: string;
-  img: string;
-}
+const teamSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  position: { type: String, required: true },
+  imageUrl: { type: String, required: true },
+}, { timestamps: true });
 
-const TeamSchema = new Schema<ITeamMember>(
-  {
-    name: { type: String, required: true },
-    position: { type: String, required: true },
-    img: { type: String, required: true },
-  },
-  { timestamps: true }
-);
-
-export const TeamModel = mongoose.models.Team || mongoose.model<ITeamMember>("Team", TeamSchema);
+export default mongoose.models.Team || mongoose.model("Team", teamSchema);
