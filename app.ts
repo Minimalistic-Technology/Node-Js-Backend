@@ -79,6 +79,8 @@ import userProfileRoutes from './CRM/routes/userProfileRoutes';
 import adminUserRoutes from './Education/routes/adminUserRoutes';
 import testimonialRoutes from './Testimonial/routes/testimonialRoutes';
 import teamRoutes from './Team/routes/teamRoutes';
+import studentGradeRoutes from './Education/routes/studentGradeRoutes';
+import examRoutes from './Education/routes/examRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -147,6 +149,8 @@ app.use('/api', userProfileRoutes);
 app.use('/api', adminUserRoutes);
 app.use('/api', testimonialRoutes);
 app.use('/api', teamRoutes);
+app.use('/api', studentGradeRoutes);
+app.use('/api', examRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
