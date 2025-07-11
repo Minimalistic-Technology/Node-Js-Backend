@@ -81,6 +81,9 @@ import testimonialRoutes from './Testimonial/routes/testimonialRoutes';
 import teamRoutes from './Team/routes/teamRoutes';
 import studentGradeRoutes from './Education/routes/studentGradeRoutes';
 import examRoutes from './Education/routes/examRoutes';
+import contentRoutes from './BookStore/routes/contentRoutes';
+import categoryRoutess from './BookStore/routes/categoryRoutes';
+import bannerRoutes from './BookStore/routes/bannerRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -141,7 +144,6 @@ app.use('/api', accountRoutes);
 app.use('/api', meetingRoutes);
 app.use('/api', leadRoutes);
 app.use('/api', dashboardRoutes);
-app.use('/api', homepageRoutes);
 app.use('/api', userRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', notificationRoutes);
@@ -151,6 +153,10 @@ app.use('/api', testimonialRoutes);
 app.use('/api', teamRoutes);
 app.use('/api', studentGradeRoutes);
 app.use('/api', examRoutes);
+app.use('/api/bookstore', homepageRoutes);
+app.use('/api/bookstore/admincontent',contentRoutes);
+app.use('/api/bookstore/admincategory',categoryRoutess);
+app.use('/api/bookstore/bannerRoutes',bannerRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
