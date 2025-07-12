@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const { Router } = require('express');
+const stocksInNewsController_1 = require("../../controllers/stocks/stocksInNewsController");
+router.post('/stocks-in-news', stocksInNewsController_1.addStocksInNews);
+router.get('/stocks-in-news', stocksInNewsController_1.getAllStocksInNews);
+router.get('/stocks-in-news/:id', stocksInNewsController_1.getStockInNewsById);
+router.put('/stocks-in-news/:id', stocksInNewsController_1.updateStocksInNews);
+router.delete('/stocks-in-news/:id', stocksInNewsController_1.deleteStocksInNews);
+exports.default = router;
