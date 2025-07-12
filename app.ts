@@ -84,7 +84,8 @@ import examRoutes from './Education/routes/examRoutes';
 import contentRoutes from './BookStore/routes/contentRoutes';
 import categoryRoutess from './BookStore/routes/categoryRoutes';
 import bannerRoutes from './BookStore/routes/bannerRoutes';
-
+import logroutes from './BookStore/routes/orderroutes';
+import productroutes from './BookStore/routes/productroutes';
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
 // cors => cross origin resource sharing
@@ -157,6 +158,8 @@ app.use('/api/bookstore', homepageRoutes);
 app.use('/api/bookstore/admincontent',contentRoutes);
 app.use('/api/bookstore/admincategory',categoryRoutess);
 app.use('/api/bookstore/bannerRoutes',bannerRoutes);
+app.use('/api/bookstore/orderroutes',logroutes);
+app.use('/api/bookstore/productroutes',productroutes);
 
 // body parser
 const bodyParser = require('body-parser');
