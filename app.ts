@@ -86,6 +86,7 @@ import searchRoutes from './CRM/routes/searchRoutes';
 import bookOrderRoutes from './BookStore/routes/bookOrderRoutes';
 import sessionRoutes from './CheckSession/routes/sessionRoutes';
 import authAccessRoutes from './Authacess/routes/authAccessRoutes';
+import subscriberRoutes from './BookStore/routes/subscriberRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -161,6 +162,7 @@ app.use('/api', searchRoutes);
 app.use('/api', bookOrderRoutes);
 app.use('/api', sessionRoutes);
 app.use('/api', authAccessRoutes);
+app.use('/api/subscribers', subscriberRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
