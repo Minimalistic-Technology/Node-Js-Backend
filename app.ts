@@ -84,6 +84,7 @@ import examRoutes from './Education/routes/examRoutes';
 import siteSettingsRoutes from './BookStore/routes/siteSettingsRoutes';
 import searchRoutes from './CRM/routes/searchRoutes';
 import bookOrderRoutes from './BookStore/routes/bookOrderRoutes';
+import sessionRoutes from './CheckSession/routes/sessionRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -157,6 +158,7 @@ app.use('/api', examRoutes);
 app.use('/api', siteSettingsRoutes);
 app.use('/api', searchRoutes);
 app.use('/api', bookOrderRoutes);
+app.use('/api', sessionRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
