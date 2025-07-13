@@ -87,7 +87,7 @@ import bannerRoutes from './BookStore/routes/bannerRoutes';
 import logroutes from './BookStore/routes/orderroutes';
 import productroutes from './BookStore/routes/productroutes';
 import bulkusers from './BookStore/routes/bulkuserroutes'
-
+import newsub    from './BookStore/routes/newsub';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -164,6 +164,7 @@ app.use('/api/bookstore/admincategory',categoryRoutess);
 app.use('/api/bookstore/bannerRoutes',bannerRoutes);
 app.use('/api/bookstore/orderroutes',logroutes);
 app.use('/api/bookstore/productroutes',productroutes);
+app.use('/api/bookstore/newsub',newsub);
 
 // body parser
 const bodyParser = require('body-parser');
