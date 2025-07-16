@@ -10,6 +10,7 @@ export interface IProduct extends Document {
   quantity: number;
   discountPercent?: number;
   related: string[];
+  gram : number;
 }
 
 const productSchema = new Schema<IProduct>(
@@ -23,8 +24,9 @@ const productSchema = new Schema<IProduct>(
     quantity: { type: Number, required: true, min: 0 },
     discountPercent: { type: Number, min: 0, max: 100 },
     related: [{ type: String, ref: 'Product' }],
+    gram: { type: Number, required: true, min: 0 }
   },
   { timestamps: true }
 );
 
-export const ProductModel = mongoose.models.AgarbattiProduct || mongoose.model<IProduct>('AgarbattiProduct', productSchema);
+export const ProductModel = mongoose.models.AgarbattiProduct || mongoose.model<IProduct>('AgarbattiProduct', productSchema);
