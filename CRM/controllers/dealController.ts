@@ -6,12 +6,13 @@ import { NotificationModel } from "../models/notification";
 export const createDeal = async (req: Request, res: Response): Promise<void> => {
   try {
     const deal = new DealModel(req.body);
+    console.log(deal);
     await deal.save();
-
+    
     await NotificationModel.create({
       userId: req.body.owner || "system",
       message: `Deal "${deal.name}" created.`,
-      type: "Deal",
+      type: "deal",
     });
 
     res.status(201).json(deal);
@@ -24,7 +25,7 @@ export const createDeal = async (req: Request, res: Response): Promise<void> => 
 export const getAllDeals = async (_req: Request, res: Response): Promise<void> => {
   try {
     const deals = await DealModel.find();
-    res.json(deals);
+    res.status(200).json(deals);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch deals" });
   }
@@ -34,8 +35,9 @@ export const getAllDeals = async (_req: Request, res: Response): Promise<void> =
 export const getDealById = async (req: Request, res: Response): Promise<void> => {
   try {
     const deal = await DealModel.findById(req.params.id);
+    console.log(deal);
     if (!deal)  res.status(404).json({ error: "Deal not found" });
-    res.json(deal);
+    res.status(200).json(deal);
   } catch (err) {
     res.status(500).json({ error: "Failed to get deal" });
   }
@@ -53,7 +55,7 @@ export const updateDeal = async (req: Request, res: Response): Promise<void> => 
     await NotificationModel.create({
       userId: req.body.owner || "system",
       message: `Deal "${updated.name}" updated.`,
-      type: "Deal",
+      type: "deal",
     });
 
     res.json(updated);
@@ -74,11 +76,11 @@ export const deleteDeal = async (req: Request, res: Response): Promise<void> => 
     await NotificationModel.create({
       userId: "system",
       message: `Deal "${deleted.name}" deleted.`,
-      type: "Deal",
+      type: "deal",
     });
 
-    res.json({ message: "Deal deleted" });
+    res.status(200).json({ message: "Deal deleted" });
   } catch (err) {
-    res.status(400).json({ error: "Failed to delete deal" });
-  }
+    res.status(400).json({ error: "Failed to delete deal" });
+  }
 };

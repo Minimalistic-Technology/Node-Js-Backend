@@ -40,29 +40,28 @@ export const updateAccessToken = async (req: Request, res: Response): Promise<vo
 };
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
-  const { name, email, password, phone, institute } = req.body;
+  const { username, email, password, phone, institute } = req.body;
 
-  if (!name || !email || !password) {
-    res.status(400).json({ error: "Name, email, and password are required" });
+  if (!username || !email || !password) {
+    res.status(400).json({ error: "Username, email, and password are required" });
     return;
   }
 
   try {
-    const userExists = await User.findOne({ $or: [{ username: name }, { email }] });
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
     if (userExists) {
-      res.status(400).json({ error: 'Name or email already registered' });
+      res.status(400).json({ error: 'Username or email already registered' });
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const newUser = new User({
-      username: name,
+      username,
       email,
-      password: hashedPassword,
+      password, // Let schema hash it
       phone,
       institute
     });
+
     await newUser.save();
 
     if (email && typeof email === 'string' && email.trim() !== '') {
@@ -71,11 +70,10 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
           email,
           subject: 'Welcome to Our App!',
           template: 'welcome.ejs',
-          data: { username: name }
+          data: { username }
         });
       } catch (mailError) {
         console.error("Error sending welcome email:", mailError);
-        // Email failure should not prevent signup
       }
     }
 
@@ -146,7 +144,8 @@ export const logout = (req: Request, res: Response): void => {
   res.clearCookie('refreshToken');
   res.json({ message: 'Logged out successfully' });
 };
-export function getUser(arg0: string, getUser: any) {
-    throw new Error('Function not implemented.');
-}
 
+// Optional placeholder
+export function getUser(arg0: string, getUser: any) {
+  throw new Error('Function not implemented.');
+}

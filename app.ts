@@ -88,6 +88,13 @@ import logroutes from './BookStore/routes/orderroutes';
 import productroutes from './BookStore/routes/productroutes';
 import bulkusers from './BookStore/routes/bulkuserroutes'
 import newsub    from './BookStore/routes/newsub';
+import siteSettingsRoutes from './BookStore/routes/siteSettingsRoutes';
+import searchRoutes from './CRM/routes/searchRoutes';
+import bookOrderRoutes from './BookStore/routes/bookOrderRoutes';
+import sessionRoutes from './CheckSession/routes/sessionRoutes';
+import authAccessRoutes from './Authacess/routes/authAccessRoutes';
+import subscriberRoutes from './BookStore/routes/subscriberRoutes';
+import eventTrackRoutes from './CheckSession/routes/eventTrackRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -165,6 +172,13 @@ app.use('/api/bookstore/bannerRoutes',bannerRoutes);
 app.use('/api/bookstore/orderroutes',logroutes);
 app.use('/api/bookstore/productroutes',productroutes);
 app.use('/api/bookstore/newsub',newsub);
+app.use('/api', siteSettingsRoutes);
+app.use('/api', searchRoutes);
+app.use('/api', bookOrderRoutes);
+app.use('/api', sessionRoutes);
+app.use('/api', authAccessRoutes);
+app.use('/api/subscribers', subscriberRoutes);
+app.use('/api', eventTrackRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
