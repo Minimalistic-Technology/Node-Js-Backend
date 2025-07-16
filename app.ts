@@ -95,6 +95,7 @@ import sessionRoutes from './CheckSession/routes/sessionRoutes';
 import authAccessRoutes from './Authacess/routes/authAccessRoutes';
 import subscriberRoutes from './BookStore/routes/subscriberRoutes';
 import eventTrackRoutes from './CheckSession/routes/eventTrackRoutes';
+import upcomingProductRoutes from './Agarbatti Products/routes/upcomingProductRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -179,6 +180,7 @@ app.use('/api', sessionRoutes);
 app.use('/api', authAccessRoutes);
 app.use('/api/subscribers', subscriberRoutes);
 app.use('/api', eventTrackRoutes);
+app.use('/api', upcomingProductRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
