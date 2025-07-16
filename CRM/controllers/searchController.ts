@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ContactModel } from "../models/registercontact";
+import { ContactModel } from "../models/Registercontact";
 import { AccountModel } from "../models/account";
 import { CampaignModel } from "../models/campaign";
 import { LeadModel } from "../models/lead";
