@@ -8,6 +8,7 @@ export const createCampaign = async (req: Request, res: Response): Promise<void>
     await NotificationModel.create({
       userId: req.body.createdBy,
       message: `New campaign created: ${campaign.name}`,
+      type: 'campaign',
     });
     res.status(201).json(campaign);
   } catch (error) {
@@ -42,6 +43,7 @@ export const updateCampaign = async (req: Request, res: Response): Promise<void>
     await NotificationModel.create({
       userId: req.body.updatedBy,
       message: `Campaign updated: ${updated.name}`,
+      type: 'campaign',
     });
 
     res.json(updated);
@@ -54,14 +56,15 @@ export const deleteCampaign = async (req: Request, res: Response): Promise<void>
   try {
     const deleted = await CampaignModel.findByIdAndDelete(req.params.id);
     if (!deleted)  res.status(404).json({ error: 'Campaign not found' });
-
+   console.log(deleted);
     await NotificationModel.create({
       userId: req.body.deletedBy,
       message: `Campaign deleted: ${deleted.name}`,
+      type: 'campaign',
     });
 
     res.json({ message: 'Campaign deleted successfully' });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete campaign' });
-  }
+    res.status(500).json({ error: 'Failed to delete campaign' });
+  }
 };
