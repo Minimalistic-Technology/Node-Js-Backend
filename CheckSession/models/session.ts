@@ -6,4 +6,4 @@ const sessionSchema = new mongoose.Schema({
   checkOut: { type: Date, default: null }
 }, { timestamps: true });
 
-export const SessionModel = mongoose.model('Session', sessionSchema);
+export const SessionModel = mongoose.model('Session', sessionSchema);
