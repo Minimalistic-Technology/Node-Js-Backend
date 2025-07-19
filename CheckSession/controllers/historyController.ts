@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
 import { HistoryModel } from '../models/history';
 
+interface AuthRequest extends Request {
+  user?: any;
+}
+
 // CREATE
-export const createHistory = async (req: Request, res: Response): Promise<void> => {
+export const createHistory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const history = new HistoryModel(req.body);
     await history.save();
@@ -12,8 +16,8 @@ export const createHistory = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// READ ALL
-export const getAllHistories = async (_req: Request, res: Response): Promise<void> => {
+// READ ALL (Admin only)
+export const getAllHistories = async (_req: AuthRequest, res: Response): Promise<void> => {
   try {
     const histories = await HistoryModel.find().sort({ createdAt: -1 });
     res.json(histories);
@@ -22,11 +26,16 @@ export const getAllHistories = async (_req: Request, res: Response): Promise<voi
   }
 };
 
-// READ ONE
-export const getHistoryByUserId = async (req: Request, res: Response): Promise<void> => {
+// READ ONE (User sees own)
+export const getHistoryByUserId = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    if (req.user.role !== 'Admin' && req.user.id !== req.params.userId) {
+       res.status(403).json({ message: 'Access denied' });
+    }
+
     const history = await HistoryModel.findOne({ userId: req.params.userId });
     if (!history)  res.status(404).json({ message: 'History not found' });
+
     res.json(history);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch history' });
@@ -34,9 +43,18 @@ export const getHistoryByUserId = async (req: Request, res: Response): Promise<v
 };
 
 // UPDATE
-export const updateHistory = async (req: Request, res: Response): Promise<void> => {
+export const updateHistory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const history = await HistoryModel.findOneAndUpdate({ userId: req.params.userId }, req.body, { new: true });
+    if (req.user.role !== 'Admin' && req.user.id !== req.params.userId) {
+       res.status(403).json({ message: 'Access denied' });
+    }
+
+    const history = await HistoryModel.findOneAndUpdate(
+      { userId: req.params.userId },
+      req.body,
+      { new: true }
+    );
+
     if (!history)  res.status(404).json({ message: 'History not found' });
     res.json(history);
   } catch (err) {
@@ -44,8 +62,8 @@ export const updateHistory = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// DELETE
-export const deleteHistory = async (req: Request, res: Response): Promise<void> => {
+// DELETE (Admin only)
+export const deleteHistory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     await HistoryModel.findOneAndDelete({ userId: req.params.userId });
     res.status(204).send();

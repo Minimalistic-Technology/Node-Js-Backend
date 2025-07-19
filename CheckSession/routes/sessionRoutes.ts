@@ -7,14 +7,19 @@ import {
   deleteSession,
   updateCheckIn
 } from '../controllers/sessionController';
+import { verifyToken, isAdmin } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-router.post('/session/checkin', checkIn);
-router.put('/session/checkout/:id', checkOut);
-router.put('/session/checkin/:id', updateCheckIn);
-router.get('/session', getAllSessions);
-router.get('/session/:id', getSessionById);
-router.delete('/session/:id', deleteSession);
+router.post('/session/checkin', verifyToken, checkIn);
+router.put('/session/checkout/:id', verifyToken, checkOut);
+router.put('/session/checkin/:id', verifyToken, updateCheckIn);
+
+// Admin-only access
+router.get('/session', verifyToken, isAdmin, getAllSessions);
+router.delete('/session/:id', verifyToken, isAdmin, deleteSession);
+
+// Both Admin/User can view session by ID
+router.get('/session/:id', verifyToken, getSessionById);
 
 export default router;

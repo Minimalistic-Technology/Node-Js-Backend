@@ -20,6 +20,19 @@ export const getContacts = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
+export const getContactById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const contact = await ContactModel.findById(req.params.id);
+    if (!contact) {
+      res.status(404).json({ error: 'Contact not found' });
+      return;
+    }
+    res.json(contact);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching contact' });
+  }
+}; 
+
 export const updateContact = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await ContactModel.findByIdAndUpdate(req.params.id, req.body, { new: true });

@@ -1,13 +1,30 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-const historySchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  history: [
-    {
-      checkIn: { type: Date, required: true },
-      checkOut: { type: Date, default: null }
-    }
-  ]
-}, { timestamps: true });
+export interface IHistoryEntry {
+  checkIn: Date;
+  checkOut: Date | null;
+}
 
-export const HistoryModel = mongoose.model('UserHistory', historySchema);
+export interface IHistory extends Document {
+  userId: mongoose.Types.ObjectId;
+  history: IHistoryEntry[];
+}
+
+const historyEntrySchema = new Schema<IHistoryEntry>({
+  checkIn: { type: Date, required: true },
+  checkOut: { type: Date, default: null }
+});
+
+const historySchema = new Schema<IHistory>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'AuthUser',
+      required: true
+    },
+    history: [historyEntrySchema]
+  },
+  { timestamps: true }
+);
+
+export const HistoryModel = mongoose.model<IHistory>('UserHistory', historySchema);
