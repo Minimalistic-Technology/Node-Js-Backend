@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-interface IBookRequest extends Document {
+export interface IBookRequest extends Document {
   name: string;
   email: string;
   mobile: string;
@@ -11,7 +11,7 @@ interface IBookRequest extends Document {
   message: string;
 }
 
-const bookRequestSchema: Schema = new Schema({
+const BookRequestSchema: Schema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
   mobile: { type: String, required: true },
@@ -19,7 +19,7 @@ const bookRequestSchema: Schema = new Schema({
   publisher: { type: String, required: true },
   author: { type: String, required: true },
   classLevel: { type: String, required: true },
-  message: { type: String, required: true }
+  message: { type: String, required: true },
 }, { timestamps: true });
 
-export default mongoose.model<IBookRequest>('BookRequest', bookRequestSchema);
+export const BookRequestModel = mongoose.models.BookRequest || mongoose.model<IBookRequest>('BookRequest', BookRequestSchema);

@@ -11,7 +11,7 @@ export const createMeeting = async (req: Request, res: Response): Promise<void> 
     await NotificationModel.create({
       userId: req.body.owner || "system",
       message: `New meeting "${meeting.name}" created.`,
-      type: "Meeting",
+      type: "meeting",
     });
 
     res.status(201).json(meeting);
@@ -53,7 +53,7 @@ export const updateMeeting = async (req: Request, res: Response): Promise<void> 
     await NotificationModel.create({
       userId: req.body.owner || "system",
       message: `Meeting "${updated.name}" updated.`,
-      type: "Meeting",
+      type: "meeting",
     });
 
     res.json(updated);
@@ -74,7 +74,7 @@ export const deleteMeeting = async (req: Request, res: Response): Promise<void> 
     await NotificationModel.create({
       userId: "system",
       message: `Meeting "${deleted.name}" deleted.`,
-      type: "Meeting",
+      type: "meeting",
     });
 
     res.json({ message: "Meeting deleted" });

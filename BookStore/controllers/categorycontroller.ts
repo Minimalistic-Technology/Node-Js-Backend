@@ -1,23 +1,23 @@
 import { Request, Response } from 'express';
-import { Category } from '../../BookStore/models/category';
+import { Category } from '../models/category';
 
 export class CategoryController {
-  // Get all categories/tags
-  static async getAllCategories(req: Request, res: Response): Promise<void> {
+  // Get all categories
+  static async getAllCategories(req: Request, res: Response) {
     try {
       const categories = await Category.find();
       res.json(categories);
     } catch (error) {
-      res.status(500).json({ message: (error as Error).message });
+      res.status(500).json({ message: 'Failed to fetch categories', error });
     }
   }
 
-  // Get single category/tag by ID
+  // Get single category by ID
   static async getCategoryById(req: Request, res: Response): Promise<void> {
     try {
       const category = await Category.findById(req.params.id);
       if (!category) {
-        res.status(404).json({ message: 'Category/Tag not found' });
+        res.status(404).json({ message: 'Category not found' });
         return;
       }
       res.json(category);
@@ -26,14 +26,13 @@ export class CategoryController {
     }
   }
 
-  // Create new category/tag
+  // Create new category
   static async createCategory(req: Request, res: Response): Promise<void> {
     try {
       const categoryData = {
         name: req.body.name,
-        type: req.body.type, // Use 'type' instead of 'category'
         seoTitle: req.body.seoTitle,
-        seoDescription: req.body.seoDescription
+        seoDescription: req.body.seoDescription,
       };
 
       const category = new Category(categoryData);
@@ -44,17 +43,16 @@ export class CategoryController {
     }
   }
 
-  // Update category/tag
+  // Update category
   static async updateCategory(req: Request, res: Response): Promise<void> {
     try {
       const category = await Category.findById(req.params.id);
       if (!category) {
-        res.status(404).json({ message: 'Category/Tag not found' });
+        res.status(404).json({ message: 'Category not found' });
         return;
       }
 
       category.name = req.body.name || category.name;
-      category.type = req.body.type || category.type; // Use 'type' instead of 'category'
       category.seoTitle = req.body.seoTitle || category.seoTitle;
       category.seoDescription = req.body.seoDescription || category.seoDescription;
 
@@ -65,17 +63,17 @@ export class CategoryController {
     }
   }
 
-  // Delete category/tag
+  // Delete category
   static async deleteCategory(req: Request, res: Response): Promise<void> {
     try {
       const category = await Category.findById(req.params.id);
       if (!category) {
-        res.status(404).json({ message: 'Category/Tag not found' });
+        res.status(404).json({ message: 'Category not found' });
         return;
       }
       
       await category.deleteOne();
-      res.json({ message: 'Category/Tag deleted' });
+      res.json({ message: 'Category deleted' });
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });
     }

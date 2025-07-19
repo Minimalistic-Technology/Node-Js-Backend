@@ -1,20 +1,60 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Model } from 'mongoose';
 
-export interface IReview extends Document {
+interface IBookstoreReview {
+  bookId: mongoose.Types.ObjectId;
+  categoryName: string;
   name: string;
-  email: string;
+  email?: string;
   rating: number;
-  review: string;
+  comment: string;
+  status: 'pending' | 'approved' | 'disapproved';
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const reviewSchema: Schema = new Schema(
+const bookstoreReviewSchema = new Schema<IBookstoreReview>(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    rating: { type: Number, required: true, min: 1, max: 5 },
-    review: { type: String, required: true },
+    bookId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Book',
+      required: true,
+    },
+    categoryName: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      trim: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    comment: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'disapproved'],
+      default: 'pending',
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-export default mongoose.model<IReview>('BooksReview', reviewSchema);
+// Prevent model overwrite by checking if the model exists
+const BookstoreReviewModel: Model<IBookstoreReview> = mongoose.models.BookstoreReview || mongoose.model<IBookstoreReview>('BookstoreReview', bookstoreReviewSchema);
+
+export { BookstoreReviewModel };

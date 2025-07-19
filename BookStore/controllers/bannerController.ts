@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Banner } from '../../BookStore/models/banner';
+import { Banner } from '../models/banner';
 
 export class BannerController {
     // Get all banners

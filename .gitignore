@@ -1,3 +1,5 @@
 node_modules
 .env
 /build
+# WhatsApp Web.js auth/session files
+.wwebjs_auth/
