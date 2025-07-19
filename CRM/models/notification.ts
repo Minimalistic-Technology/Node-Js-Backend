@@ -24,13 +24,14 @@ const NotificationSchema = new Schema<INotification>(
   { timestamps: true }
 );
 
-// Automatically delete notifications 90 days after being marked read
+// Auto-expire notifications 90 days after being marked as read
 NotificationSchema.index(
   { readAt: 1 },
   {
-    expireAfterSeconds: 7776000, // 90 days
+    expireAfterSeconds: 60 * 60 * 24 * 90, // 90 days
     partialFilterExpression: { read: true },
   }
 );
 
-export const NotificationModel = mongoose.models.Notification || mongoose.model<INotification>("Notification", NotificationSchema);
+export const NotificationModel =
+  mongoose.models.Notification || mongoose.model<INotification>("Notification", NotificationSchema);

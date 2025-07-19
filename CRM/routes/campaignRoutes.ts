@@ -9,10 +9,10 @@ import {
 
 const router = express.Router();
 
-router.post('/Campaign', createCampaign);
-router.get('/Campaign', getCampaigns);
-router.get('/Campaign/:id', getCampaignById);
-router.put('/Campaign/:id', updateCampaign);
-router.delete('/Campaign/:id', deleteCampaign);
+router.post('/', createCampaign);
+router.get('/', getCampaigns);
+router.get('/:id', getCampaignById);
+router.put('/:id', updateCampaign);
+router.delete('/:id', deleteCampaign);
 
 export default router;

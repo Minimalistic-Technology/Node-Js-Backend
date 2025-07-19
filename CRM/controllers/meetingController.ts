@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { MeetingModel } from "../models/meeting";
 import { NotificationModel } from "../models/notification";
 
-// Create
+// Create a new meeting
 export const createMeeting = async (req: Request, res: Response): Promise<void> => {
   try {
     const meeting = new MeetingModel(req.body);
@@ -16,32 +16,38 @@ export const createMeeting = async (req: Request, res: Response): Promise<void> 
 
     res.status(201).json(meeting);
   } catch (err) {
+    console.error("Create Meeting Error:", err);
     res.status(400).json({ error: "Failed to create meeting" });
   }
 };
 
-// Get All
+// Get all meetings
 export const getAllMeetings = async (_req: Request, res: Response): Promise<void> => {
   try {
     const meetings = await MeetingModel.find();
-    res.json(meetings);
+    res.status(200).json(meetings);
   } catch (err) {
+    console.error("Fetch Meetings Error:", err);
     res.status(500).json({ error: "Failed to fetch meetings" });
   }
 };
 
-// Get by ID
+// Get meeting by ID
 export const getMeetingById = async (req: Request, res: Response): Promise<void> => {
   try {
     const meeting = await MeetingModel.findById(req.params.id);
-    if (!meeting)  res.status(404).json({ error: "Meeting not found" });
-    res.json(meeting);
+    if (!meeting) {
+      res.status(404).json({ error: "Meeting not found" });
+      return;
+    }
+    res.status(200).json(meeting);
   } catch (err) {
+    console.error("Get Meeting Error:", err);
     res.status(500).json({ error: "Failed to get meeting" });
   }
 };
 
-// Update
+// Update a meeting
 export const updateMeeting = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await MeetingModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -56,13 +62,14 @@ export const updateMeeting = async (req: Request, res: Response): Promise<void> 
       type: "meeting",
     });
 
-    res.json(updated);
+    res.status(200).json(updated);
   } catch (err) {
+    console.error("Update Meeting Error:", err);
     res.status(400).json({ error: "Failed to update meeting" });
   }
 };
 
-// Delete
+// Delete a meeting
 export const deleteMeeting = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await MeetingModel.findByIdAndDelete(req.params.id);
@@ -77,8 +84,9 @@ export const deleteMeeting = async (req: Request, res: Response): Promise<void> 
       type: "meeting",
     });
 
-    res.json({ message: "Meeting deleted" });
+    res.status(200).json({ message: "Meeting deleted" });
   } catch (err) {
+    console.error("Delete Meeting Error:", err);
     res.status(400).json({ error: "Failed to delete meeting" });
   }
 };
