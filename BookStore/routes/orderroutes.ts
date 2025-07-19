@@ -1,16 +1,12 @@
+// File: orderroutes.ts
 import express from 'express';
-import {
-  createOrder,
-  getAllOrders,
-  updateOrder,
-  deleteOrder,
-} from '../controllers/ordercontroller';
+import { createOrder, getAllOrders, updateOrderStatus, deleteOrder } from '../controllers/ordercontroller';
 
 const router = express.Router();
 
-router.post('/orders', createOrder);         // Create new order
-router.get('/orders', getAllOrders);         // Get all orders
-router.put('/orders/:id', updateOrder);      // Update order status
-router.delete('/orders/:id', deleteOrder);   // Delete order
+router.post('/orders', createOrder);
+router.get('/orders', getAllOrders);
+router.put('/orders/:id', updateOrderStatus);
+router.delete('/orders/:id', deleteOrder);
 
 export default router;
