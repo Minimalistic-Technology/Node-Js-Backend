@@ -11,7 +11,7 @@ export const createLead = async (req: Request, res: Response): Promise<void> => 
     await NotificationModel.create({
       userId: req.body.leadOwner || "system",
       message: `Lead "${lead.firstName} ${lead.lastName}" created.`,
-      type: "Lead",
+      type: "lead",
     });
 
     res.status(201).json(lead);
@@ -53,7 +53,7 @@ export const updateLead = async (req: Request, res: Response): Promise<void> => 
     await NotificationModel.create({
       userId: req.body.leadOwner || "system",
       message: `Lead "${updated.firstName} ${updated.lastName}" updated.`,
-      type: "Lead",
+      type: "lead",
     });
 
     res.json(updated);
@@ -74,7 +74,7 @@ export const deleteLead = async (req: Request, res: Response): Promise<void> => 
     await NotificationModel.create({
       userId: "system",
       message: `Lead "${deleted.firstName} ${deleted.lastName}" deleted.`,
-      type: "Lead",
+      type: "lead",
     });
 
     res.json({ message: "Lead deleted" });
