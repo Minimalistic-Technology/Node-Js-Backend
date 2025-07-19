@@ -102,7 +102,6 @@ import stockRoutes from './Stocks/routes/stockRoutes';
 import teamRoutes from './Team/routes/teamRoutes';
 import templateRoutes from './Template/routes/templateRoutes';
 import testimonialRoutes from './Testimonial/routes/testimonialRoutes';
-import { Book } from "./BookStore/models/content";
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -157,7 +156,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/course', courseRoutes);
 app.use('/api', accountRoutes);
 app.use('/api', campaignRoutes);
-app.use('/api', crmcontactRoutes);
+app.use('/api/crm/contacts', crmcontactRoutes);
 app.use('/api', dashboardRoutes); 
 app.use('/api', dealRoutes);
 app.use('/api', leadRoutes);
