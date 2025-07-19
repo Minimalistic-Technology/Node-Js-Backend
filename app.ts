@@ -336,3 +336,5 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 
 
 app.use(errorMiddleware);
+
+export default app;

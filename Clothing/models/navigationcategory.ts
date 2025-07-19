@@ -8,7 +8,7 @@ export interface IDress extends Document {
   about: string;
   gender: 'men' | 'women';
   isCommon: boolean;
-  productCategory: string; 
+  productCategory: string;
 }
 
 const DressSchema: Schema<IDress> = new Schema(
@@ -28,17 +28,18 @@ const DressSchema: Schema<IDress> = new Schema(
 export interface ICategory extends Document {
   name: string;
   gender: 'men' | 'women';
-  dresses: Types.ObjectId[]; 
+  dresses: Types.ObjectId[];
 }
 
 const CategorySchema: Schema<ICategory> = new Schema(
   {
     name: { type: String, required: true },
     gender: { type: String, enum: ['men', 'women'], required: true },
-    dresses: [{ type: Schema.Types.ObjectId, ref: 'Dress' }]  // ✅ added this
+    dresses: [{ type: Schema.Types.ObjectId, ref: 'Dress' }]
   },
   { timestamps: true }
 );
 
-export const DressModel = mongoose.model<IDress>('Dress', DressSchema);
-export const CategoryModel = mongoose.model<ICategory>('Category', CategorySchema);
+// ✅ Use models guard to prevent OverwriteModelError
+export const DressModel = mongoose.models.Dress || mongoose.model<IDress>('Dress', DressSchema);
+export const CategoryModel = mongoose.models.Category || mongoose.model<ICategory>('Category', CategorySchema);
