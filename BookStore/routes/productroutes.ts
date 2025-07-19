@@ -5,7 +5,7 @@ import {
   updateProduct,
   deleteProduct,
   bulkCreateProduct,
-} from '../../BookStore/controllers/productcontroller';
+} from '../controllers/productcontroller';
 
 const router = express.Router();
 

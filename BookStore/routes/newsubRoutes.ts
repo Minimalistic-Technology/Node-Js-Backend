@@ -2,7 +2,7 @@ import express, { Router } from 'express';
 import {
   sendEmailHandler,
   getSubscribersHandler,
-} from '../../BookStore/controllers/newsub';
+} from '../controllers/newsub';
 
 const router: Router = express.Router();
 
