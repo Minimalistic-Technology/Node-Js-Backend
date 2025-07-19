@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Product } from '../../BookStore/models/product';
+import { Product } from '../models/product';
 
 // POST /api/products - Create new product
 export const createProduct = async (req: Request, res: Response): Promise<void> => {

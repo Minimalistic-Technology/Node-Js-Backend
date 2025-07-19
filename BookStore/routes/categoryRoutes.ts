@@ -1,15 +1,13 @@
 import { Router } from 'express';
-import {CategoryController } from '../../BookStore/controllers/categorycontroller';
-
-
+import { CategoryController } from '../controllers/categoryController';
 
 const router = Router();
 
-// Routes
-router.get('/', CategoryController.getAllCategories);
-router.get('/:id', CategoryController.getCategoryById);
-router.post('/', CategoryController.createCategory);
-router.put('/:id', CategoryController.updateCategory);
-router.delete('/:id', CategoryController.deleteCategory);
+// Category routes
+router.get('/categories', CategoryController.getAllCategories);
+router.get('/categories/:id', CategoryController.getCategoryById);
+router.post('/categories', CategoryController.createCategory);
+router.put('/categories/:id', CategoryController.updateCategory);
+router.delete('/categories/:id', CategoryController.deleteCategory);
 
 export default router;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Book } from '../../BookStore/models/content';
+import { Book } from '../models/content';
 import axios from 'axios';
 
 interface Category {

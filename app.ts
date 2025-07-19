@@ -87,16 +87,10 @@ import bannerRoutes from './BookStore/routes/bannerRoutes';
 import logroutes from './BookStore/routes/orderroutes';
 import productroutes from './BookStore/routes/productroutes';
 import bulkusers from './BookStore/routes/bulkuserroutes'
-import newsub    from './BookStore/routes/newsub';
-import siteSettingsRoutes from './BookStore/routes/siteSettingsRoutes';
-import searchRoutes from './CRM/routes/searchRoutes';
 import bookOrderRoutes from './BookStore/routes/bookOrderRoutes';
-import sessionRoutes from './CheckSession/routes/sessionRoutes';
+import siteSettingsRoutes from './BookStore/routes/siteSettingsRoutes';
 import authAccessRoutes from './Authacess/routes/authAccessRoutes';
-import subscriberRoutes from './BookStore/routes/subscriberRoutes';
-import upcomingProductRoutes from './Agarbatti Products/routes/upcomingProductRoutes';
-import locationRoutes from './CheckSession/routes/locationRoutes';
-import historyRoutes from './CheckSession/routes/historyRoutes';
+
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -107,12 +101,13 @@ app.use(
     // make sure you don't have / in last 
     // Do "http://localhost:3000"
     // Don't "http://localhost:3000/"
-
+    
     origin: ["http://localhost:3000"],
     credentials: true,
   })
 );
 
+app.use('/api/bookstore',homepageRoutes)
 app.use('/api/products', productRoutes);
 app.use('/api/prices', productPriceRoutes);
 app.use('/api', projectRoutes);
@@ -157,6 +152,7 @@ app.use('/api', accountRoutes);
 app.use('/api', meetingRoutes);
 app.use('/api', leadRoutes);
 app.use('/api', dashboardRoutes);
+app.use('/api', homepageRoutes);
 app.use('/api', userRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', notificationRoutes);
@@ -166,23 +162,16 @@ app.use('/api', testimonialRoutes);
 app.use('/api', teamRoutes);
 app.use('/api', studentGradeRoutes);
 app.use('/api', examRoutes);
-app.use('/api', bulkusers);
-app.use('/api/bookstore', homepageRoutes);
 app.use('/api/bookstore/admincontent',contentRoutes);
 app.use('/api/bookstore/admincategory',categoryRoutess);
 app.use('/api/bookstore/bannerRoutes',bannerRoutes);
 app.use('/api/bookstore/orderroutes',logroutes);
 app.use('/api/bookstore/productroutes',productroutes);
-app.use('/api/bookstore/newsub',newsub);
+app.use('/api', bulkusers);
 app.use('/api', siteSettingsRoutes);
-app.use('/api', searchRoutes);
 app.use('/api', bookOrderRoutes);
-app.use('/api', sessionRoutes);
 app.use('/api', authAccessRoutes);
-app.use('/api/subscribers', subscriberRoutes);
-app.use('/api', upcomingProductRoutes);
-app.use('/api', locationRoutes);
-app.use('/api', historyRoutes);
+
 // body parser
 const bodyParser = require('body-parser');
 
