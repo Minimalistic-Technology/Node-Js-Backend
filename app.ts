@@ -218,7 +218,7 @@ const limiter = rateLimit({
   handler: function (req, res, next) {
       setTimeout(() => {
         next();
-      }, 5000); // 5-second delay for requests over the limit
+      }, 5000); 
   }
 })
 
@@ -226,14 +226,6 @@ const limiter = rateLimit({
 app.use(limiter);
 // app.use(apiLogger)
 // routes
-
-const ml = ""
-const mt = ""
-const mc = ""
-const ms = ""
-const mml = ""
-const mp = ""
-const mn = ""
 
 app.use(
   "/api/v1/auth", authRoutes,
