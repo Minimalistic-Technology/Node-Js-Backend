@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import client from '../utils/whatsappClient';
 
 interface MessageEntry {
     number: string;
@@ -19,7 +18,6 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
 
     try {
         const waNumber = number.includes('@c.us') ? number : `${number}@c.us`;
-        await client.sendMessage(waNumber, message);
 
         messageLog.push({ number, message, timestamp: Date.now() });
 

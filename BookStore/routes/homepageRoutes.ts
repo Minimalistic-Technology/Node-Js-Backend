@@ -5,9 +5,6 @@ import BookRequestController from '../controllers/addbookController';
 
 const router = express.Router();
 
-// Log route registration for debugging
-console.log('Registering bookstore routes...');
-
 // Book category routes
 router.get('/book-categories', BookController.getAllCategories);
 router.post('/book-categories', BookController.createCategory);
@@ -42,7 +39,5 @@ router.delete('/reviews/:id', deleteReview);
 // Book request routes
 router.post('/book-requests', BookRequestController.createBookRequest);
 router.get('/book-requests', BookRequestController.getBookRequests);
-
-console.log('Bookstore routes registered successfully');
 
 export default router;
