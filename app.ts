@@ -125,6 +125,16 @@ const bodyParser = require('body-parser');
 // cookie parser
 app.use(cookieParser());
 
+// NO Capitalization in the body
+// Exmaple :
+
+// app.use('/api/aggarbatti', AgarbattiproductRoutes);
+// app.use('/api/auth', AuthRoutes);
+// app.use('/api/blog', blogRoutes);
+// app.use('/api/book-store', BookStoreorderRoutes);
+
+
+
 app.use('/api/products', AgarbattiproductRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', orderRoutes);
@@ -132,7 +142,6 @@ app.use('/api', upcomingProductRoutes);
 app.use('/api', userRoutes);
 app.use('/api', heroSlideRoutes);
 app.use('/api', authAccessRoutes);
-app.use('/api/blog', blogRoutes);
 app.use('/api/quote', quoteBlogRoutes);
 app.use('/api/banner', bannerRoutes);
 app.use('/api', bookOrderRoutes);
