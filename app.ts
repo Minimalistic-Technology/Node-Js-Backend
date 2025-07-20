@@ -125,83 +125,107 @@ const bodyParser = require('body-parser');
 // cookie parser
 app.use(cookieParser());
 
-app.use('/api/products', AgarbattiproductRoutes);
-app.use('/api', categoryRoutes);
-app.use('/api', orderRoutes);
-app.use('/api', upcomingProductRoutes);
-app.use('/api', userRoutes);
-app.use('/api', heroSlideRoutes);
-app.use('/api', authAccessRoutes);
-app.use('/api/blog', blogRoutes);
-app.use('/api/quote', quoteBlogRoutes);
-app.use('/api/banner', bannerRoutes);
-app.use('/api', bookOrderRoutes);
-app.use('/api', BookStorecategoryRoutes);
-app.use('/api', BookStoreorderRoutes);
-app.use('/api', bulkuserRoutes);
-app.use('/api', homepageRoutes);
-app.use('/api', newsubRoutes);
-app.use('/api', productRoutes);
-app.use('/api', siteSettingsRoutes);
-app.use('/api/subscriber', subscriberRoutes);
-app.use('/api', AccessControlRoutes);
-app.use('/api', historyRoutes);
-app.use('/api', locationRoutes);
-app.use('/api', sessionRoutes);
-app.use('/api', collectionRoutes);
-app.use('/api', contactFormRoutes);
-app.use('/api/contact', contactRoutes);
-app.use('/api/course', courseRoutes);
-app.use('/api/accounts', accountRoutes);
-app.use('/api/campaigns', campaignRoutes);
-app.use('/api/register-contacts', crmcontactRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/deals', dealRoutes);
-app.use('/api/leads', leadRoutes);
-app.use('/api/meetings', meetingRoutes);
-app.use('/api', navigationcategoryRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/search', searchRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/user-profiles', userProfileRoutes);
-app.use('/api', contentRoutes);
-app.use('/api', cartRoutes);
-app.use('/api', checkoutRoutes);
-app.use('/api', favoriteRoutes);
-app.use('/api', feedbackRoutes);
-app.use('/api', paymentRoutes);
-app.use('/api', productPriceRoutes);
-app.use('/api', productsRoutes);
-app.use('/api', adminProfileRoutes);
-app.use('/api', adminUserRoutes);
-app.use('/api', documentRoutes);
-app.use('/api', examRoutes);
-app.use('/api', examSettingRoutes);
-app.use('/api', helpSupportRoutes);
-app.use('/api', loginRoutes);
-app.use('/api', scheduleRoutes);
-app.use('/api', studentGradeRoutes);
-app.use('/api', studentProfileRoutes);
-app.use('/api', studyMaterialRoutes);
-app.use('/api', bmiRoutes);
-app.use('/api', imageRoutes);
-app.use('/api', workoutProgressRoutes);
-app.use('/api', workoutRoutes);
-app.use('/api', goldpriceRoutes);
-app.use('/api', doctorreviewRoutes);
-app.use('/api', hospitalRoutes);
-app.use('/api', messageRoutes);
-app.use('/api', otpRoutes);
-app.use('/api', profileRoutes);
-app.use('/api', projectRoutes);
-app.use('/api', propertyRoutes);
-app.use('/api', redevelopmentRoutes);
-app.use('/api', commercialRoutes);
-app.use('/api', stockRoutes);
-app.use('/api', teamRoutes);
-app.use('/api', templateRoutes);
-app.use('/api', testimonialRoutes);
+app.use('/api/aggarbatti', AgarbattiproductRoutes);
+app.use('/api/aggarbatti', categoryRoutes);
+app.use('/api/aggarbatti', orderRoutes);
+app.use('/api/aggarbatti', upcomingProductRoutes);
+app.use('/api/aggarbatti', userRoutes);
+app.use('/api/aggarbatti', heroSlideRoutes);
 
+app.use('/api/blog', blogRoutes);
+app.use('/api/blog', quoteBlogRoutes);
+
+app.use('/api/bookstore', bannerRoutes);
+app.use('/api/bookstore', bookOrderRoutes);
+app.use('/api/bookstore', BookStorecategoryRoutes);
+app.use('/api/bookstore', BookStoreorderRoutes);
+app.use('/api/bookstore', bulkuserRoutes);
+app.use('/api/bookstore', homepageRoutes);
+app.use('/api/bookstore', newsubRoutes);
+app.use('/api/bookstore', productRoutes);
+app.use('/api/bookstore', siteSettingsRoutes);
+app.use('/api/bookstore', subscriberRoutes);
+app.use('/api/bookstore', contentRoutes);
+
+app.use('/api/checksession', AccessControlRoutes);
+app.use('/api/checksession', historyRoutes);
+app.use('/api/checksession', locationRoutes);
+app.use('/api/checksession', sessionRoutes);
+
+
+app.use('/api/contact', contactFormRoutes);
+app.use('/api/contact', contactRoutes);
+
+app.use('/api/crm', accountRoutes);
+app.use('/api/crm', campaignRoutes);
+app.use('/api/crm', crmcontactRoutes);
+app.use('/api/crm', dashboardRoutes);
+app.use('/api/crm', dealRoutes);
+app.use('/api/crm', leadRoutes);
+app.use('/api/crm', meetingRoutes);
+app.use('/api/crm', notificationRoutes);
+app.use('/api/crm', searchRoutes);
+app.use('/api/crm', taskRoutes);
+app.use('/api/crm', userProfileRoutes);
+
+app.use('/api/clothing', navigationcategoryRoutes);
+
+app.use('/api/ecommerce', cartRoutes);
+app.use('/api/ecommerce', checkoutRoutes);
+app.use('/api/ecommerce', favoriteRoutes);
+app.use('/api/ecommerce', feedbackRoutes);
+app.use('/api/ecommerce', paymentRoutes);
+app.use('/api/ecommerce', productPriceRoutes);
+app.use('/api/ecommerce', productsRoutes);
+
+app.use('/api/education', adminProfileRoutes);
+app.use('/api/education', adminUserRoutes);
+app.use('/api/education', documentRoutes);
+app.use('/api/education', examRoutes);
+app.use('/api/education', examSettingRoutes);
+app.use('/api/education', helpSupportRoutes);
+app.use('/api/education', loginRoutes);
+app.use('/api/education', scheduleRoutes);
+app.use('/api/education', studentGradeRoutes);
+app.use('/api/education', studentProfileRoutes);
+app.use('/api/education', studyMaterialRoutes);
+
+app.use('/api/fitness', bmiRoutes);
+app.use('/api/fitness', imageRoutes);
+app.use('/api/fitness', workoutProgressRoutes);
+app.use('/api/fitness', workoutRoutes);
+
+app.use('/api/property', propertyRoutes);
+app.use('/api/property', redevelopmentRoutes);
+app.use('/api/property', commercialRoutes);
+
+app.use('/api/hospital', doctorreviewRoutes);
+app.use('/api/hospital', hospitalRoutes);
+
+app.use('/api/message', messageRoutes);
+
+app.use('/api/otp', otpRoutes);
+
+app.use('/api/profile', profileRoutes);
+
+app.use('/api/project', projectRoutes);
+
+
+app.use('/api/stocks', stockRoutes);
+
+app.use('/api/team', teamRoutes);
+
+app.use('/api/template', templateRoutes);
+
+app.use('/api/test', testimonialRoutes);
+
+app.use('/api/authaccess', authAccessRoutes);
+
+app.use('/api/collection', collectionRoutes);
+
+app.use('/api/goldprice', goldpriceRoutes);
+
+app.use('/api/course', courseRoutes);
 // api requests limit
 // const limiter = rateLimit({
 //   windowMs: 5 * 60 * 1000,
