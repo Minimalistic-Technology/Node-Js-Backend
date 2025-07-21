@@ -98,6 +98,7 @@ import projectRoutes from './Project/routes/projectRoutes';
 import propertyRoutes from './Property/routes/propertyRoutes';
 import redevelopmentRoutes from "./Property/routes/redevelopmentRoutes";
 import commercialRoutes from "./Property/routes/commercialRoutes";
+import brokerRoutes from "./Property/routes/brokerRoutes";
 import stockRoutes from './Stocks/routes/stockRoutes';
 import teamRoutes from './Team/routes/teamRoutes';
 import templateRoutes from './Template/routes/templateRoutes';
@@ -133,7 +134,10 @@ app.use(cookieParser());
 // app.use('/api/blog', blogRoutes);
 // app.use('/api/book-store', BookStoreorderRoutes);
 
-
+app.use('/api', propertyRoutes);
+app.use('/api', redevelopmentRoutes);
+app.use('/api', commercialRoutes);
+app.use('/api', brokerRoutes);
 
 app.use('/api/products', AgarbattiproductRoutes);
 app.use('/api', categoryRoutes);
@@ -203,9 +207,6 @@ app.use('/api', messageRoutes);
 app.use('/api', otpRoutes);
 app.use('/api', profileRoutes);
 app.use('/api', projectRoutes);
-app.use('/api', propertyRoutes);
-app.use('/api', redevelopmentRoutes);
-app.use('/api', commercialRoutes);
 app.use('/api', stockRoutes);
 app.use('/api', teamRoutes);
 app.use('/api', templateRoutes);
