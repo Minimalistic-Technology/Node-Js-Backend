@@ -104,6 +104,7 @@ import stockRoutes from './Stocks/routes/stockRoutes';
 import teamRoutes from './Team/routes/teamRoutes';
 import templateRoutes from './Template/routes/templateRoutes';
 import testimonialRoutes from './Testimonial/routes/testimonialRoutes';
+import authUserRoutes from './CRM/routes/authUserRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -213,6 +214,7 @@ app.use('/api', stockRoutes);
 app.use('/api', teamRoutes);
 app.use('/api', templateRoutes);
 app.use('/api', testimonialRoutes);
+app.use('/api/crm/auth-user', authUserRoutes);
 
 // api requests limit
 // const limiter = rateLimit({
