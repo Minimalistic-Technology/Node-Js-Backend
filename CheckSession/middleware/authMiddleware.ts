@@ -1,3 +1,4 @@
+// authMiddleware.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
@@ -31,6 +32,6 @@ export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction): vo
   if (req.user?.role !== 'Admin') {
     res.status(403).json({ message: 'Admin access required' });
     return; // Explicit return
-  }
-  next();
+  }
+  next();
 };

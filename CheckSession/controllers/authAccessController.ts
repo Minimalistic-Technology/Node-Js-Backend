@@ -78,3 +78,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: 'Login failed' });
   }
 };
+
+// Get all users (Admin only)
+export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const users = await AuthUserModel.find({}, { password: 0 }); // Exclude password field
+    res.status(200).json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+};
