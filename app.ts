@@ -99,6 +99,7 @@ import propertyRoutes from './Property/routes/propertyRoutes';
 import redevelopmentRoutes from "./Property/routes/redevelopmentRoutes";
 import commercialRoutes from "./Property/routes/commercialRoutes";
 import brokerRoutes from "./Property/routes/brokerRoutes";
+import propertyReuirementRoutes from "./Property/routes/propertyRequirementRoutes";
 import stockRoutes from './Stocks/routes/stockRoutes';
 import teamRoutes from './Team/routes/teamRoutes';
 import templateRoutes from './Template/routes/templateRoutes';
@@ -138,6 +139,7 @@ app.use('/api', propertyRoutes);
 app.use('/api', redevelopmentRoutes);
 app.use('/api', commercialRoutes);
 app.use('/api', brokerRoutes);
+app.use('/api', propertyReuirementRoutes);
 
 app.use('/api/products', AgarbattiproductRoutes);
 app.use('/api', categoryRoutes);
