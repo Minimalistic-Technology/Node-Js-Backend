@@ -6,7 +6,7 @@ export interface ICampaign extends Document {
   status: string;
   budget: string;
   expectedRevenue: string;
-  actualRevenue: string; 
+  actualRevenue: string;
   startDate: Date;
   endDate: Date;
 }

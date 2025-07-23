@@ -8,9 +8,9 @@ import {
 
 const router = Router();
 
-router.post('/', createProductPrice);
-router.get('/', getAllProductPrices);
-router.put('/:id', updateProductPrice);
-router.delete('/:id', deleteProductPrice);
+router.post('/product-price', createProductPrice);
+router.get('/product-price', getAllProductPrices);
+router.put('/product-price/:id', updateProductPrice);
+router.delete('/product-price/:id', deleteProductPrice);
 
 export default router;

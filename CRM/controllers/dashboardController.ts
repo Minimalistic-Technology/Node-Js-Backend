@@ -4,7 +4,7 @@ import { MeetingModel } from "../models/meeting";
 import { TaskModel } from "../models/task";
 import { DealModel } from "../models/deal";
 
-export const getDashboardData = async (req: Request, res: Response) => {
+export const getDashboardData = async (_req: Request, res: Response): Promise<void> => {
   try {
     const [leads, meetings, tasks, deals] = await Promise.all([
       LeadModel.find(),
@@ -13,12 +13,7 @@ export const getDashboardData = async (req: Request, res: Response) => {
       DealModel.find()
     ]);
 
-    res.json({
-      leads,
-      meetings,
-      tasks,
-      deals
-    });
+    res.status(200).json({ leads, meetings, tasks, deals });
   } catch (err) {
     console.error("Dashboard error:", err);
     res.status(500).json({ error: "Failed to load dashboard data" });

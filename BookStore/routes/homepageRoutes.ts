@@ -1,30 +1,42 @@
 import express from 'express';
 import BookController from '../controllers/homepageController';
-import { createReview, getReviews, getReviewById, updateReview, deleteReview } from '../controllers/reviewController';
+import { createReview, getReviews, getReviewById, updateReview, deleteReview, getApprovedReviewsByBookId } from '../controllers/reviewController';
 import BookRequestController from '../controllers/addbookController';
+
 const router = express.Router();
 
-// Category routes
-router.get('/categories', BookController.getAllCategories);
-router.post('/categories', BookController.createCategory);
-router.get('/categories/:categoryName', BookController.getCategoryByNameWithBooks);
-router.post('/categories/:categoryName', BookController.createBook);
+// Book category routes
+router.get('/book-categories', BookController.getAllCategories);
+router.post('/book-categories', BookController.createCategory);
+router.get('/book-categories/:categoryName', BookController.getCategoryByNameWithBooks);
+router.put('/book-categories/:id', BookController.updateCategory);
+router.delete('/book-categories/:id', BookController.deleteCategory);
 
-// Book details route
-router.get('/categories/:categoryName/:bookId', BookController.getBookDetailsById);
+// Tag routes
+router.get('/book-categories/:categoryName/tags', BookController.getTagsByCategory);
+router.post('/book-categories/:categoryName/tags', BookController.createTag);
+router.put('/book-categories/:categoryName/tags/:tagName', BookController.updateTag);
+router.delete('/book-categories/:categoryName/tags/:tagName', BookController.deleteTag);
 
+// Book routes
+router.post('/book-categories/:categoryName', BookController.createBook);
+router.get('/book-categories/:categoryName/:bookId', BookController.getBookDetailsById);
+router.put('/book-categories/:categoryName/:bookId', BookController.updateBook);
+router.delete('/book-categories/:categoryName/:bookId', BookController.deleteBook);
 
 // Delete routes
-router.delete('/categories', BookController.deleteAllCategories);
-router.delete('/books', BookController.deleteAllBooks)
+router.delete('/book-categories', BookController.deleteAllCategories);
+router.delete('/books', BookController.deleteAllBooks);
 
-
-router.post('/reviews', createReview);
+// Review routes
 router.get('/reviews', getReviews);
+router.get('/reviews/book/:bookId', getApprovedReviewsByBookId);
+router.post('/reviews', createReview);
 router.get('/reviews/:id', getReviewById);
 router.put('/reviews/:id', updateReview);
 router.delete('/reviews/:id', deleteReview);
 
+// Book request routes
 router.post('/book-requests', BookRequestController.createBookRequest);
 router.get('/book-requests', BookRequestController.getBookRequests);
 

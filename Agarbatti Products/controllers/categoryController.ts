@@ -39,3 +39,28 @@ export const deleteCategory = async (req: Request, res: Response): Promise<void>
     res.status(400).json({ error: 'Failed to delete category' });
   }
 };
+
+export const bulkUpdateCod = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { categoryIds, codAvailable } = req.body;
+  console.log("Incoming body:", req.body);
+
+  if (!Array.isArray(categoryIds) || typeof codAvailable !== "boolean") {
+    res.status(400).json({ error: "Invalid input" });
+    return;
+  }
+
+  try {
+    await ProductCategoryModel.updateMany(
+      { _id: { $in: categoryIds } },
+      { $set: { codAvailable } }
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Bulk COD update failed:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};

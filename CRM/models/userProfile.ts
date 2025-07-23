@@ -30,6 +30,8 @@ export interface IUserProfile extends Document {
   social: Social;
   personal: Personal;
   address: Address;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const UserProfileSchema = new Schema<IUserProfile>(
@@ -39,23 +41,23 @@ const UserProfileSchema = new Schema<IUserProfile>(
     role: { type: String, required: true },
     location: { type: String, required: true },
     social: {
-      facebook: String,
-      twitter: String,
-      linkedin: String,
-      instagram: String,
+      facebook: { type: String },
+      twitter: { type: String },
+      linkedin: { type: String },
+      instagram: { type: String },
     },
     personal: {
-      firstName: String,
-      lastName: String,
-      email: String,
-      phone: String,
-      bio: String,
+      firstName: { type: String },
+      lastName: { type: String },
+      email: { type: String },
+      phone: { type: String },
+      bio: { type: String },
     },
     address: {
-      country: String,
-      cityState: String,
-      postalCode: String,
-      taxId: String,
+      country: { type: String },
+      cityState: { type: String },
+      postalCode: { type: String },
+      taxId: { type: String },
     },
   },
   { timestamps: true }

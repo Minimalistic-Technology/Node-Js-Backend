@@ -1,99 +1,184 @@
 import { Request, Response } from 'express';
-import BookReview, { IReview } from '../models/review';
+import mongoose from 'mongoose';
+import { BookstoreReviewModel } from '../models/review';
 
-// Create a new review
+export const getReviews = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const reviews = await BookstoreReviewModel.find().populate({
+      path: 'bookId',
+      select: 'title price imageUrl subCategory',
+      match: { _id: { $exists: true } },
+    }).lean();
+    res.status(200).json(reviews);
+  } catch (err: any) {
+    console.error('Error fetching reviews:', {
+      message: err.message,
+      stack: err.stack,
+      request: req.url,
+    });
+    res.status(500).json({ error: 'An unexpected error occurred while fetching reviews', details: err.message });
+  }
+};
+
+export const getApprovedReviewsByBookId = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { bookId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(bookId)) {
+      res.status(400).json({ error: 'Invalid bookId format' });
+      return;
+    }
+    const reviews = await BookstoreReviewModel.find({
+      bookId: new mongoose.Types.ObjectId(bookId),
+      status: 'approved',
+    }).populate({
+      path: 'bookId',
+      select: 'title price imageUrl subCategory',
+      match: { _id: { $exists: true } },
+    }).lean();
+    res.status(200).json(reviews);
+  } catch (err: any) {
+    console.error('Error fetching approved reviews by bookId:', {
+      message: err.message,
+      stack: err.stack,
+      bookId: req.params.bookId,
+    });
+    res.status(500).json({ error: 'An unexpected error occurred while fetching approved reviews', details: err.message });
+  }
+};
+
 export const createReview = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, rating, review } = req.body;
+    const { bookId, name, email, rating, comment, categoryName } = req.body;
 
-    // Validate required fields
-    if (!name || !email || !rating || !review) {
-      res.status(400).json({ message: 'All fields are required' });
+    // Validate input
+    if (!bookId || !name || !rating || !comment || !categoryName) {
+      res.status(400).json({ error: 'Missing required fields: bookId, name, rating, comment, or categoryName' });
+      return;
+    }
+
+    // Validate bookId as ObjectId
+    if (!mongoose.Types.ObjectId.isValid(bookId)) {
+      res.status(400).json({ error: 'Invalid bookId format' });
       return;
     }
 
     // Validate rating
     if (rating < 1 || rating > 5) {
-      res.status(400).json({ message: 'Rating must be between 1 and 5' });
+      res.status(400).json({ error: 'Rating must be between 1 and 5' });
       return;
     }
 
-    const newReview: IReview = new BookReview({
+    const review = new BookstoreReviewModel({
+      bookId,
       name,
       email,
       rating,
-      review,
+      comment,
+      categoryName,
+      status: 'pending',
     });
 
-    await newReview.save();
-    res.status(201).json({ message: 'Review submitted successfully', review: newReview });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    const savedReview = await review.save();
+    res.status(201).json(savedReview);
+  } catch (err: any) {
+    console.error('Error creating review:', {
+      message: err.message,
+      stack: err.stack,
+      body: req.body,
+    });
+    res.status(500).json({ error: 'An unexpected error occurred while creating the review', details: err.message });
   }
 };
 
-// Fetch all reviews
-export const getReviews = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const reviews = await BookReview.find().sort({ createdAt: -1 });
-    res.status(200).json(reviews);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
-  }
-};
-
-// Fetch a review by ID
 export const getReviewById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const review = await BookReview.findById(req.params.id);
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({ error: 'Invalid review ID format' });
+      return;
+    }
+    const review = await BookstoreReviewModel.findById(id).populate({
+      path: 'bookId',
+      select: 'title price imageUrl subCategory',
+    });
     if (!review) {
-      res.status(404).json({ message: 'Review not found' });
+      res.status(404).json({ error: 'Review not found' });
       return;
     }
     res.status(200).json(review);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+  } catch (err: any) {
+    console.error('Error fetching review by ID:', {
+      message: err.message,
+      stack: err.stack,
+      reviewId: req.params.id,
+    });
+    res.status(500).json({ error: 'An unexpected error occurred while fetching the review', details: err.message });
   }
 };
 
-// Update a review by ID
 export const updateReview = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, rating, review } = req.body;
+    const { id } = req.params;
+    const { rating, comment, status } = req.body;
 
-    // Validate rating if provided
-    if (rating !== undefined && (rating < 1 || rating > 5)) {
-      res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({ error: 'Invalid review ID format' });
       return;
     }
 
-    const updatedReview = await BookReview.findByIdAndUpdate(
-      req.params.id,
-      { name, email, rating, review },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedReview) {
-      res.status(404).json({ message: 'Review not found' });
-      return;
+    const updateFields: any = {};
+    if (rating !== undefined) {
+      if (rating < 1 || rating > 5) {
+        res.status(400).json({ error: 'Rating must be between 1 and 5' });
+        return;
+      }
+      updateFields.rating = rating;
+    }
+    if (comment !== undefined) updateFields.comment = comment;
+    if (status !== undefined) {
+      if (!['pending', 'approved', 'disapproved'].includes(status)) {
+        res.status(400).json({ error: 'Invalid status value' });
+        return;
+      }
+      updateFields.status = status;
     }
 
-    res.status(200).json({ message: 'Review updated successfully', review: updatedReview });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    const review = await BookstoreReviewModel.findByIdAndUpdate(id, updateFields, { new: true, runValidators: true });
+    if (!review) {
+      res.status(404).json({ error: 'Review not found' });
+      return;
+    }
+    res.status(200).json(review);
+  } catch (err: any) {
+    console.error('Error updating review:', {
+      message: err.message,
+      stack: err.stack,
+      reviewId: req.params.id,
+      body: req.body,
+    });
+    res.status(500).json({ error: 'An unexpected error occurred while updating the review', details: err.message });
   }
 };
 
-// Delete a review by ID
 export const deleteReview = async (req: Request, res: Response): Promise<void> => {
   try {
-    const deletedReview = await BookReview.findByIdAndDelete(req.params.id);
-    if (!deletedReview) {
-      res.status(404).json({ message: 'Review not found' });
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({ error: 'Invalid review ID format' });
+      return;
+    }
+    const review = await BookstoreReviewModel.findByIdAndDelete(id);
+    if (!review) {
+      res.status(404).json({ error: 'Review not found' });
       return;
     }
     res.status(200).json({ message: 'Review deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+  } catch (err: any) {
+    console.error('Error deleting review:', {
+      message: err.message,
+      stack: err.stack,
+      reviewId: req.params.id,
+    });
+    res.status(500).json({ error: 'An unexpected error occurred while deleting the review', details: err.message });
   }
-}
+};

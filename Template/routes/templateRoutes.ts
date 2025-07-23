@@ -9,10 +9,10 @@ import {
 
 const router = express.Router();
 
-router.post('/', createTemplate);
-router.get('/', getTemplates);
-router.get('/:id', getTemplateById);
-router.put('/:id', updateTemplate);
-router.delete('/:id', deleteTemplate);
+router.post('/template', createTemplate);
+router.get('/template', getTemplates);
+router.get('/template/:id', getTemplateById);
+router.put('/template/:id', updateTemplate);
+router.delete('/template/:id', deleteTemplate);
 
 export default router;
