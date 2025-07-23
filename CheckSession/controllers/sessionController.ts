@@ -114,3 +114,16 @@ export const deleteSession = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ error: 'Failed to delete session' });
   }
 };
+
+
+// Add this to your sessionController.ts
+export const getUserSessions = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const sessions = await SessionModel.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    const validSessions = sessions.map(session => session.toJSON());
+    res.json(validSessions);
+  } catch (error) {
+    console.error('Error fetching user sessions:', error);
+    res.status(500).json({ error: 'Failed to fetch user sessions' });
+  }
+};
