@@ -57,15 +57,29 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      SECRET_KEY,
-      { expiresIn: '1d' }
-    );
+    const accessToken = jwt.sign({ id: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1d' });
+    const refreshToken = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '7d' });
+
+    // Add cookie options
+    const accessTokenOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    };
+
+    const refreshTokenOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    };
+
+    // ✅ Set cookies here
+    res.cookie("access_token", accessToken, accessTokenOptions);
+    res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 
     res.json({
       message: 'Login successful',
-      token,
+      token: accessToken,
       user: {
         id: user._id,
         username: user.username,
@@ -78,6 +92,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: 'Login failed' });
   }
 };
+
 
 // Get all users (Admin only)
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
