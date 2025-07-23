@@ -1,4 +1,3 @@
-
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { v2 as cloudinary } from 'cloudinary';
@@ -311,7 +310,7 @@ class BookController {
 
   static async createBook(req: Request, res: Response): Promise<void> {
     try {
-      const booksData = Array.isArray(req.body) ? req.body : [req.body];
+      const booksData = Array.isArray(req.body.books) ? req.body.books : [req.body];
 
       if (booksData.length === 0) {
         res.status(400).json({ error: 'At least one book object is required' });
@@ -342,7 +341,6 @@ class BookController {
           seoDescription,
         } = book;
 
-        // Validation
         if (
           !title ||
           !categoryName ||
@@ -363,20 +361,20 @@ class BookController {
           continue;
         }
 
-        if (!['NEW - ORIGINAL PRICE', 'OLD - 35% OFF', 'BOTH'].includes(condition)) {
+        if (!['NEW - ORIGINAL PRICE', 'OLD', 'BOTH'].includes(condition)) {
           errors.push({
             title,
-            error: 'Condition must be "NEW - ORIGINAL PRICE", "OLD - 35% OFF", or "BOTH"',
+            error: 'Condition must be "NEW - ORIGINAL PRICE", "OLD", or "BOTH"',
           });
           continue;
         }
 
-        const tagsArray = typeof tags === 'string' ? tags.split(',').map((tag: string) => tag.trim()) : tags;
+        const tagsArray = typeof tags === 'string' ? tags.split(',').map((tag: string) => tag.trim()).filter(Boolean) : tags;
 
-        if (!Array.isArray(tagsArray)) {
+        if (!Array.isArray(tagsArray) || tagsArray.length === 0) {
           errors.push({
             title,
-            error: 'Tags must be an array or a comma-separated string',
+            error: 'Tags must be a non-empty array or a comma-separated string',
           });
           continue;
         }
@@ -413,7 +411,6 @@ class BookController {
           continue;
         }
 
-        // Generate unique book name
         const baseBookName = `${title.replace(/ /g, '-')}-${subCategory.replace(/ /g, '-')}`.toLowerCase();
         let bookName = baseBookName;
         let counter = 1;
@@ -421,7 +418,6 @@ class BookController {
           bookName = `${baseBookName}-${counter++}`;
         }
 
-        // Create new book
         const newBook = new BookModel({
           bookName,
           categoryName,
@@ -446,7 +442,6 @@ class BookController {
         const savedBook = await newBook.save();
         savedBooks.push(savedBook);
 
-        // Update or create category
         const category = await BookCategoryModel.findOne({ name: categoryName });
         if (category) {
           category.books.push(savedBook._id);
@@ -464,7 +459,6 @@ class BookController {
           await newCategory.save();
         }
 
-        // Admin notification
         if (savedBook.quantityNew === 0 && savedBook.quantityOld > 0) {
           console.log(`Admin Notification: New books for '${title}' are out of stock. Suggesting second-hand books.`);
         }
@@ -565,14 +559,13 @@ class BookController {
         return;
       }
 
-      // Update fields with proper fallbacks
       const updatedTitle = title !== undefined ? title : book.title;
       const updatedCategoryName = newCategoryName !== undefined ? newCategoryName : book.categoryName;
       const updatedSubCategory = subCategory !== undefined ? subCategory : book.subCategory;
       const updatedPrice = price !== undefined ? parseFloat(price) : book.price;
       const updatedDescription = description !== undefined ? description : book.description;
       const updatedEstimatedDelivery = estimatedDelivery !== undefined ? estimatedDelivery : book.estimatedDelivery;
-      const updatedTags = tags !== undefined ? (typeof tags === 'string' ? tags.split(',').map((tag: string) => tag.trim()) : tags) : book.tags;
+      const updatedTags = tags !== undefined ? (typeof tags === 'string' ? tags.split(',').map((tag: string) => tag.trim()).filter(Boolean) : tags) : book.tags;
       const updatedCondition = condition !== undefined ? condition : book.condition;
       const updatedAuthor = author !== undefined ? author : book.author;
       const updatedPublisher = publisher !== undefined ? publisher : book.publisher;
@@ -582,12 +575,12 @@ class BookController {
       const updatedDiscountOld = discountOld !== undefined ? parseFloat(discountOld) || 0 : book.discountOld;
       const updatedImageUrl = imageUrl !== undefined ? imageUrl : book.imageUrl;
 
-      // Validation
       if (
         !updatedTitle ||
         !updatedCategoryName ||
         !updatedSubCategory ||
         !updatedTags ||
+        !updatedTags.length ||
         updatedPrice <= 0 ||
         !updatedDescription ||
         !updatedEstimatedDelivery ||
@@ -600,13 +593,13 @@ class BookController {
         return;
       }
 
-      if (!['NEW - ORIGINAL PRICE', 'OLD - 35% OFF', 'BOTH'].includes(updatedCondition)) {
-        res.status(400).json({ error: 'Condition must be "NEW - ORIGINAL PRICE", "OLD - 35% OFF", or "BOTH"' });
+      if (!['NEW - ORIGINAL PRICE', 'OLD', 'BOTH'].includes(updatedCondition)) {
+        res.status(400).json({ error: 'Condition must be "NEW - ORIGINAL PRICE", "OLD", or "BOTH"' });
         return;
       }
 
-      if (!Array.isArray(updatedTags)) {
-        res.status(400).json({ error: 'Tags must be an array or a comma-separated string' });
+      if (!Array.isArray(updatedTags) || updatedTags.length === 0) {
+        res.status(400).json({ error: 'Tags must be a non-empty array or a comma-separated string' });
         return;
       }
 
@@ -625,7 +618,6 @@ class BookController {
         return;
       }
 
-      // Generate unique book name
       const baseBookName = `${updatedTitle.replace(/ /g, '-')}-${updatedSubCategory.replace(/ /g, '-')}`.toLowerCase();
       let bookName = baseBookName;
       let counter = 1;
@@ -633,7 +625,6 @@ class BookController {
         bookName = `${baseBookName}-${counter++}`;
       }
 
-      // Update book
       book.bookName = bookName;
       book.categoryName = updatedCategoryName;
       book.title = updatedTitle;
@@ -655,7 +646,6 @@ class BookController {
 
       const updatedBook = await book.save();
 
-      // Update category
       const category = await BookCategoryModel.findOne({ name: updatedCategoryName });
       if (category) {
         const uniqueTags = updatedTags.filter((tag: string) => !category.tags.includes(tag));
@@ -672,7 +662,6 @@ class BookController {
         await newCategory.save();
       }
 
-      // Admin notification
       if (updatedBook.quantityNew === 0 && updatedBook.quantityOld > 0) {
         console.log(`Admin Notification: New books for '${updatedTitle}' are out of stock. Suggesting second-hand books.`);
       }
