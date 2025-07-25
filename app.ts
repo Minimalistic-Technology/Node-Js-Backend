@@ -138,7 +138,6 @@ app.use('/api/aggarbatti', heroSlideRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/blog', quoteBlogRoutes);
 
-app.use('/api/bookstore', bannerRoutes);
 app.use('/api/bookstore', bookOrderRoutes);
 app.use('/api/bookstore', BookStorecategoryRoutes);
 app.use('/api/bookstore', BookStoreorderRoutes);
@@ -149,6 +148,7 @@ app.use('/api/bookstore', productRoutes);
 app.use('/api/bookstore', siteSettingsRoutes);
 app.use('/api/bookstore', subscriberRoutes);
 app.use('/api/bookstore', contentRoutes);
+app.use('/api/bookstore', bannerRoutes);
 
 app.use('/api/checksession', AccessControlRoutes);
 app.use('/api/checksession', historyRoutes);
