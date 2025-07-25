@@ -45,7 +45,7 @@ const BookSchema: Schema = new Schema({
   description: { type: String, required: true },
   estimatedDelivery: { type: String, required: true },
   tags: { type: [String], required: true },
-  condition: { type: String, required: true, enum: ['NEW - ORIGINAL PRICE', 'OLD ', 'BOTH'] },
+  condition: { type: String, required: true, enum: ['NEW - ORIGINAL PRICE', 'OLD', 'BOTH'] },
   author: { type: String, required: true },
   publisher: { type: String, required: true },
   quantityNew: { type: Number, required: true, default: 0 },

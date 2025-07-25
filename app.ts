@@ -98,10 +98,13 @@ import projectRoutes from './Project/routes/projectRoutes';
 import propertyRoutes from './Property/routes/propertyRoutes';
 import redevelopmentRoutes from "./Property/routes/redevelopmentRoutes";
 import commercialRoutes from "./Property/routes/commercialRoutes";
+import brokerRoutes from "./Property/routes/brokerRoutes";
+import propertyReuirementRoutes from "./Property/routes/propertyRequirementRoutes";
 import stockRoutes from './Stocks/routes/stockRoutes';
 import teamRoutes from './Team/routes/teamRoutes';
 import templateRoutes from './Template/routes/templateRoutes';
 import testimonialRoutes from './Testimonial/routes/testimonialRoutes';
+import authUserRoutes from './CRM/routes/authUserRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -152,11 +155,11 @@ app.use('/api/checksession', historyRoutes);
 app.use('/api/checksession', locationRoutes);
 app.use('/api/checksession', sessionRoutes);
 
-
 app.use('/api/contact', contactFormRoutes);
 app.use('/api/contact', contactRoutes);
 
 app.use('/api/crm', accountRoutes);
+app.use('/api/crm', authUserRoutes);
 app.use('/api/crm', campaignRoutes);
 app.use('/api/crm', crmcontactRoutes);
 app.use('/api/crm', dashboardRoutes);
@@ -167,8 +170,6 @@ app.use('/api/crm', notificationRoutes);
 app.use('/api/crm', searchRoutes);
 app.use('/api/crm', taskRoutes);
 app.use('/api/crm', userProfileRoutes);
-
-app.use('/api/clothing', navigationcategoryRoutes);
 
 app.use('/api/ecommerce', cartRoutes);
 app.use('/api/ecommerce', checkoutRoutes);
@@ -198,6 +199,8 @@ app.use('/api/fitness', workoutRoutes);
 app.use('/api/property', propertyRoutes);
 app.use('/api/property', redevelopmentRoutes);
 app.use('/api/property', commercialRoutes);
+app.use('/api/property', brokerRoutes);
+app.use('/api/property', propertyReuirementRoutes);
 
 app.use('/api/hospital', doctorreviewRoutes);
 app.use('/api/hospital', hospitalRoutes);
@@ -209,7 +212,6 @@ app.use('/api/otp', otpRoutes);
 app.use('/api/profile', profileRoutes);
 
 app.use('/api/project', projectRoutes);
-
 
 app.use('/api/stocks', stockRoutes);
 
@@ -226,6 +228,12 @@ app.use('/api/collection', collectionRoutes);
 app.use('/api/goldprice', goldpriceRoutes);
 
 app.use('/api/course', courseRoutes);
+
+app.use('/api/clothing', navigationcategoryRoutes);
+
+app.use('/api/auth', authRoutes);
+
+
 // api requests limit
 // const limiter = rateLimit({
 //   windowMs: 5 * 60 * 1000,
