@@ -147,6 +147,7 @@ app.use('/api/bookstore', newsubRoutes);
 app.use('/api/bookstore', productRoutes);
 app.use('/api/bookstore', siteSettingsRoutes);
 app.use('/api/bookstore', subscriberRoutes);
+app.use('/api/bookstore', authAccessRoutes);
 app.use('/api/bookstore', contentRoutes);
 app.use('/api/bookstore', bannerRoutes);
 
@@ -220,8 +221,6 @@ app.use('/api/team', teamRoutes);
 app.use('/api/template', templateRoutes);
 
 app.use('/api/test', testimonialRoutes);
-
-app.use('/api/bookstore', authAccessRoutes);
 
 app.use('/api/collection', collectionRoutes);
 
