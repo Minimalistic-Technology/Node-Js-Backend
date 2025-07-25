@@ -48,3 +48,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: "Login failed" });
   }
 };
+
+// Get all users
+export const getAllUsers = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const users = await AuthAccessModel.find({}, { password: 0 }); // exclude password
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to retrieve users" });
+  }
+};
+
