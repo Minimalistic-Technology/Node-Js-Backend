@@ -100,6 +100,7 @@ import redevelopmentRoutes from "./Property/routes/redevelopmentRoutes";
 import commercialRoutes from "./Property/routes/commercialRoutes";
 import brokerRoutes from "./Property/routes/brokerRoutes";
 import propertyReuirementRoutes from "./Property/routes/propertyRequirementRoutes";
+import propertyMessageRoutes from "./Property/routes/propertyMessageRoutes";
 import stockRoutes from './Stocks/routes/stockRoutes';
 import teamRoutes from './Team/routes/teamRoutes';
 import templateRoutes from './Template/routes/templateRoutes';
@@ -202,6 +203,7 @@ app.use('/api/property', redevelopmentRoutes);
 app.use('/api/property', commercialRoutes);
 app.use('/api/property', brokerRoutes);
 app.use('/api/property', propertyReuirementRoutes);
+app.use('api/property', propertyMessageRoutes);
 
 app.use('/api/hospital', doctorreviewRoutes);
 app.use('/api/hospital', hospitalRoutes);
