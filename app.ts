@@ -221,7 +221,7 @@ app.use('/api/template', templateRoutes);
 
 app.use('/api/test', testimonialRoutes);
 
-app.use('/api/authaccess', authAccessRoutes);
+app.use('/api/bookstore', authAccessRoutes);
 
 app.use('/api/collection', collectionRoutes);
 
