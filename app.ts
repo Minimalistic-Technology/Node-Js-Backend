@@ -46,6 +46,7 @@ import BookStoreorderRoutes from './BookStore/routes/BookStoreorderRoutes';
 import productRoutes from './BookStore/routes/productroutes';
 import siteSettingsRoutes from './BookStore/routes/siteSettingsRoutes';
 import subscriberRoutes from './BookStore/routes/subscriberRoutes';
+import cancelRoutes from './BookStore/routes/cancelRoutes';
 import AccessControlRoutes from './CheckSession/routes/AccessControlRoutes';
 import historyRoutes from './CheckSession/routes/historyRoutes';
 import locationRoutes from './CheckSession/routes/locationRoutes';
@@ -140,6 +141,7 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/blog', quoteBlogRoutes);
 
 app.use('/api/bookstore', bookOrderRoutes);
+app.use('/api/bookstore', cancelRoutes);
 app.use('/api/bookstore', BookStorecategoryRoutes);
 app.use('/api/bookstore', BookStoreorderRoutes);
 app.use('/api/bookstore', bulkuserRoutes);
@@ -151,6 +153,7 @@ app.use('/api/bookstore', subscriberRoutes);
 app.use('/api/bookstore', authAccessRoutes);
 app.use('/api/bookstore', contentRoutes);
 app.use('/api/bookstore', bannerRoutes);
+
 
 app.use('/api/checksession', AccessControlRoutes);
 app.use('/api/checksession', historyRoutes);
