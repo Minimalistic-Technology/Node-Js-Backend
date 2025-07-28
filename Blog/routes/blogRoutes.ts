@@ -1,21 +1,30 @@
-import express, { Router } from "express";
-import * as blogController from "../controllers/blogController";
+import express from 'express';
+import {
+  createBlog,
+  getAllBlogs,
+  getBlogById,
+  getUserBlogs,
+  getRelatedBlogs,
+  updateBlog,
+  deleteBlog,
+  deleteAllBlogs,
+  getMostViewedBlogs,
+  getMostRecentBlogs,
+} from '../controllers/blogController';
+import authenticateToken from '../middleware/authMiddleware';
 
-const router: Router = express.Router();
+const router = express.Router();
 
-// Routes
-router.post("/", blogController.createBlog);
-router.get("/", blogController.getAllBlogs);
-
-
-router.get("/most-viewed", blogController.getMostViewedBlogs);
-router.get("/most-recent", blogController.getMostRecentBlogs);
-
-router.get("/:id", blogController.getBlogById);
-router.put("/:id", blogController.updateBlog);
-
-router.delete("/", blogController.deleteAllBlogs);
-
-router.delete("/:id", blogController.deleteBlog);
+// Route order matters — place more specific routes first
+router.get('/related', getRelatedBlogs);
+router.get('/my-blogs', authenticateToken, getUserBlogs);
+router.post('/', authenticateToken, createBlog);
+router.get('/', getAllBlogs);
+router.get('/most-viewed', getMostViewedBlogs);
+router.get('/most-recent', getMostRecentBlogs);
+router.get('/:id', getBlogById);
+router.put('/:id', authenticateToken, updateBlog);
+router.delete('/', deleteAllBlogs);
+router.delete('/:id', authenticateToken, deleteBlog);
 
 export default router;

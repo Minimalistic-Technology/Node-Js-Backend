@@ -1,9 +1,14 @@
-import express, { Router } from "express";
-import * as quoteController from "../controllers/quoteBlogController";
+import express from 'express';
+import {
+  getLatestQuotes,
+  createQuote,
+  deleteQuote
+} from '../controllers/quoteBlogController';
 
-const router: Router = express.Router();
+const router = express.Router();
 
-router.get("/latest", quoteController.getLatestQuotes);
-router.post("/", quoteController.createQuote);
+router.get('/latest', getLatestQuotes);
+router.post('/', createQuote);
+router.delete('/:id', deleteQuote);
 
 export default router;

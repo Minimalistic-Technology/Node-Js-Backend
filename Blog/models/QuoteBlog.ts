@@ -1,5 +1,6 @@
-import { Schema, model, Document } from "mongoose";
+import mongoose, { Document, Schema, model } from 'mongoose';
 
+// Interface for QuoteBlog document
 export interface IQuoteBlog extends Document {
   quote: string;
   name: string;
@@ -7,6 +8,7 @@ export interface IQuoteBlog extends Document {
   createdAt: Date;
 }
 
+// Define schema
 const quoteBlogSchema = new Schema<IQuoteBlog>({
   quote: { type: String, required: true },
   name: { type: String, required: true },
@@ -14,8 +16,9 @@ const quoteBlogSchema = new Schema<IQuoteBlog>({
   createdAt: {
     type: Date,
     default: Date.now,
-  },
+  }
 });
 
-const QuoteBlog = model<IQuoteBlog>("QuoteBlog", quoteBlogSchema);
+// Export model
+const QuoteBlog = model<IQuoteBlog>('QuoteBlog', quoteBlogSchema);
 export default QuoteBlog;

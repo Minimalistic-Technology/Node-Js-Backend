@@ -138,7 +138,7 @@ app.use('/api/aggarbatti', userRoutes);
 app.use('/api/aggarbatti', heroSlideRoutes);
 
 app.use('/api/blog', blogRoutes);
-app.use('/api/quote-blog', quoteBlogRoutes);
+app.use('/api/quotes', quoteBlogRoutes);
 
 app.use('/api/bookstore', bookOrderRoutes);
 app.use('/api/bookstore', cancelRoutes);
