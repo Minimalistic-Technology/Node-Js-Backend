@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import QuoteBlog from '../models/QuoteBlog';
+import { Request, Response } from "express";
+import QuoteBlog from "../models/QuoteBlog";
 
 export const createQuote = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -17,7 +17,7 @@ export const getLatestQuotes = async (req: Request, res: Response): Promise<void
 
   try {
     const quotes = await QuoteBlog.find({
-      createdAt: { $gte: threeMonthsAgo }
+      createdAt: { $gte: threeMonthsAgo },
     }).sort({ createdAt: -1 });
 
     res.json(quotes);

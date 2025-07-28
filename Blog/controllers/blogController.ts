@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import Blog from '../models/Blog';
+import { Request, Response } from "express";
+import Blog from "../models/Blog";
 
 export const createBlog = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -15,8 +15,8 @@ export const getAllBlogs = async (req: Request, res: Response): Promise<void> =>
   try {
     const blogs = await Blog.find();
     res.json(blogs);
-  } catch (err: any) {
-    res.status(500).json({ error: 'Failed to fetch blogs' });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch blogs" });
   }
 };
 
@@ -28,8 +28,8 @@ export const getBlogById = async (req: Request, res: Response): Promise<void> =>
       return;
     }
     res.json(blog);
-  } catch (err: any) {
-    res.status(400).json({ error: 'Invalid blog ID' });
+  } catch (err) {
+    res.status(400).json({ error: "Invalid blog ID" });
   }
 };
 
@@ -41,8 +41,8 @@ export const updateBlog = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     res.json(blog);
-  } catch (err: any) {
-    res.status(400).json({ error: 'Failed to update blog' });
+  } catch (err) {
+    res.status(400).json({ error: "Failed to update blog" });
   }
 };
 
@@ -54,19 +54,19 @@ export const deleteBlog = async (req: Request, res: Response): Promise<void> => 
       return;
     }
     res.json({ message: "Blog deleted successfully" });
-  } catch (err: any) {
-    res.status(400).json({ error: 'Failed to delete blog' });
+  } catch (err) {
+    res.status(400).json({ error: "Failed to delete blog" });
   }
 };
-export function getMostViewedBlogs(arg0: string, getMostViewedBlogs: any) {
-    throw new Error('Function not implemented.');
-}
 
-export function getMostRecentBlogs(arg0: string, getMostRecentBlogs: any) {
-    throw new Error('Function not implemented.');
-}
+export const getMostViewedBlogs = async (req: Request, res: Response): Promise<void> => {
+  res.status(501).json({ message: "getMostViewedBlogs not implemented" });
+};
 
-export function deleteAllBlogs(arg0: string, deleteAllBlogs: any) {
-    throw new Error('Function not implemented.');
-}
+export const getMostRecentBlogs = async (req: Request, res: Response): Promise<void> => {
+  res.status(501).json({ message: "getMostRecentBlogs not implemented" });
+};
 
+export const deleteAllBlogs = async (req: Request, res: Response): Promise<void> => {
+  res.status(501).json({ message: "deleteAllBlogs not implemented" });
+};
