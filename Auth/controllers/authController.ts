@@ -115,7 +115,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.json({ message: 'Login successful', accessToken });
+    res.json({ message: 'Login successful', accessToken , user: { id: user._id, username: user.username, email: user.email } });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ error: 'Login failed' });
