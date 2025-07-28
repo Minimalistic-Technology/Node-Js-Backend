@@ -4,14 +4,14 @@ import { Types } from 'mongoose';
 
 interface AuthenticatedRequest extends Request {
   user?: {
-    userId: string;
+    userID: string;
   };
 }
 
 // ✅ Create Blog
 export const createBlog: RequestHandler = async (req, res) => {
   const userReq = req as AuthenticatedRequest;
-  if (!userReq.user?.userId) {
+  if (!userReq.user?.userID) {
     res.status(401).json({ error: 'User not authenticated' });
     return;
   }
@@ -19,7 +19,7 @@ export const createBlog: RequestHandler = async (req, res) => {
   try {
     const blog = new Blog({
       ...req.body,
-      authorId: userReq.user.userId,
+      authorId: userReq.user.userID,
     });
     await blog.save();
     res.status(201).json(blog);
@@ -77,13 +77,15 @@ export const getBlogById: RequestHandler = async (req, res) => {
 // ✅ Get User Blogs
 export const getUserBlogs: RequestHandler = async (req, res) => {
   const userReq = req as AuthenticatedRequest;
-  if (!userReq.user?.userId) {
+  console.log('User ID:', userReq.user);
+  if (!userReq.user?.userID) {
     res.status(401).json({ error: 'User not authenticated' });
     return;
   }
 
   try {
-    const blogs = await Blog.find({ authorId: userReq.user.userId });
+    const blogs = await Blog.find({ authorId: userReq.user.userID
+     });
     res.json(blogs);
   } catch (err: any) {
     res.status(500).json({ error: "Failed to fetch user's blogs" });
@@ -133,7 +135,7 @@ export const deleteBlog: RequestHandler = async (req, res) => {
 export const deleteAllBlogs: RequestHandler = async (_req, res) => {
   try {
     const result = await Blog.deleteMany({});
-    res.json({ message: `${result.deletedCount} blogs deleted successfully` });
+    res.json({ message: ${result.deletedCount} blogs deleted successfully });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
