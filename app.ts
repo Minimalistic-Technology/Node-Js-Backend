@@ -206,7 +206,7 @@ app.use('/api/property', redevelopmentRoutes);
 app.use('/api/property', commercialRoutes);
 app.use('/api/property', brokerRoutes);
 app.use('/api/property', propertyReuirementRoutes);
-app.use('api/property', propertyMessageRoutes);
+app.use('/api/property', propertyMessageRoutes);
 
 app.use('/api/hospital', doctorreviewRoutes);
 app.use('/api/hospital', hospitalRoutes);
