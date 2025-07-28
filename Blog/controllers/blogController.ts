@@ -135,7 +135,7 @@ export const deleteBlog: RequestHandler = async (req, res) => {
 export const deleteAllBlogs: RequestHandler = async (_req, res) => {
   try {
     const result = await Blog.deleteMany({});
-    res.json({ message: ${result.deletedCount} blogs deleted successfully });
+    res.json({ message: `${result.deletedCount} blogs deleted successfully` });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
