@@ -108,6 +108,7 @@ import templateRoutes from './Template/routes/templateRoutes';
 import testimonialRoutes from './Testimonial/routes/testimonialRoutes';
 import authUserRoutes from './CRM/routes/authUserRoutes';
 import usersRoutes from './GFG/routes/usersRoutes';
+import languageRoutes from './GFG/routes/languageRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -239,6 +240,7 @@ app.use('/api/clothing', navigationcategoryRoutes);
 app.use('/api/auth', authRoutes);
 
 app.use('/api/gfg', usersRoutes);
+app.use('/api/gfg', languageRoutes);
 
 // api requests limit
 // const limiter = rateLimit({
