@@ -109,6 +109,7 @@ import testimonialRoutes from './Testimonial/routes/testimonialRoutes';
 import authUserRoutes from './CRM/routes/authUserRoutes';
 import usersRoutes from './GFG/routes/usersRoutes';
 import languageRoutes from './GFG/routes/languageRoutes';
+import documentationRoutes from './GFG/routes/documentationRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -241,6 +242,7 @@ app.use('/api/auth', authRoutes);
 
 app.use('/api/gfg', usersRoutes);
 app.use('/api/gfg', languageRoutes);
+app.use('/api/gfg', documentationRoutes);
 
 // api requests limit
 // const limiter = rateLimit({
