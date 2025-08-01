@@ -7,6 +7,17 @@ const quizSchema = new mongoose.Schema({
   explanation: { type: String, required: true },
 });
 
+const subtopicSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  theory: { type: String, required: true },
+  code: { type: String, required: true },
+  output: { type: String },
+  quiz: {
+    type: [quizSchema],
+    validate: [(val: any[]) => val.length === 2, '{PATH} must have exactly 2 quiz items']
+  }
+});
+
 const documentationSchema = new mongoose.Schema({
   language: { type: String, required: true },
   title: { type: String, required: true },
@@ -16,7 +27,8 @@ const documentationSchema = new mongoose.Schema({
   quiz: {
     type: [quizSchema],
     validate: [(val: any[]) => val.length === 2, '{PATH} must have exactly 2 quiz items']
-  }
+  },
+  subtopics: [subtopicSchema]
 }, { timestamps: true });
 
 const Documentation = mongoose.model('Documentation', documentationSchema);
