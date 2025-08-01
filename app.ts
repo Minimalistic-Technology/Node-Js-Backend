@@ -113,6 +113,7 @@ import documentationRoutes from './GFG/routes/documentationRoutes';
 import practiceProblemRoutes from './GFG/routes/practiceProblemRoutes';
 import searchEntryRoutes from './GFG/routes/searchEntryRoutes';
 import dashboardStatRoutes from './GFG/routes/dashboardStatRoutes';
+import notificationGFGRoutes from './GFG/routes/notificationGFGRoutes';
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -245,6 +246,7 @@ app.use('/api/auth', authRoutes);
 
 app.use('/api/gfg', usersRoutes);
 app.use('/api/gfg', languageRoutes);
+app.use('/api/gfg', notificationGFGRoutes);
 app.use('/api/gfg', documentationRoutes);
 app.use('/api/gfg', practiceProblemRoutes);
 app.use('/api/gfg', dashboardStatRoutes);
