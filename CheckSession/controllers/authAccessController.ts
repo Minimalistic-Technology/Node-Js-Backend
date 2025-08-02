@@ -60,7 +60,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const accessToken = jwt.sign({ id: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1d' });
     const refreshToken = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '7d' });
 
-    // Add cookie options
     const accessTokenOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -73,7 +72,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
-    // ✅ Set cookies here
     res.cookie("access_token", accessToken, accessTokenOptions);
     res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 
@@ -93,14 +91,78 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
-// Get all users (Admin only)
-export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
+// Get all users (for Admin panel)
+export const getAllUsers = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const users = await AuthUserModel.find({}, { password: 0 }); // Exclude password field
+    const users = await AuthUserModel.find({}, { password: 0 }); // Exclude password
     res.status(200).json(users);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to fetch users' });
-  }
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+};
+
+// ✅ Update User
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const updatedUser = await AuthUserModel.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true
+    });
+
+    if (!updatedUser) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.status(200).json({ message: 'User updated', user: updatedUser });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+};
+
+// ✅ Delete User
+export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const deletedUser = await AuthUserModel.findByIdAndDelete(id);
+    if (!deletedUser) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.status(200).json({ message: 'User deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete user' });
+  }
+};
+
+// ✅ Get logged-in user details (from cookie)
+export const getLoggedInUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const token = req.cookies.access_token;
+
+    if (!token) {
+      res.status(401).json({ message: 'Not authenticated' });
+      return;
+    }
+
+    const decoded: any = jwt.verify(token, SECRET_KEY);
+    const user = await AuthUserModel.findById(decoded.id).select('-password');
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(401).json({ message: 'Invalid or expired token' });
+  }
 };
