@@ -7,7 +7,7 @@ export const createProblem = async (req: Request, res: Response): Promise<void> 
     await newProblem.save();
     res.status(201).json(newProblem);
   } catch (error) {
-    res.status(400).json({ error: 'Failed to create practice problem' });
+    res.status(400).json({ error: 'Failed to create practice problem', details: error });
   }
 };
 
@@ -15,8 +15,8 @@ export const getAllProblems = async (_req: Request, res: Response): Promise<void
   try {
     const problems = await PracticeProblem.find();
     res.status(200).json(problems);
-  } catch {
-    res.status(500).json({ error: 'Failed to fetch problems' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch problems', details: error });
   }
 };
 
@@ -25,8 +25,8 @@ export const getProblemById = async (req: Request, res: Response): Promise<void>
     const problem = await PracticeProblem.findById(req.params.id);
     if (!problem)  res.status(404).json({ error: 'Problem not found' });
     res.json(problem);
-  } catch {
-    res.status(400).json({ error: 'Invalid ID format' });
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid ID format', details: error });
   }
 };
 
@@ -35,8 +35,8 @@ export const updateProblem = async (req: Request, res: Response): Promise<void> 
     const updated = await PracticeProblem.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updated)  res.status(404).json({ error: 'Problem not found' });
     res.json(updated);
-  } catch {
-    res.status(400).json({ error: 'Failed to update problem' });
+  } catch (error) {
+    res.status(400).json({ error: 'Failed to update problem', details: error });
   }
 };
 
@@ -45,7 +45,7 @@ export const deleteProblem = async (req: Request, res: Response): Promise<void> 
     const deleted = await PracticeProblem.findByIdAndDelete(req.params.id);
     if (!deleted)  res.status(404).json({ error: 'Problem not found' });
     res.json({ message: 'Problem deleted successfully' });
-  } catch {
-    res.status(500).json({ error: 'Failed to delete problem' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete problem', details: error });
   }
 };

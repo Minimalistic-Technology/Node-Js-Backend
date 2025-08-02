@@ -1,22 +1,14 @@
-import express from "express";
-import {
-  createOrder,
-  getAllOrders,
-  getOrderById,
-  updateOrderStatus,
-  deleteOrder,
-  cancelOrder,
-  refundOrder,
-} from "../controllers/bookOrderController";
+// File: orderroutes.ts
+import express from 'express';
+import { createOrder, getAllOrders, updateOrderStatus, deleteOrder, getCancelReasons, cancelOrder } from '../controllers/ordercontroller';
 
 const router = express.Router();
 
-router.post("/book-orders", createOrder);
-router.get("/book-orders", getAllOrders);
-router.get("/book-orders/:id", getOrderById);
-router.put("/book-orders/:id", updateOrderStatus);
-router.delete("/book-orders/:id", deleteOrder);
-router.put("/book-orders/:id/cancel", cancelOrder);
-router.put("/book-orders/:id/refund", refundOrder);
+router.post('/orders', createOrder);
+router.get('/orders', getAllOrders);
+router.put('/orders/:id', updateOrderStatus);
+router.delete('/orders/:id', deleteOrder);
+router.get('/cancel-reasons', getCancelReasons);
+router.post('/orders/:id/cancel', cancelOrder); // New route for canceling orders
 
 export default router;

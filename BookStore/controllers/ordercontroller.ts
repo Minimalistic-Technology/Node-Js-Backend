@@ -1,7 +1,20 @@
-// File: ordercontroller.ts
 import { Request, Response } from 'express';
 import { Order } from '../../BookStore/models/order';
 import { BookModel } from '../../BookStore/models/homepage';
+
+export const getCancelReasons = (_req: Request, res: Response) => {
+  const reasons: string[] = [
+    "I changed my mind",
+    "I don't like the book content",
+    "Found the book cheaper elsewhere",
+    "The book is taking too long to arrive",
+    "I ordered the wrong book",
+    "I wanted a different edition or format",
+    "I no longer need the book",
+    "Other"
+  ];
+  res.status(200).json({ reasons });
+};
 
 export const createOrder = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -48,9 +61,12 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
         date: order.date,
         bookId: order.bookId,
         title: book.title,
+        imageUrl: book.imageUrl,
+        cancelReason: order.cancelReason || null,
       },
     });
   } catch (err) {
+    console.error('Error creating order:', err);
     res.status(500).json({ message: 'Server error', error: err instanceof Error ? err.message : 'Unknown error' });
   }
 };
@@ -77,9 +93,47 @@ export const getAllOrders = async (_req: Request, res: Response): Promise<void> 
         bookId: order.bookId,
         title: order.bookId ? (order.bookId as any).title : 'Unknown Book',
         imageUrl: order.bookId ? (order.bookId as any).imageUrl : null,
+        cancelReason: order.cancelReason || null,
       })),
     });
   } catch (err) {
+    console.error('Error fetching orders:', err);
+    res.status(500).json({ message: 'Server error', error: err instanceof Error ? err.message : 'Unknown error' });
+  }
+};
+
+export const getOrderById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findById(id).populate('bookId', 'title imageUrl');
+    if (!order) {
+      res.status(404).json({ message: 'Order not found' });
+      return;
+    }
+    res.status(200).json({
+      message: 'Order retrieved successfully',
+      order: {
+        _id: order._id,
+        customerName: order.customerName,
+        email: order.email,
+        mobileNumber: order.mobileNumber,
+        address: order.address,
+        paymentType: order.paymentType,
+        quantity: order.quantity,
+        price: order.price,
+        status: order.status,
+        condition: order.condition,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        date: order.date,
+        bookId: order.bookId,
+        title: order.bookId ? (order.bookId as any).title : 'Unknown Book',
+        imageUrl: order.bookId ? (order.bookId as any).imageUrl : null,
+        cancelReason: order.cancelReason || null,
+      },
+    });
+  } catch (err) {
+    console.error('Error fetching order:', err);
     res.status(500).json({ message: 'Server error', error: err instanceof Error ? err.message : 'Unknown error' });
   }
 };
@@ -119,24 +173,116 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
         bookId: order.bookId,
         title: order.bookId ? (order.bookId as any).title : 'Unknown Book',
         imageUrl: order.bookId ? (order.bookId as any).imageUrl : null,
+        cancelReason: order.cancelReason || null,
       },
     });
   } catch (err) {
+    console.error('Error updating order:', err);
     res.status(500).json({ message: 'Server error', error: err instanceof Error ? err.message : 'Unknown error' });
   }
 };
 
-
 export const deleteOrder = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    console.log(`Attempting to delete order with ID: ${id}`); // Debug log
     const order = await Order.findByIdAndDelete(id);
     if (!order) {
       res.status(404).json({ message: 'Order not found' });
       return;
     }
+    // Optionally, restore book stock
+    const book = await BookModel.findById(order.bookId);
+    if (book) {
+      if (order.condition === 'New') book.quantityNew += order.quantity;
+      if (order.condition === 'Old') book.quantityOld += order.quantity;
+      await book.save();
+    }
     res.status(200).json({ message: 'Order deleted successfully' });
   } catch (err) {
+    console.error('Error deleting order:', err);
+    res.status(500).json({ message: 'Server error', error: err instanceof Error ? err.message : 'Unknown error' });
+  }
+};
+
+export const cancelOrder = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    if (!reason) {
+      res.status(400).json({ message: 'Cancellation reason is required' });
+      return;
+    }
+
+    const order = await Order.findById(id).populate('bookId', 'title imageUrl');
+    if (!order) {
+      res.status(404).json({ message: 'Order not found' });
+      return;
+    }
+
+    if (order.status === 'Cancelled') {
+      res.status(400).json({ message: 'Order is already cancelled' });
+      return;
+    }
+
+    if (order.status === 'Delivered') {
+      res.status(400).json({ message: 'Cannot cancel a delivered order' });
+      return;
+    }
+
+    order.status = 'Cancelled';
+    order.cancelReason = reason;
+    await order.save();
+
+    // Optionally, restore book stock
+    const book = await BookModel.findById(order.bookId);
+    if (book) {
+      if (order.condition === 'New') book.quantityNew += order.quantity;
+      if (order.condition === 'Old') book.quantityOld += order.quantity;
+      await book.save();
+    }
+
+    res.status(200).json({
+      message: `Order ${id} has been cancelled successfully.`,
+      order: {
+        _id: order._id,
+        customerName: order.customerName,
+        email: order.email,
+        mobileNumber: order.mobileNumber,
+        address: order.address,
+        paymentType: order.paymentType,
+        quantity: order.quantity,
+        price: order.price,
+        status: order.status,
+        condition: order.condition,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+        date: order.date,
+        bookId: order.bookId,
+        title: order.bookId ? (order.bookId as any).title : 'Unknown Book',
+        imageUrl: order.bookId ? (order.bookId as any).imageUrl : null,
+        cancelReason: order.cancelReason,
+      },
+    });
+  } catch (err) {
+    console.error('Error cancelling order:', err);
+    res.status(500).json({ message: 'Server error', error: err instanceof Error ? err.message : 'Unknown error' });
+  }
+};
+
+export const refundOrder = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findById(id);
+    if (!order) {
+      res.status(404).json({ message: 'Order not found' });
+      return;
+    }
+    // Implement refund logic here (e.g., integrate with payment gateway)
+    res.status(200).json({ message: 'Refund processed successfully' });
+  } catch (err) {
+    console.error('Error processing refund:', err);
     res.status(500).json({ message: 'Server error', error: err instanceof Error ? err.message : 'Unknown error' });
   }
 };

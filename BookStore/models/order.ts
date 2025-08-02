@@ -1,4 +1,3 @@
-// File: order.ts
 import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export type OrderStatus = 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
@@ -28,6 +27,7 @@ export interface IOrder extends Document {
   updatedAt: Date;
   __v: number;
   bookId: Types.ObjectId;
+  cancelReason?: string; // Added field for cancellation reason
 }
 
 const OrderSchema: Schema = new Schema<IOrder>(
@@ -49,6 +49,7 @@ const OrderSchema: Schema = new Schema<IOrder>(
     condition: { type: String, enum: ['New', 'Old'], required: true },
     date: { type: Date, default: Date.now },
     bookId: { type: Schema.Types.ObjectId, ref: 'Book', required: true },
+    cancelReason: { type: String, required: false }, // Added field
   },
   { timestamps: { createdAt: true, updatedAt: true }, versionKey: '__v' }
 );
