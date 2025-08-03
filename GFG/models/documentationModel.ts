@@ -14,7 +14,7 @@ const subtopicSchema = new mongoose.Schema({
   output: { type: String },
   quiz: {
     type: [quizSchema],
-    validate: [(val: any[]) => val.length === 2, '{PATH} must have exactly 2 quiz items']
+    validate: [(val: any[]) => val.length <= 2, '{PATH} can have up to 2 quiz items'],
   }
 });
 
@@ -26,7 +26,7 @@ const documentationSchema = new mongoose.Schema({
   output: { type: String },
   quiz: {
     type: [quizSchema],
-    validate: [(val: any[]) => val.length === 2, '{PATH} must have exactly 2 quiz items']
+    validate: [(val: any[]) => val.length <= 2, '{PATH} can have up to 2 quiz items'],
   },
   subtopics: [subtopicSchema]
 }, { timestamps: true });
