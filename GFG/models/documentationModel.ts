@@ -12,10 +12,7 @@ const subtopicSchema = new mongoose.Schema({
   theory: { type: String, required: true },
   code: { type: String, required: true },
   output: { type: String },
-  quiz: {
-    type: [quizSchema],
-    validate: [(val: any[]) => val.length <= 2, '{PATH} can have up to 2 quiz items'],
-  }
+  quiz: [quizSchema] 
 });
 
 const documentationSchema = new mongoose.Schema({
@@ -24,10 +21,7 @@ const documentationSchema = new mongoose.Schema({
   theory: { type: String, required: true },
   code: { type: String, required: true },
   output: { type: String },
-  quiz: {
-    type: [quizSchema],
-    validate: [(val: any[]) => val.length <= 2, '{PATH} can have up to 2 quiz items'],
-  },
+  quiz: [quizSchema], 
   subtopics: [subtopicSchema]
 }, { timestamps: true });
 
