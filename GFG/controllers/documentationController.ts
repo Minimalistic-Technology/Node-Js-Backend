@@ -95,11 +95,6 @@ export const addQuizToSection = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  if (section.quiz.length >= 2) {
-    res.status(400).json({ error: 'Only 2 quiz items allowed' });
-    return;
-  }
-
   section.quiz.push(req.body);
   await section.save();
   res.status(201).json(section);
