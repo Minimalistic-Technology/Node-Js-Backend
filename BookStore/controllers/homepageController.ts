@@ -4,7 +4,7 @@ import { BookModel, BookCategoryModel, IBook, IBookCategory } from "../models/ho
 class BookController {
   static async getAllCategories(req: Request, res: Response): Promise<void> {
     try {
-      const categories = await BookCategoryModel.find().lean();
+      const categories = (await BookCategoryModel.find().lean()) as IBookCategory[];
       res.status(200).json(categories);
     } catch (err: any) {
       console.error('Error fetching categories:', err);
@@ -14,20 +14,16 @@ class BookController {
 
   static async createCategory(req: Request, res: Response): Promise<void> {
     try {
-      console.log('Request body:', req.body); // Debugging log
-      const { name, tags, subCategories, seoTitle, seoDescription } = req.body;
+      console.log('Request body:', req.body);
+      const { name, tags, subCategories, seoTitle, seoDescription, categoryDiscount } = req.body;
 
-      // Validate required name field
       if (!name || !name.trim()) {
         res.status(400).json({ error: 'Category name is required' });
         return;
       }
 
-      // Format name to replace spaces with hyphens
       const formattedName = name.trim().replace(/\s+/g, '-');
-
-      // Check if category with the same name already exists
-      const existingCategory = await BookCategoryModel.findOne({ name: formattedName });
+      const existingCategory = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${formattedName}$`, 'i') } });
       if (existingCategory) {
         res.status(400).json({ error: 'Category name already exists' });
         return;
@@ -43,10 +39,12 @@ class BookController {
                 ? sub.subSubCategories.map((subSub: string) => subSub.trim().replace(/\s+/g, '-'))
                 : [],
               books: [],
+              subCategoryDiscount: sub.subCategoryDiscount || 0,
             }))
           : [],
         seoTitle,
         seoDescription,
+        categoryDiscount: categoryDiscount || 0,
       });
       await category.save();
       res.status(201).json(category);
@@ -58,7 +56,7 @@ class BookController {
 
   static async createBulkCategories(req: Request, res: Response): Promise<void> {
     try {
-      console.log('Bulk request body:', req.body); // Debugging log
+      console.log('Bulk request body:', req.body);
       const categories = req.body;
 
       if (!Array.isArray(categories) || categories.length === 0) {
@@ -66,11 +64,11 @@ class BookController {
         return;
       }
 
-      const createdCategories = [];
-      const errors = [];
+      const createdCategories: IBookCategory[] = [];
+      const errors: { name: string; error: string }[] = [];
 
       for (const cat of categories) {
-        const { name, tags, subCategories, seoTitle, seoDescription } = cat;
+        const { name, tags, subCategories, seoTitle, seoDescription, categoryDiscount } = cat;
 
         if (!name || !name.trim()) {
           errors.push({ name: name || 'undefined', error: 'Category name is required' });
@@ -78,7 +76,7 @@ class BookController {
         }
 
         const formattedName = name.trim().replace(/\s+/g, '-');
-        const existingCategory = await BookCategoryModel.findOne({ name: formattedName });
+        const existingCategory = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${formattedName}$`, 'i') } });
         if (existingCategory) {
           errors.push({ name: formattedName, error: 'Category name already exists' });
           continue;
@@ -94,10 +92,12 @@ class BookController {
                   ? sub.subSubCategories.map((subSub: string) => subSub.trim().replace(/\s+/g, '-'))
                   : [],
                 books: [],
+                subCategoryDiscount: sub.subCategoryDiscount || 0,
               }))
             : [],
           seoTitle,
           seoDescription,
+          categoryDiscount: categoryDiscount || 0,
         });
 
         try {
@@ -124,43 +124,148 @@ class BookController {
     }
   }
 
-  static async getCategoryByNameWithBooks(req: Request, res: Response): Promise<void> {
+  static async setCategoryDiscount(req: Request, res: Response): Promise<void> {
     try {
-      const { categoryName, subCategory, subSubCategory } = req.params;
-      const category = await BookCategoryModel.findOne({ name: decodeURIComponent(categoryName) }).lean();
+      const { categoryName } = req.params;
+      const { discount } = req.body;
+
+      if (typeof discount !== 'number' || discount < 0 || discount > 100) {
+        res.status(400).json({ error: 'Discount must be a number between 0 and 100' });
+        return;
+      }
+
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
       if (!category) {
         res.status(404).json({ error: 'Category not found' });
         return;
       }
 
-      let booksQuery: any = { categoryName: decodeURIComponent(categoryName) };
-      if (subCategory) {
-        booksQuery.subCategory = decodeURIComponent(subCategory);
-      }
-      if (subSubCategory) {
-        booksQuery.subSubCategory = decodeURIComponent(subSubCategory);
+      category.categoryDiscount = discount;
+      await category.save();
+      res.status(200).json(category);
+    } catch (err: any) {
+      console.error('Error setting category discount:', err);
+      res.status(400).json({ error: 'Failed to set category discount', details: err.message });
+    }
+  }
+
+  static async setSubCategoryDiscount(req: Request, res: Response): Promise<void> {
+    try {
+      const { categoryName, subCategory } = req.params;
+      const { discount } = req.body;
+
+      if (typeof discount !== 'number' || discount < 0 || discount > 100) {
+        res.status(400).json({ error: 'Discount must be a number between 0 and 100' });
+        return;
       }
 
-      const books = await BookModel.find(booksQuery).lean();
-      res.status(200).json({ ...category, books });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
+      if (!category) {
+        res.status(404).json({ error: 'Category not found' });
+        return;
+      }
+
+      const subCat = category.subCategories.find((sub: any) => sub.name.toLowerCase() === decodeURIComponent(subCategory).toLowerCase());
+      if (!subCat) {
+        res.status(404).json({ error: 'Subcategory not found' });
+        return;
+      }
+
+      subCat.subCategoryDiscount = discount;
+      await category.save();
+      res.status(200).json(category);
+    } catch (err: any) {
+      console.error('Error setting subcategory discount:', err);
+      res.status(400).json({ error: 'Failed to set subcategory discount', details: err.message });
+    }
+  }
+
+  static async getCategoryByNameWithBooks(req: Request, res: Response): Promise<void> {
+    try {
+      const { categoryName, subCategory, subSubCategory } = req.params;
+      const category = (await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } }).lean()) as IBookCategory;
+      if (!category) {
+        res.status(404).json({ error: 'Category not found' });
+        return;
+      }
+
+      let booksQuery: any = { categoryName: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } };
+      if (subCategory) {
+        booksQuery.subCategory = { $regex: new RegExp(`^${decodeURIComponent(subCategory)}$`, 'i') };
+      }
+      if (subSubCategory) {
+        booksQuery.subSubCategory = { $regex: new RegExp(`^${decodeURIComponent(subSubCategory)}$`, 'i') };
+      }
+
+      const books = (await BookModel.find(booksQuery).lean()) as IBook[];
+      const subCat = subCategory
+        ? category.subCategories.find((sub) => sub.name.toLowerCase() === decodeURIComponent(subCategory).toLowerCase())
+        : null;
+
+      const booksWithDiscount = books.map((book) => {
+        const effectiveDiscount =
+          subCat?.subCategoryDiscount && subCat.subCategoryDiscount > 0
+            ? subCat.subCategoryDiscount
+            : category.categoryDiscount && category.categoryDiscount > 0
+            ? category.categoryDiscount
+            : book.condition === 'new'
+            ? book.discountNew || 0
+            : book.discountOld || 0;
+        const discountedPrice = book.price
+          ? book.price * (1 - effectiveDiscount / 100)
+          : book.price;
+        return { ...book, effectiveDiscount, discountedPrice };
+      });
+
+      res.status(200).json({ ...category, books: booksWithDiscount });
     } catch (err: any) {
       console.error('Error fetching category with books:', err);
       res.status(500).json({ error: 'Failed to fetch category with books', details: err.message });
     }
   }
 
+  static async getBookDetailsById(req: Request, res: Response): Promise<void> {
+    try {
+      const { bookId } = req.params;
+      const book = (await BookModel.findById(bookId).lean()) as IBook;
+      if (!book) {
+        res.status(404).json({ error: 'Book not found' });
+        return;
+      }
+
+      const category = (await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${book.categoryName}$`, 'i') } }).lean()) as IBookCategory;
+      const subCat = category?.subCategories.find((sub) => sub.name.toLowerCase() === book.subCategory?.toLowerCase());
+
+      const effectiveDiscount =
+        subCat?.subCategoryDiscount && subCat.subCategoryDiscount > 0
+          ? subCat.subCategoryDiscount
+          : category?.categoryDiscount && category.categoryDiscount > 0
+          ? category.categoryDiscount
+          : book.condition === 'new'
+          ? book.discountNew || 0
+          : book.discountOld || 0;
+      const discountedPrice = book.price
+        ? book.price * (1 - effectiveDiscount / 100)
+        : book.price;
+
+      res.status(200).json({ ...book, effectiveDiscount, discountedPrice });
+    } catch (err: any) {
+      console.error('Error fetching book:', err);
+      res.status(500).json({ error: 'Failed to fetch book', details: err.message });
+    }
+  }
+
   static async updateCategory(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { name, tags, subCategories, seoTitle, seoDescription } = req.body;
+      const { name, tags, subCategories, seoTitle, seoDescription, categoryDiscount } = req.body;
 
-      // Validate name if provided
       if (name && !name.trim()) {
         res.status(400).json({ error: 'Category name cannot be empty' });
         return;
       }
 
-      const updateData: any = {
+      const updateData: Partial<IBookCategory> = {
         tags: tags ? tags.map((tag: string) => tag.trim().replace(/\s+/g, '-')) : [],
         subCategories: subCategories
           ? subCategories.map((sub: any) => ({
@@ -169,15 +274,17 @@ class BookController {
                 ? sub.subSubCategories.map((subSub: string) => subSub.trim().replace(/\s+/g, '-'))
                 : [],
               books: sub.books || [],
+              subCategoryDiscount: sub.subCategoryDiscount || 0,
             }))
           : [],
         seoTitle,
         seoDescription,
+        categoryDiscount: categoryDiscount || 0,
       };
 
       if (name) {
         updateData.name = name.trim().replace(/\s+/g, '-');
-        const existingCategory = await BookCategoryModel.findOne({ name: updateData.name });
+        const existingCategory = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${updateData.name}$`, 'i') } });
         if (existingCategory && existingCategory._id.toString() !== id) {
           res.status(400).json({ error: 'Category name already exists' });
           return;
@@ -204,7 +311,7 @@ class BookController {
         res.status(404).json({ error: 'Category not found' });
         return;
       }
-      await BookModel.deleteMany({ categoryName: category.name });
+      await BookModel.deleteMany({ categoryName: { $regex: new RegExp(`^${category.name}$`, 'i') } });
       res.status(200).json({ message: 'Category and associated books deleted successfully' });
     } catch (err: any) {
       console.error('Error deleting category:', err);
@@ -215,7 +322,7 @@ class BookController {
   static async createSubCategory(req: Request, res: Response): Promise<void> {
     try {
       const { categoryName } = req.params;
-      const { name, subSubCategories } = req.body;
+      const { name, subSubCategories, subCategoryDiscount } = req.body;
 
       if (!name || !name.trim()) {
         res.status(400).json({ error: 'Subcategory name is required' });
@@ -223,12 +330,12 @@ class BookController {
       }
 
       const formattedName = name.trim().replace(/\s+/g, '-');
-      const category = await BookCategoryModel.findOne({ name: decodeURIComponent(categoryName) });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
       if (!category) {
         res.status(404).json({ error: 'Category not found' });
         return;
       }
-      if (category.subCategories.some((sub: any) => sub.name === formattedName)) {
+      if (category.subCategories.some((sub: any) => sub.name.toLowerCase() === formattedName.toLowerCase())) {
         res.status(400).json({ error: 'Subcategory already exists' });
         return;
       }
@@ -238,6 +345,7 @@ class BookController {
           ? subSubCategories.map((subSub: string) => subSub.trim().replace(/\s+/g, '-'))
           : [],
         books: [],
+        subCategoryDiscount: subCategoryDiscount || 0,
       });
       await category.save();
       res.status(201).json(category);
@@ -250,23 +358,23 @@ class BookController {
   static async deleteSubCategory(req: Request, res: Response): Promise<void> {
     try {
       const { categoryName, subCategoryName } = req.params;
-      const category = await BookCategoryModel.findOne({ name: decodeURIComponent(categoryName) });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
       if (!category) {
         res.status(404).json({ error: 'Category not found' });
         return;
       }
-      const subCategory = category.subCategories.find((sub: any) => sub.name === decodeURIComponent(subCategoryName));
+      const subCategory = category.subCategories.find((sub: any) => sub.name.toLowerCase() === decodeURIComponent(subCategoryName).toLowerCase());
       if (!subCategory) {
         res.status(404).json({ error: 'Subcategory not found' });
         return;
       }
       category.subCategories = category.subCategories.filter(
-        (sub: any) => sub.name !== decodeURIComponent(subCategoryName)
+        (sub: any) => sub.name.toLowerCase() !== decodeURIComponent(subCategoryName).toLowerCase()
       );
       await category.save();
       await BookModel.deleteMany({
-        categoryName: decodeURIComponent(categoryName),
-        subCategory: decodeURIComponent(subCategoryName),
+        categoryName: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') },
+        subCategory: { $regex: new RegExp(`^${decodeURIComponent(subCategoryName)}$`, 'i') },
       });
       res.status(200).json(category);
     } catch (err: any) {
@@ -286,17 +394,17 @@ class BookController {
       }
 
       const formattedName = name.trim().replace(/\s+/g, '-');
-      const category = await BookCategoryModel.findOne({ name: decodeURIComponent(categoryName) });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
       if (!category) {
         res.status(404).json({ error: 'Category not found' });
         return;
       }
-      const subCat = category.subCategories.find((sub: any) => sub.name === decodeURIComponent(subCategory));
+      const subCat = category.subCategories.find((sub: any) => sub.name.toLowerCase() === decodeURIComponent(subCategory).toLowerCase());
       if (!subCat) {
         res.status(404).json({ error: 'Subcategory not found' });
         return;
       }
-      if (subCat.subSubCategories.includes(formattedName)) {
+      if (subCat.subSubCategories.some((subSub: string) => subSub.toLowerCase() === formattedName.toLowerCase())) {
         res.status(400).json({ error: 'Sub-subcategory already exists' });
         return;
       }
@@ -312,28 +420,28 @@ class BookController {
   static async deleteSubSubCategory(req: Request, res: Response): Promise<void> {
     try {
       const { categoryName, subCategory, subSubCategoryName } = req.params;
-      const category = await BookCategoryModel.findOne({ name: decodeURIComponent(categoryName) });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
       if (!category) {
         res.status(404).json({ error: 'Category not found' });
         return;
       }
-      const subCat = category.subCategories.find((sub: any) => sub.name === decodeURIComponent(subCategory));
+      const subCat = category.subCategories.find((sub: any) => sub.name.toLowerCase() === decodeURIComponent(subCategory).toLowerCase());
       if (!subCat) {
         res.status(404).json({ error: 'Subcategory not found' });
         return;
       }
-      if (!subCat.subSubCategories.includes(decodeURIComponent(subSubCategoryName))) {
+      if (!subCat.subSubCategories.some((subSub: string) => subSub.toLowerCase() === decodeURIComponent(subSubCategoryName).toLowerCase())) {
         res.status(404).json({ error: 'Sub-subcategory not found' });
         return;
       }
       subCat.subSubCategories = subCat.subSubCategories.filter(
-        (subSub: any) => subSub !== decodeURIComponent(subSubCategoryName)
+        (subSub: string) => subSub.toLowerCase() !== decodeURIComponent(subSubCategoryName).toLowerCase()
       );
       await category.save();
       await BookModel.deleteMany({
-        categoryName: decodeURIComponent(categoryName),
-        subCategory: decodeURIComponent(subCategory),
-        subSubCategory: decodeURIComponent(subSubCategoryName),
+        categoryName: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') },
+        subCategory: { $regex: new RegExp(`^${decodeURIComponent(subCategory)}$`, 'i') },
+        subSubCategory: { $regex: new RegExp(`^${decodeURIComponent(subSubCategoryName)}$`, 'i') },
       });
       res.status(200).json(category);
     } catch (err: any) {
@@ -345,7 +453,7 @@ class BookController {
   static async getTagsByCategory(req: Request, res: Response): Promise<void> {
     try {
       const { categoryName } = req.params;
-      const category = await BookCategoryModel.findOne({ name: decodeURIComponent(categoryName) });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
       if (!category) {
         res.status(404).json({ error: 'Category not found' });
         return;
@@ -366,12 +474,12 @@ class BookController {
         return;
       }
       const formattedTag = tag.trim().replace(/\s+/g, '-');
-      const category = await BookCategoryModel.findOne({ name: decodeURIComponent(categoryName) });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
       if (!category) {
         res.status(404).json({ error: 'Category not found' });
         return;
       }
-      if (category.tags.includes(formattedTag)) {
+      if (category.tags.some((t: string) => t.toLowerCase() === formattedTag.toLowerCase())) {
         res.status(400).json({ error: 'Tag already exists' });
         return;
       }
@@ -393,17 +501,17 @@ class BookController {
         return;
       }
       const formattedNewTag = newTag.trim().replace(/\s+/g, '-');
-      const category = await BookCategoryModel.findOne({ name: decodeURIComponent(categoryName) });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
       if (!category) {
         res.status(404).json({ error: 'Category not found' });
         return;
       }
-      const index = category.tags.indexOf(decodeURIComponent(tagName));
+      const index = category.tags.findIndex((tag: string) => tag.toLowerCase() === decodeURIComponent(tagName).toLowerCase());
       if (index === -1) {
         res.status(404).json({ error: 'Tag not found' });
         return;
       }
-      if (category.tags.includes(formattedNewTag)) {
+      if (category.tags.some((t: string) => t.toLowerCase() === formattedNewTag.toLowerCase())) {
         res.status(400).json({ error: 'New tag already exists' });
         return;
       }
@@ -419,16 +527,16 @@ class BookController {
   static async deleteTag(req: Request, res: Response): Promise<void> {
     try {
       const { categoryName, tagName } = req.params;
-      const category = await BookCategoryModel.findOne({ name: decodeURIComponent(categoryName) });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
       if (!category) {
         res.status(404).json({ error: 'Category not found' });
         return;
       }
-      if (!category.tags.includes(decodeURIComponent(tagName))) {
+      if (!category.tags.some((tag: string) => tag.toLowerCase() === decodeURIComponent(tagName).toLowerCase())) {
         res.status(404).json({ error: 'Tag not found' });
         return;
       }
-      category.tags = category.tags.filter((tag: any) => tag !== decodeURIComponent(tagName));
+      category.tags = category.tags.filter((tag: string) => tag.toLowerCase() !== decodeURIComponent(tagName).toLowerCase());
       await category.save();
       res.status(200).json({ tags: category.tags });
     } catch (err: any) {
@@ -473,17 +581,17 @@ class BookController {
         delete bookData._id;
       }
 
-      const category = await BookCategoryModel.findOne({ name: bookData.categoryName });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${bookData.categoryName}$`, 'i') } });
       if (!category) {
         res.status(404).json({ error: 'Category not found' });
         return;
       }
-      const subCat = category.subCategories.find((sub: any) => sub.name === bookData.subCategory);
+      const subCat = category.subCategories.find((sub: any) => sub.name.toLowerCase() === bookData.subCategory?.toLowerCase());
       if (bookData.subCategory && !subCat) {
         res.status(404).json({ error: 'Subcategory not found' });
         return;
       }
-      if (bookData.subSubCategory && (!subCat || !subCat.subSubCategories.includes(bookData.subSubCategory))) {
+      if (bookData.subSubCategory && (!subCat || !subCat.subSubCategories.some((subSub: string) => subSub.toLowerCase() === bookData.subSubCategory?.toLowerCase()))) {
         res.status(404).json({ error: 'Sub-subcategory not found' });
         return;
       }
@@ -497,21 +605,6 @@ class BookController {
     } catch (err: any) {
       console.error('Error creating book:', err);
       res.status(400).json({ error: 'Failed to create book', details: err.message });
-    }
-  }
-
-  static async getBookDetailsById(req: Request, res: Response): Promise<void> {
-    try {
-      const { bookId } = req.params;
-      const book = await BookModel.findById(bookId);
-      if (!book) {
-        res.status(404).json({ error: 'Book not found' });
-        return;
-      }
-      res.status(200).json(book);
-    } catch (err: any) {
-      console.error('Error fetching book:', err);
-      res.status(500).json({ error: 'Failed to fetch book', details: err.message });
     }
   }
 
@@ -533,14 +626,14 @@ class BookController {
       const oldCategoryName = book.categoryName;
       const oldSubCategory = book.subCategory;
       const newCategoryName = decodeURIComponent(categoryName);
-      const newSubCategory = decodeURIComponent(subCategory);
-      const newSubSubCategory = decodeURIComponent(subSubCategory);
+      const newSubCategory = subCategory ? decodeURIComponent(subCategory) : '';
+      const newSubSubCategory = subSubCategory ? decodeURIComponent(subSubCategory) : '';
 
       Object.assign(book, {
         bookName: title.trim(),
         categoryName: newCategoryName,
-        subCategory: newSubCategory,
-        subSubCategory: newSubSubCategory,
+        subCategory: newSubCategory || undefined,
+        subSubCategory: newSubSubCategory || undefined,
         title: title.trim(),
         tags: typeof tags === 'string' ? tags.split(',').map((tag: string) => tag.trim().replace(/\s+/g, '-')) : (tags || []).map((tag: string) => tag.trim().replace(/\s+/g, '-')),
         seoTitle,
@@ -560,31 +653,33 @@ class BookController {
 
       await book.save();
 
-      if (oldCategoryName !== newCategoryName || oldSubCategory !== newSubCategory) {
-        const oldCategory = await BookCategoryModel.findOne({ name: oldCategoryName });
+      if (oldCategoryName.toLowerCase() !== newCategoryName.toLowerCase() || oldSubCategory?.toLowerCase() !== newSubCategory?.toLowerCase()) {
+        const oldCategory = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${oldCategoryName}$`, 'i') } });
         if (oldCategory) {
-          const oldSubCat = oldCategory.subCategories.find((sub: any) => sub.name === oldSubCategory);
+          const oldSubCat = oldCategory.subCategories.find((sub: any) => sub.name.toLowerCase() === oldSubCategory?.toLowerCase());
           if (oldSubCat) {
             oldSubCat.books = oldSubCat.books.filter((id: any) => id.toString() !== bookId);
             await oldCategory.save();
           }
         }
-        const newCategory = await BookCategoryModel.findOne({ name: newCategoryName });
+        const newCategory = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${newCategoryName}$`, 'i') } });
         if (!newCategory) {
           res.status(404).json({ error: 'New category not found' });
           return;
         }
-        const newSubCat = newCategory.subCategories.find((sub: any) => sub.name === newSubCategory);
-        if (!newSubCat) {
+        const newSubCat = newCategory.subCategories.find((sub: any) => sub.name.toLowerCase() === newSubCategory?.toLowerCase());
+        if (newSubCategory && !newSubCat) {
           res.status(404).json({ error: 'New subcategory not found' });
           return;
         }
-        if (!newSubCat.subSubCategories.includes(newSubSubCategory)) {
+        if (newSubSubCategory && (!newSubCat || !newSubCat.subSubCategories.some((subSub: string) => subSub.toLowerCase() === newSubSubCategory.toLowerCase()))) {
           res.status(404).json({ error: 'New sub-subcategory not found' });
           return;
         }
-        newSubCat.books.push(book._id);
-        await newCategory.save();
+        if (newSubCat) {
+          newSubCat.books.push(book._id);
+          await newCategory.save();
+        }
       }
 
       res.status(200).json(book);
@@ -602,9 +697,9 @@ class BookController {
         res.status(404).json({ error: 'Book not found' });
         return;
       }
-      const category = await BookCategoryModel.findOne({ name: decodeURIComponent(categoryName) });
+      const category = await BookCategoryModel.findOne({ name: { $regex: new RegExp(`^${decodeURIComponent(categoryName)}$`, 'i') } });
       if (category) {
-        const subCat = category.subCategories.find((sub: any) => sub.name === decodeURIComponent(subCategory));
+        const subCat = category.subCategories.find((sub: any) => sub.name.toLowerCase() === decodeURIComponent(subCategory).toLowerCase());
         if (subCat) {
           subCat.books = subCat.books.filter((id: any) => id.toString() !== bookId);
           await category.save();

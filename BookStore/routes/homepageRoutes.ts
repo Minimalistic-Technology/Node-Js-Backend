@@ -8,12 +8,14 @@ const router = express.Router();
 // Book category routes
 router.get("/book-categories", BookController.getAllCategories);
 router.post("/book-categories", BookController.createCategory);
-router.post("/book-categories/bulk", BookController.createBulkCategories); // New bulk endpoint
+router.post("/book-categories/bulk", BookController.createBulkCategories);
 router.get("/book-categories/:categoryName", BookController.getCategoryByNameWithBooks);
 router.get("/book-categories/:categoryName/:subCategory", BookController.getCategoryByNameWithBooks);
 router.get("/book-categories/:categoryName/:subCategory/:subSubCategory", BookController.getCategoryByNameWithBooks);
 router.put("/book-categories/:id", BookController.updateCategory);
 router.delete("/book-categories/:id", BookController.deleteCategory);
+router.post("/book-categories/:categoryName/discount", BookController.setCategoryDiscount); // New
+router.post("/book-categories/:categoryName/:subCategory/discount", BookController.setSubCategoryDiscount); // New
 
 // Subcategory routes
 router.post("/book-categories/:categoryName/subcategories", BookController.createSubCategory);
@@ -29,7 +31,7 @@ router.post("/book-categories/:categoryName/tags", BookController.createTag);
 router.put("/book-categories/:categoryName/tags/:tagName", BookController.updateTag);
 router.delete("/book-categories/:categoryName/tags/:tagName", BookController.deleteTag);
 
-// Tag routes with subcategory and sub-subcategory (for specific use cases)
+// Tag routes with subcategory and sub-subcategory
 router.get("/book-categories/:categoryName/:subCategory/:subSubCategory/tags", BookController.getTagsByCategory);
 router.post("/book-categories/:categoryName/:subCategory/:subSubCategory/tags", BookController.createTag);
 router.put("/book-categories/:categoryName/:subCategory/:subSubCategory/tags/:tagName", BookController.updateTag);

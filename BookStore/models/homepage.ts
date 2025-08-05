@@ -1,77 +1,91 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IBook extends Document {
   bookName: string;
   categoryName: string;
-  subCategory: string;
-  subSubCategory: string;
+  subCategory?: string;
+  subSubCategory?: string;
   title: string;
-  price: number;
-  imageUrl: string;
-  description: string;
-  estimatedDelivery: string;
   tags: string[];
-  condition: string;
-  author: string;
-  publisher: string;
-  quantityNew: number;
-  quantityOld: number;
-  discountNew: number;
-  discountOld: number;
   seoTitle?: string;
   seoDescription?: string;
+  price?: number;
+  description?: string;
+  estimatedDelivery?: string;
+  condition?: string;
+  author?: string;
+  publisher?: string;
+  imageUrl?: string;
+  quantityNew?: number;
+  quantityOld?: number;
+  discountNew?: number;
+  discountOld?: number;
+}
+
+export interface ISubCategory {
+  name: string;
+  subSubCategories: string[];
+  books: mongoose.Types.ObjectId[];
+  subCategoryDiscount?: number; // New field for subcategory discount
 }
 
 export interface IBookCategory extends Document {
   name: string;
-  subCategories: { name: string; subSubCategories: string[]; books: mongoose.Types.ObjectId[] }[];
+  subCategories: ISubCategory[];
   tags: string[];
   seoTitle?: string;
   seoDescription?: string;
+  categoryDiscount?: number; // New field for category discount
 }
-
 export interface IClothingCategory extends Document {
   name: string;
   gender: string;
   dresses: mongoose.Types.ObjectId[];
 }
 
-const BookSchema: Schema = new Schema({
-  bookName: { type: String, required: true, unique: true },
-  categoryName: { type: String, required: true },
-  subCategory: { type: String, required: true },
-  subSubCategory: { type: String, required: true },
-  title: { type: String, required: true },
-  price: { type: Number, required: true },
-  imageUrl: { type: String, required: true },
-  description: { type: String, required: true },
-  estimatedDelivery: { type: String, required: true },
-  tags: { type: [String], required: true },
-  condition: { type: String, required: true, enum: ["NEW - ORIGINAL PRICE", "OLD", "BOTH"] },
-  author: { type: String, required: true },
-  publisher: { type: String, required: true },
-  quantityNew: { type: Number, required: true, default: 0 },
-  quantityOld: { type: Number, required: true, default: 0 },
-  discountNew: { type: Number, default: 0, min: 0, max: 100 },
-  discountOld: { type: Number, default: 0, min: 0, max: 100 },
-  seoTitle: { type: String, required: false },
-  seoDescription: { type: String, required: false },
-}, { timestamps: true });
+const BookCategorySchema: Schema = new Schema(
+  {
+    name: { type: String, required: true, unique: true },
+    subCategories: [
+      {
+        name: { type: String, required: true },
+        subSubCategories: [{ type: String }],
+        books: [{ type: Schema.Types.ObjectId, ref: 'Book' }],
+        subCategoryDiscount: { type: Number, default: 0 }, // Added
+      },
+    ],
+    tags: [{ type: String }],
+    seoTitle: { type: String },
+    seoDescription: { type: String },
+    categoryDiscount: { type: Number, default: 0 }, // Added
+  },
+  { timestamps: true }
+);
 
-const BookCategorySchema: Schema = new Schema({
-  name: { type: String, required: true, unique: true },
-  subCategories: [
-    {
-      name: { type: String, required: true },
-      subSubCategories: { type: [String], default: [] },
-      books: [{ type: Schema.Types.ObjectId, ref: "Book" }],
-    },
-  ],
-  tags: { type: [String], default: [] },
-  seoTitle: { type: String, required: false },
-  seoDescription: { type: String, required: false },
-}, { timestamps: true, collection: "BookCategories" });
-
+const BookSchema: Schema = new Schema(
+  {
+    bookName: { type: String, required: true },
+    categoryName: { type: String, required: true },
+    subCategory: { type: String },
+    subSubCategory: { type: String },
+    title: { type: String, required: true },
+    tags: [{ type: String }],
+    seoTitle: { type: String },
+    seoDescription: { type: String },
+    price: { type: Number },
+    description: { type: String },
+    estimatedDelivery: { type: String },
+    condition: { type: String },
+    author: { type: String },
+    publisher: { type: String },
+    imageUrl: { type: String },
+    quantityNew: { type: Number, default: 0 },
+    quantityOld: { type: Number, default: 0 },
+    discountNew: { type: Number, default: 0 },
+    discountOld: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+);
 const ClothingCategorySchema: Schema = new Schema({
   name: { type: String, required: true },
   gender: { type: String, required: true, enum: ["men", "women"] },
