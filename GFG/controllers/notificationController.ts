@@ -41,3 +41,27 @@ export const deleteNotificationById = async (req: Request, res: Response): Promi
   await Notification.findByIdAndDelete(id);
   res.status(200).json({ message: 'Notification deleted' });
 };
+
+export const markAsReadAndDelete = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const notification = await Notification.findById(id);
+    if (!notification) {
+      res.status(404).json({ error: 'Notification not found' });
+      return;
+    }
+    await Notification.findByIdAndDelete(id);
+    res.status(200).json({ message: 'Notification marked as read and deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mark as read', details: err });
+  }
+};
+
+export const markAllAsReadAndDelete = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const result = await Notification.deleteMany({ isRead: false });
+    res.status(200).json({ message: 'All unread notifications marked as read and deleted', deleted: result.deletedCount });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mark all as read', details: err });
+  }
+};
