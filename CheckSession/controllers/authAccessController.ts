@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 const SECRET_KEY = process.env.JWT_SECRET || 'your_fallback_secret';
 
-// Signup
+// Signup (role required)
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, email, password, role } = req.body;
@@ -40,12 +40,13 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Login
+// Login (role removed - determined from database)
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body; // Removed role from destructuring
 
-    const user = await AuthUserModel.findOne({ email, role });
+    // Find user by email only (role will be retrieved from database)
+    const user = await AuthUserModel.findOne({ email });
     if (!user) {
       res.status(404).json({ message: 'User not found' });
       return;
@@ -57,6 +58,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // Use the role from the database record
     const accessToken = jwt.sign({ id: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1d' });
     const refreshToken = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '7d' });
 
@@ -102,16 +104,21 @@ export const getAllUsers = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
-// ✅ Update User
+// Update User
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const updates = req.body;
 
+    // If password is being updated, hash it
+    if (updates.password) {
+      updates.password = await bcrypt.hash(updates.password, 10);
+    }
+
     const updatedUser = await AuthUserModel.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true
-    });
+    }).select('-password'); // Exclude password from response
 
     if (!updatedUser) {
       res.status(404).json({ message: 'User not found' });
@@ -125,7 +132,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// ✅ Delete User
+// Delete User
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -143,7 +150,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// ✅ Get logged-in user details (from cookie)
+// Get logged-in user details (from cookie)
 export const getLoggedInUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const token = req.cookies.access_token;
