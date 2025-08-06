@@ -244,11 +244,11 @@ app.use('/api/auth', authRoutes);
 
 app.use('/api/gfg', usersRoutes);
 app.use('/api/gfg', languageRoutes);
-app.use('/api/gfg', notificationGFGRoutes);
-app.use('/api/gfg', documentationRoutes);
-app.use('/api/gfg', practiceProblemRoutes);
-app.use('/api/gfg', dashboardStatRoutes);
-app.use('/api/gfg', searchEntryRoutes);
+app.use("/api/gfg", practiceProblemRoutes);
+app.use("/api/gfg", documentationRoutes);
+app.use("/api/gfg", dashboardStatRoutes);
+app.use("/api/gfg/notification", notificationGFGRoutes);
+app.use("/api/gfg", searchEntryRoutes);
 
 
 // api requests limit
