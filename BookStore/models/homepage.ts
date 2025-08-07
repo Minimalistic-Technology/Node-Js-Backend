@@ -20,23 +20,27 @@ export interface IBook extends Document {
   quantityOld?: number;
   discountNew?: number;
   discountOld?: number;
+  effectiveDiscount?: number;
+  discountedPrice?: number;
 }
 
 export interface ISubCategory {
   name: string;
   subSubCategories: string[];
   books: mongoose.Types.ObjectId[];
-  subCategoryDiscount?: number; // New field for subcategory discount
+  subCategoryDiscount?: number;
 }
 
 export interface IBookCategory extends Document {
   name: string;
   subCategories: ISubCategory[];
+  books: mongoose.Types.ObjectId[];
   tags: string[];
   seoTitle?: string;
   seoDescription?: string;
-  categoryDiscount?: number; // New field for category discount
+  categoryDiscount?: number;
 }
+
 export interface IClothingCategory extends Document {
   name: string;
   gender: string;
@@ -45,19 +49,20 @@ export interface IClothingCategory extends Document {
 
 const BookCategorySchema: Schema = new Schema(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true, unique: true, index: true },
     subCategories: [
       {
         name: { type: String, required: true },
         subSubCategories: [{ type: String }],
         books: [{ type: Schema.Types.ObjectId, ref: 'Book' }],
-        subCategoryDiscount: { type: Number, default: 0 }, // Added
+        subCategoryDiscount: { type: Number, default: 0 },
       },
     ],
+    books: [{ type: Schema.Types.ObjectId, ref: 'Book' }], // Added top-level books field
     tags: [{ type: String }],
     seoTitle: { type: String },
     seoDescription: { type: String },
-    categoryDiscount: { type: Number, default: 0 }, // Added
+    categoryDiscount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
@@ -65,9 +70,9 @@ const BookCategorySchema: Schema = new Schema(
 const BookSchema: Schema = new Schema(
   {
     bookName: { type: String, required: true },
-    categoryName: { type: String, required: true },
-    subCategory: { type: String },
-    subSubCategory: { type: String },
+    categoryName: { type: String, required: true, index: true },
+    subCategory: { type: String, index: true },
+    subSubCategory: { type: String, index: true },
     title: { type: String, required: true },
     tags: [{ type: String }],
     seoTitle: { type: String },
@@ -83,15 +88,21 @@ const BookSchema: Schema = new Schema(
     quantityOld: { type: Number, default: 0 },
     discountNew: { type: Number, default: 0 },
     discountOld: { type: Number, default: 0 },
+    effectiveDiscount: { type: Number, default: 0 },
+    discountedPrice: { type: Number },
   },
   { timestamps: true }
 );
-const ClothingCategorySchema: Schema = new Schema({
-  name: { type: String, required: true },
-  gender: { type: String, required: true, enum: ["men", "women"] },
-  dresses: [{ type: Schema.Types.ObjectId, ref: "Dress" }],
-}, { timestamps: true, collection: "Category" });
 
-export const BookModel = mongoose.models.Book || mongoose.model<IBook>("Book", BookSchema);
-export const BookCategoryModel = mongoose.models.BookCategory || mongoose.model<IBookCategory>("BookCategory", BookCategorySchema);
-export const ClothingCategoryModel = mongoose.models.Category || mongoose.model<IClothingCategory>("Category", ClothingCategorySchema);
+const ClothingCategorySchema: Schema = new Schema(
+  {
+    name: { type: String, required: true },
+    gender: { type: String, required: true, enum: ['men', 'women'] },
+    dresses: [{ type: Schema.Types.ObjectId, ref: 'Dress' }],
+  },
+  { timestamps: true, collection: 'Category' }
+);
+
+export const BookModel = mongoose.models.Book || mongoose.model<IBook>('Book', BookSchema);
+export const BookCategoryModel = mongoose.models.BookCategory || mongoose.model<IBookCategory>('BookCategory', BookCategorySchema);
+export const ClothingCategoryModel = mongoose.models.Category || mongoose.model<IClothingCategory>('Category', ClothingCategorySchema);
