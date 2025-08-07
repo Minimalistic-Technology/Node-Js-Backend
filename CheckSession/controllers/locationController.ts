@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { LocationModel } from '../models/location';
 
-// CREATE
+
 export const createLocation = async (req: Request, res: Response): Promise<void> => {
   try {
     const location = new LocationModel(req.body);
@@ -12,7 +12,6 @@ export const createLocation = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// READ ALL
 export const getAllLocations = async (_req: Request, res: Response): Promise<void> => {
   try {
     const locations = await LocationModel.find().sort({ createdAt: -1 });
@@ -22,7 +21,7 @@ export const getAllLocations = async (_req: Request, res: Response): Promise<voi
   }
 };
 
-// READ ONE
+
 export const getLocationById = async (req: Request, res: Response): Promise<void> => {
   try {
     const location = await LocationModel.findById(req.params.id);
@@ -33,7 +32,7 @@ export const getLocationById = async (req: Request, res: Response): Promise<void
   }
 };
 
-// UPDATE
+
 export const updateLocation = async (req: Request, res: Response): Promise<void> => {
   try {
     const location = await LocationModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -44,7 +43,7 @@ export const updateLocation = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// DELETE
+
 export const deleteLocation = async (req: Request, res: Response): Promise<void> => {
   try {
     await LocationModel.findByIdAndDelete(req.params.id);

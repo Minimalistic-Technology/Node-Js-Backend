@@ -5,7 +5,7 @@ import {Contact} from '../models/email';
 
 dotenv.config();
 
-// Set up the email transporter
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -14,22 +14,21 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Submit contact form and send email
+
 export const submitContactForm = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, email, phone, message } = req.body;
 
-    // Validate required fields
+  
     if (!name || !email || !phone || !message) {
       res.status(400).json({ message: 'All fields are required' });
       return;
     }
 
-    // Save contact to database
     const newContact = new Contact({ name, email, phone, message });
     await newContact.save();
 
-    // Email configuration
+   
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: process.env.EMAIL_TO,
@@ -44,7 +43,7 @@ export const submitContactForm = async (req: Request, res: Response): Promise<vo
       `,
     };
 
-    // Send email
+   
     await transporter.sendMail(mailOptions);
     res.status(201).json({ message: 'Contact form submitted successfully, and email sent' });
   } catch (error: any) {
@@ -52,7 +51,7 @@ export const submitContactForm = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// Return static contact info
+
 export const getContactDetails = (_req: Request, res: Response): void => {
   try {
     const contactDetails = {

@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 const SECRET_KEY = process.env.JWT_SECRET || 'your_fallback_secret';
 
-// Signup (role required)
+
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, email, password, role } = req.body;
@@ -40,12 +40,10 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Login (role removed - determined from database)
+
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body; // Removed role from destructuring
-
-    // Find user by email only (role will be retrieved from database)
+    const { email, password } = req.body; 
     const user = await AuthUserModel.findOne({ email });
     if (!user) {
       res.status(404).json({ message: 'User not found' });
@@ -58,20 +56,20 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Use the role from the database record
+   
     const accessToken = jwt.sign({ id: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1d' });
     const refreshToken = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '7d' });
 
     const accessTokenOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      maxAge: 24 * 60 * 60 * 1000, 
     };
 
     const refreshTokenOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
     };
 
     res.cookie("access_token", accessToken, accessTokenOptions);
@@ -93,7 +91,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Get all users (for Admin panel)
+
 export const getAllUsers = async (_req: Request, res: Response): Promise<void> => {
   try {
     const users = await AuthUserModel.find({}, { password: 0 }); // Exclude password
@@ -104,13 +102,13 @@ export const getAllUsers = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
-// Update User
+
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const updates = req.body;
 
-    // If password is being updated, hash it
+   
     if (updates.password) {
       updates.password = await bcrypt.hash(updates.password, 10);
     }
@@ -118,7 +116,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     const updatedUser = await AuthUserModel.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true
-    }).select('-password'); // Exclude password from response
+    }).select('-password'); 
 
     if (!updatedUser) {
       res.status(404).json({ message: 'User not found' });
@@ -132,7 +130,6 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Delete User
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -150,7 +147,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Get logged-in user details (from cookie)
+
 export const getLoggedInUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const token = req.cookies.access_token;

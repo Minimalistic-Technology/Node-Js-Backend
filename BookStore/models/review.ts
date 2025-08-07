@@ -54,7 +54,7 @@ const bookstoreReviewSchema = new Schema<IBookstoreReview>(
   }
 );
 
-// Prevent model overwrite by checking if the model exists
+
 const BookstoreReviewModel: Model<IBookstoreReview> = mongoose.models.BookstoreReview || mongoose.model<IBookstoreReview>('BookstoreReview', bookstoreReviewSchema);
 
 export { BookstoreReviewModel };

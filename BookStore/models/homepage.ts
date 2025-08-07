@@ -58,7 +58,7 @@ const BookCategorySchema: Schema = new Schema(
         subCategoryDiscount: { type: Number, default: 0 },
       },
     ],
-    books: [{ type: Schema.Types.ObjectId, ref: 'Book' }], // Added top-level books field
+    books: [{ type: Schema.Types.ObjectId, ref: 'Book' }], 
     tags: [{ type: String }],
     seoTitle: { type: String },
     seoDescription: { type: String },

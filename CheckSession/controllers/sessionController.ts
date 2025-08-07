@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { SessionModel } from '../models/session';
 
-// Create (Check-In)
+
 export const checkIn = async (req: Request, res: Response): Promise<void> => {
   try {
     const session = new SessionModel({
@@ -20,7 +20,7 @@ export const checkIn = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Update (Check-Out)
+
 export const checkOut = async (req: Request, res: Response): Promise<void> => {
   try {
     const session = await SessionModel.findByIdAndUpdate(
@@ -43,7 +43,7 @@ export const checkOut = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Update Check-In Time
+
 export const updateCheckIn = async (req: Request, res: Response): Promise<void> => {
   try {
     const session = await SessionModel.findByIdAndUpdate(
@@ -66,7 +66,7 @@ export const updateCheckIn = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Read all sessions
+
 export const getAllSessions = async (_req: Request, res: Response): Promise<void> => {
   try {
     const sessions = await SessionModel.find().sort({ createdAt: -1 });
@@ -76,7 +76,7 @@ export const getAllSessions = async (_req: Request, res: Response): Promise<void
       }
       return session.toJSON();
     });
-    console.log('Fetched sessions:', validSessions); // Debug log with plain objects
+    console.log('Fetched sessions:', validSessions); 
     res.json(validSessions);
   } catch (error) {
     console.error('Fetch sessions error:', error);
@@ -84,7 +84,7 @@ export const getAllSessions = async (_req: Request, res: Response): Promise<void
   }
 };
 
-// Read one session
+
 export const getSessionById = async (req: Request, res: Response): Promise<void> => {
   try {
     const session = await SessionModel.findById(req.params.id);
@@ -103,7 +103,7 @@ export const getSessionById = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Delete session
+
 export const deleteSession = async (req: Request, res: Response): Promise<void> => {
   try {
     await SessionModel.findByIdAndDelete(req.params.id);
@@ -116,7 +116,7 @@ export const deleteSession = async (req: Request, res: Response): Promise<void> 
 };
 
 
-// Add this to your sessionController.ts
+
 export const getUserSessions = async (req: Request, res: Response): Promise<void> => {
   try {
     const sessions = await SessionModel.find({ userId: req.params.userId }).sort({ createdAt: -1 });

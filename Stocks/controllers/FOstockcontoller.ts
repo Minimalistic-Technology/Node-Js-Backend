@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import FOStock, { IFOStock } from '../models/FOStock';
 
-// Add single or multiple top stocks
 export const addTopStocks = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: Partial<IFOStock>[] = Array.isArray(req.body) ? req.body : [req.body];
@@ -12,7 +11,7 @@ export const addTopStocks = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get all top stocks (only selected fields)
+
 export const getTopStocks = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await FOStock.find({}, 'name price change icon volume');
@@ -22,7 +21,7 @@ export const getTopStocks = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get top stock by ID
+
 export const getTopStockById = async (req: Request, res: Response): Promise<void> => {
   try {
     const stock = await FOStock.findById(req.params.id, '-name -price -change -image -__v');
@@ -36,7 +35,7 @@ export const getTopStockById = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Update top stock by ID
+
 export const updateTopStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await FOStock.findByIdAndUpdate(req.params.id, req.body, {
@@ -53,7 +52,7 @@ export const updateTopStock = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Delete top stock by ID
+
 export const deleteTopStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await FOStock.findByIdAndDelete(req.params.id);
@@ -67,7 +66,7 @@ export const deleteTopStock = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Update stock by name
+
 export const updateStockByName = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await FOStock.findOneAndUpdate(

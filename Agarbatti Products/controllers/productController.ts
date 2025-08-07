@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ProductModel } from "../models/AgarbattiProduct";
 
-// CREATE product
+
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = new ProductModel(req.body);
@@ -13,7 +13,7 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// READ: Get all products
+
 export const getAllProducts = async (_req: Request, res: Response): Promise<void> => {
   try {
     const products = await ProductModel.find();
@@ -24,7 +24,7 @@ export const getAllProducts = async (_req: Request, res: Response): Promise<void
   }
 };
 
-// READ: Get product by _id
+
 export const getProductById = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await ProductModel.findById(req.params.id);
@@ -39,7 +39,7 @@ export const getProductById = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// READ: Get related products by product's `related` field
+
 export const getRelatedProducts = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await ProductModel.findById(req.params.id);
@@ -59,7 +59,7 @@ export const getRelatedProducts = async (req: Request, res: Response): Promise<v
   }
 };
 
-// UPDATE product by _id
+
 export const updateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const updatedProduct = await ProductModel.findByIdAndUpdate(
@@ -80,7 +80,7 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// DELETE product by _id
+
 export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const deletedProduct = await ProductModel.findByIdAndDelete(req.params.id);

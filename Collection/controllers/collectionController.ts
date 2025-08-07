@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Collection, { ICollection } from '../models/Collection';
 
-// GET /collections
+
 export const getCollections = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await Collection.find();
@@ -11,7 +11,6 @@ export const getCollections = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// POST /collections
 export const postCollection = async (req: Request, res: Response): Promise<void> => {
   try {
     const input = req.body;
@@ -44,7 +43,7 @@ export const postCollection = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// PUT /collections/:id
+
 export const putCollection = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await Collection.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -54,7 +53,7 @@ export const putCollection = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// DELETE /collections/:id
+
 export const deleteCollection = async (req: Request, res: Response): Promise<void> => {
   try {
     await Collection.findByIdAndDelete(req.params.id);

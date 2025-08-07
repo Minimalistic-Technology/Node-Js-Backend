@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-// Define TypeScript interface for Contact
+
 export interface ContactDocument extends Document {
   name: string;
   email: string;
@@ -9,7 +9,6 @@ export interface ContactDocument extends Document {
   createdAt: Date;
 }
 
-// Define schema
 const contactSchema = new Schema<ContactDocument>({
   name: {
     type: String,
@@ -33,5 +32,5 @@ const contactSchema = new Schema<ContactDocument>({
   },
 });
 
-// Export model
+
 export const Contact = mongoose.model<ContactDocument>('Contact', contactSchema);

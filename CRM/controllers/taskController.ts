@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import { TaskModel, ITask } from '../models/task';
 
-// Create Task
+
 export const createTask: RequestHandler = async (req, res) => {
   try {
     const task = await TaskModel.create(req.body);
@@ -12,7 +12,7 @@ export const createTask: RequestHandler = async (req, res) => {
   }
 };
 
-// Get All Tasks
+
 export const getTasks: RequestHandler = async (_req, res): Promise<void> => {
   try {
     const tasks = await TaskModel.find().lean();
@@ -23,7 +23,7 @@ export const getTasks: RequestHandler = async (_req, res): Promise<void> => {
   }
 };
 
-// Get Task by ID
+
 export const getTaskById: RequestHandler = async (req, res): Promise<void> => {
   try {
     const task = await TaskModel.findById(req.params.id).lean();
@@ -37,7 +37,7 @@ export const getTaskById: RequestHandler = async (req, res): Promise<void> => {
   }
 };
 
-// Update Task
+
 export const updateTask: RequestHandler = async (req, res): Promise<void> => {
   try {
     const updated = await TaskModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -52,7 +52,7 @@ export const updateTask: RequestHandler = async (req, res): Promise<void> => {
   }
 };
 
-// Delete Task
+
 export const deleteTask: RequestHandler = async (req, res): Promise<void> => {
   try {
     const deleted = await TaskModel.findByIdAndDelete(req.params.id);

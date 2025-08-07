@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { RedevelopmentProjectModel } from "../models/RedevelopmentProject";
 
-// GET all
+
 export const getAllProjects = async (req: Request, res: Response): Promise<void> => {
   try {
     const projects = await RedevelopmentProjectModel.find();
@@ -11,7 +11,7 @@ export const getAllProjects = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// GET by ID
+
 export const getProjectById = async (req: Request, res: Response): Promise<void> => {
   try {
     const project = await RedevelopmentProjectModel.findById(req.params.id);
@@ -25,7 +25,7 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// POST 
+
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const newProject = new RedevelopmentProjectModel(req.body);
@@ -36,7 +36,7 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// PUT
+
 export const updateProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await RedevelopmentProjectModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -50,7 +50,7 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// DELETE
+
 export const deleteProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await RedevelopmentProjectModel.findByIdAndDelete(req.params.id);

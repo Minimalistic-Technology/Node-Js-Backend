@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Stock from '../models/topGainersModel';
 
-// Add one or multiple stocks
+
 export const createStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = Array.isArray(req.body) ? req.body : [req.body];
@@ -12,7 +12,7 @@ export const createStock = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Get all top gainers categorized
+
 export const getTopGainers = async (_req: Request, res: Response): Promise<void> => {
   try {
     res.status(200).json({
@@ -25,7 +25,7 @@ export const getTopGainers = async (_req: Request, res: Response): Promise<void>
   }
 };
 
-// Get all stocks by category with basic info (name, price, change, image)
+
 export const getStocksByCategory = async (req: Request, res: Response): Promise<void> => {
   try {
     const { category } = req.params;
@@ -51,7 +51,6 @@ export const getStocksByCategory = async (req: Request, res: Response): Promise<
   }
 };
 
-// Get full stock details by category and stock ID
 export const getStockDetails = async (req: Request, res: Response): Promise<void> => {
   try {
     const { category, id } = req.params;
@@ -77,7 +76,7 @@ export const getStockDetails = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Update stock by ID
+
 export const updateStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await Stock.findByIdAndUpdate(req.params.id, req.body, {
@@ -96,7 +95,7 @@ export const updateStock = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Delete stock by ID
+
 export const deleteStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await Stock.findByIdAndDelete(req.params.id);

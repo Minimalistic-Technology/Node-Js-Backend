@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import FNOLooser, { IFNOLooser } from '../models/fnoloosers';
 
-// Add single or multiple top stocks
+
 export const addTopStocks = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: Partial<IFNOLooser>[] = Array.isArray(req.body) ? req.body : [req.body];
@@ -13,7 +13,7 @@ export const addTopStocks = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get all top stocks (only selected fields)
+
 export const getTopStocks = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = await FNOLooser.find({}, 'name price change icon volume');
@@ -24,7 +24,7 @@ export const getTopStocks = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get top stock by ID (excluding selected fields)
+
 export const getTopStockById = async (req: Request, res: Response): Promise<void> => {
   try {
     const stock = await FNOLooser.findById(req.params.id).select('-__v');
@@ -39,7 +39,7 @@ export const getTopStockById = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Update top stock by ID
+
 export const updateTopStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await FNOLooser.findByIdAndUpdate(req.params.id, req.body, {
@@ -57,7 +57,7 @@ export const updateTopStock = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Delete top stock by ID
+
 export const deleteTopStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await FNOLooser.findByIdAndDelete(req.params.id);
@@ -72,7 +72,7 @@ export const deleteTopStock = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Update stock by name
+
 export const updateStockByName = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await FNOLooser.findOneAndUpdate(

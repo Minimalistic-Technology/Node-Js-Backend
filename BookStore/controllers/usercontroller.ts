@@ -3,7 +3,7 @@
   import bcrypt from 'bcryptjs';
   import jwt from 'jsonwebtoken';
 
-  // POST /api/users/bulk - Bulk create users
+ 
   export const bulkCreateUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const { users } = req.body;
@@ -54,7 +54,7 @@
     }
   };
 
-  // POST /api/v1/auth/signup - Register a new user
+  
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, email, password, role } = req.body;
@@ -97,7 +97,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 };
 
 
-  // POST /api/v1/auth/login - Authenticate user
+ 
   export const login = async (req: Request, res: Response): Promise<void> => {
     try {
       const { email, password } = req.body;
@@ -119,14 +119,14 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
         return;
       }
 
-      // Generate JWT token with id and role
+     
       const token = jwt.sign(
         { id: user._id, role: user.role },
         process.env.JWT_SECRET || 'your-secret-key',
         { expiresIn: '1h' }
       );
 
-      // Generate refresh token
+      
       const refreshToken = jwt.sign(
         { id: user._id },
         process.env.JWT_SECRET || 'your-secret-key',

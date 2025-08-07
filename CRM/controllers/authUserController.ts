@@ -31,12 +31,11 @@ export const signupUser = async (req: Request, res: Response): Promise<void> => 
 
     await newUser.save();
 
-    // ✅ Automatically create the user profile
     const userProfile = new UserProfileModel({
-      avatarUrl: 'https://example.com/default-avatar.png', // <-- default avatar URL
+      avatarUrl: 'https://example.com/default-avatar.png', 
       fullName: `${firstname} ${lastname}`,
       role: 'User',
-      location: 'India', // <-- default location
+      location: 'India', 
       social: {},
       personal: {
         firstName: firstname,
@@ -85,7 +84,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     const token = jwt.sign(
       { userId: user._id, email: user.email },
-      'secret-key', // use env var in production
+      'secret-key', 
       { expiresIn: '1h' }
     );
 

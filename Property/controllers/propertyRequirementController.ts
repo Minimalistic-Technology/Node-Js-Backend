@@ -1,7 +1,7 @@
 import PropertyRequirement from '../models/PropertyRequirement';
 import { Request, Response } from 'express';
 
-// Create
+
 export const createPropertyRequirement = async (req: Request, res: Response): Promise<void> => {
   try {
     const requirement = await PropertyRequirement.create(req.body);
@@ -12,7 +12,7 @@ export const createPropertyRequirement = async (req: Request, res: Response): Pr
   }
 };
 
-// Read All
+
 export const getPropertyRequirements = async (_req: Request, res: Response): Promise<void> => {
   try {
     const requirements = await PropertyRequirement.find();
@@ -23,7 +23,7 @@ export const getPropertyRequirements = async (_req: Request, res: Response): Pro
   }
 };
 
-// Read by ID
+
 export const getPropertyRequirementById = async (req: Request, res: Response): Promise<void> => {
   try {
     const requirement = await PropertyRequirement.findById(req.params.id);
@@ -35,7 +35,7 @@ export const getPropertyRequirementById = async (req: Request, res: Response): P
   }
 };
 
-// Update
+
 export const updatePropertyRequirement = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await PropertyRequirement.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -47,7 +47,7 @@ export const updatePropertyRequirement = async (req: Request, res: Response): Pr
   }
 };
 
-// Delete
+
 export const deletePropertyRequirement = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await PropertyRequirement.findByIdAndDelete(req.params.id);

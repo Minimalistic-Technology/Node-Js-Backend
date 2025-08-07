@@ -8,7 +8,6 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-// ✅ Create Blog
 export const createBlog: RequestHandler = async (req, res) => {
   const userReq = req as AuthenticatedRequest;
   if (!userReq.user?.userID) {
@@ -28,7 +27,6 @@ export const createBlog: RequestHandler = async (req, res) => {
   }
 };
 
-// ✅ Get Related Blogs
 export const getRelatedBlogs: RequestHandler = async (req, res) => {
   const { category, excludeId } = req.query;
 
@@ -44,7 +42,7 @@ export const getRelatedBlogs: RequestHandler = async (req, res) => {
   }
 };
 
-// ✅ Get All Blogs
+
 export const getAllBlogs: RequestHandler = async (_req, res) => {
   try {
     const blogs = await Blog.find();
@@ -54,7 +52,7 @@ export const getAllBlogs: RequestHandler = async (_req, res) => {
   }
 };
 
-// ✅ Get Blog by ID
+
 export const getBlogById: RequestHandler = async (req, res) => {
   try {
     const blog = await Blog.findByIdAndUpdate(
@@ -74,7 +72,6 @@ export const getBlogById: RequestHandler = async (req, res) => {
   }
 };
 
-// ✅ Get User Blogs
 export const getUserBlogs: RequestHandler = async (req, res) => {
   const userReq = req as AuthenticatedRequest;
   console.log('User ID:', userReq.user);
@@ -92,7 +89,7 @@ export const getUserBlogs: RequestHandler = async (req, res) => {
   }
 };
 
-// ✅ Update Blog
+
 export const updateBlog: RequestHandler = async (req, res) => {
   try {
     if (req.body.date) {
@@ -116,7 +113,7 @@ export const updateBlog: RequestHandler = async (req, res) => {
   }
 };
 
-// ✅ Delete Blog
+
 export const deleteBlog: RequestHandler = async (req, res) => {
   try {
     const blog = await Blog.findByIdAndDelete(req.params.id);
@@ -131,7 +128,7 @@ export const deleteBlog: RequestHandler = async (req, res) => {
   }
 };
 
-// ✅ Delete All Blogs
+
 export const deleteAllBlogs: RequestHandler = async (_req, res) => {
   try {
     const result = await Blog.deleteMany({});
@@ -141,7 +138,7 @@ export const deleteAllBlogs: RequestHandler = async (_req, res) => {
   }
 };
 
-// ✅ Get Most Viewed Blogs
+
 export const getMostViewedBlogs: RequestHandler = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string, 10) || 10;
@@ -156,7 +153,7 @@ export const getMostViewedBlogs: RequestHandler = async (req, res) => {
   }
 };
 
-// ✅ Get Most Recent Blogs
+
 export const getMostRecentBlogs: RequestHandler = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string, 10) || 10;

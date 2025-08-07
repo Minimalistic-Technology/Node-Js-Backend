@@ -12,7 +12,7 @@ interface MessageEntry {
 
 let messageLog: MessageEntry[] = [];
 
-// Simulated message sending (WhatsApp logic removed)
+
 export const sendMessage = async (
   req: Request,
   res: Response
@@ -25,7 +25,7 @@ export const sendMessage = async (
   }
 
   try {
-    // Simulate the message send
+   
     console.log(`Simulated sending message to ${number}: ${message}`);
 
     messageLog.push({ number, message, timestamp: Date.now() });

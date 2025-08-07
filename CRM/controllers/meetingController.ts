@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { MeetingModel } from "../models/meeting";
 import { NotificationModel } from "../models/notification";
 
-// Create a new meeting
+
 export const createMeeting = async (req: Request, res: Response): Promise<void> => {
   try {
     const meeting = new MeetingModel(req.body);
@@ -21,7 +21,7 @@ export const createMeeting = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Get all meetings
+
 export const getAllMeetings = async (_req: Request, res: Response): Promise<void> => {
   try {
     const meetings = await MeetingModel.find();
@@ -32,7 +32,7 @@ export const getAllMeetings = async (_req: Request, res: Response): Promise<void
   }
 };
 
-// Get meeting by ID
+
 export const getMeetingById = async (req: Request, res: Response): Promise<void> => {
   try {
     const meeting = await MeetingModel.findById(req.params.id);
@@ -47,7 +47,7 @@ export const getMeetingById = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Update a meeting
+
 export const updateMeeting = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await MeetingModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -69,7 +69,7 @@ export const updateMeeting = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Delete a meeting
+
 export const deleteMeeting = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await MeetingModel.findByIdAndDelete(req.params.id);

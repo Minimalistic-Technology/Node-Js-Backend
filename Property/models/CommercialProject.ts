@@ -5,7 +5,7 @@ const CommercialProjectSchema = new mongoose.Schema({
   image: { type: String, required: true },
   location: { type: String, required: true },
   type: { type: String, required: true },
-  completion: { type: String, required: true }, // e.g., "Ready to Move"
+  completion: { type: String, required: true }, 
 });
 
 export const CommercialProject = mongoose.model("CommercialProject", CommercialProjectSchema);

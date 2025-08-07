@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, model } from 'mongoose';
 
-// Interface for Blog document
+
 export interface IBlog extends Document {
   title: string;
   description: string;
@@ -17,7 +17,7 @@ export interface IBlog extends Document {
   views: number;
 }
 
-// Define schema
+
 const blogSchema = new Schema<IBlog>({
   title: { type: String, required: true },
   description: { type: String, required: true },
@@ -34,6 +34,5 @@ const blogSchema = new Schema<IBlog>({
   views: { type: Number, default: 0, min: 0 },
 });
 
-// Export model
 const Blog = model<IBlog>('Blog', blogSchema);
 export default Blog;

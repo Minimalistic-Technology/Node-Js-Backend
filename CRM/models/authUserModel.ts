@@ -5,7 +5,7 @@ export interface ICrmAuthUser extends Document {
   lastname: string;
   mobileNumber: string;
   email: string;
-  password: string; // hashed password
+  password: string;
 }
 
 const CrmAuthUserSchema = new Schema<ICrmAuthUser>(

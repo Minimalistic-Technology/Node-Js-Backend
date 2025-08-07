@@ -6,9 +6,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const SECRET_KEY = process.env.JWT_SECRET as string; // ✅ Loaded from .env
-
-// Signup
+const SECRET_KEY = process.env.JWT_SECRET as string; 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, email, password, role } = req.body;
@@ -24,7 +22,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Login
+
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password, role } = req.body;
@@ -49,7 +47,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Get all users
+
 export const getAllUsers = async (_req: Request, res: Response): Promise<void> => {
   try {
     const users = await AuthAccessModel.find({}, { password: 0 }); // exclude password

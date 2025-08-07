@@ -27,7 +27,7 @@ export interface IOrder extends Document {
   updatedAt: Date;
   __v: number;
   bookId: Types.ObjectId;
-  cancelReason?: string; // Added field for cancellation reason
+  cancelReason?: string;
 }
 
 const OrderSchema: Schema = new Schema<IOrder>(
@@ -49,7 +49,7 @@ const OrderSchema: Schema = new Schema<IOrder>(
     condition: { type: String, enum: ['New', 'Old'], required: true },
     date: { type: Date, default: Date.now },
     bookId: { type: Schema.Types.ObjectId, ref: 'Book', required: true },
-    cancelReason: { type: String, required: false }, // Added field
+    cancelReason: { type: String, required: false }, 
   },
   { timestamps: { createdAt: true, updatedAt: true }, versionKey: '__v' }
 );

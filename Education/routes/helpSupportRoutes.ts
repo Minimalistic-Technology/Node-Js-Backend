@@ -17,7 +17,7 @@ import {
 
 const router = express.Router();
 
-// Ticket routes
+
 router.post("/tickets", createTicket);
 router.get("/tickets", getAllTickets);
 router.get("/tickets/:id", getTicketById);
@@ -25,7 +25,7 @@ router.put("/tickets/:id", updateTicket);
 router.delete("/tickets/:id", deleteTicket);
 router.post("/tickets/:id/responses", addResponseToTicket);
 
-// FAQ routes
+
 router.post("/faqs", createFAQ);
 router.get("/faqs", getAllFAQs);
 router.put("/faqs/:id", updateFAQ);

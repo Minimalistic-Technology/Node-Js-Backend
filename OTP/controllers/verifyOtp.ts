@@ -12,7 +12,7 @@ export const verifyOtp = (req: Request, res: Response): void => {
   const storedOtp = otpStore.get(email);
 
   if (storedOtp === otp) {
-    otpStore.delete(email); // Optional cleanup
+    otpStore.delete(email); 
     res.status(200).json({ message: "OTP verified successfully" });
   } else {
     res.status(401).json({ message: "Invalid OTP" });

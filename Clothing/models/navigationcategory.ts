@@ -40,6 +40,6 @@ const CategorySchema: Schema<ICategory> = new Schema(
   { timestamps: true }
 );
 
-// ✅ Use models guard to prevent OverwriteModelError
+
 export const DressModel = mongoose.models.Dress || mongoose.model<IDress>('Dress', DressSchema);
 export const CategoryModel = mongoose.models.Category || mongoose.model<ICategory>('Category', CategorySchema);

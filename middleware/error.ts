@@ -1,4 +1,4 @@
-// middleware/error.ts
+
 
 import { Request, Response, NextFunction } from 'express';
 

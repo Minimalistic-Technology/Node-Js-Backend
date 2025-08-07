@@ -27,7 +27,7 @@ userSchema.pre('save', async function (next) {
 
 const User = mongoose.models.User as mongoose.Model<IUser> || mongoose.model<IUser>('User', userSchema);
 
-// Seed dummy users
+
 export const seedUsers = async (): Promise<void> => {
   try {
     const existingUsers = await User.find();

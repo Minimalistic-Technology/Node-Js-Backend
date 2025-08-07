@@ -3,7 +3,7 @@ import { BannerController } from '../../Bookstore/controllers/bannerController';
 
 const router = Router();
 
-// Routes
+
 router.get('/', BannerController.getAllBanners);
 router.get('/active', BannerController.getActiveBanners);
 router.get('/inactive', BannerController.getInactiveBanners);

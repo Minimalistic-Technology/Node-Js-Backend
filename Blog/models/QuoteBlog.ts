@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, model } from 'mongoose';
 
-// Interface for QuoteBlog document
+
 export interface IQuoteBlog extends Document {
   quote: string;
   name: string;
@@ -8,7 +8,6 @@ export interface IQuoteBlog extends Document {
   createdAt: Date;
 }
 
-// Define schema
 const quoteBlogSchema = new Schema<IQuoteBlog>({
   quote: { type: String, required: true },
   name: { type: String, required: true },
@@ -19,6 +18,6 @@ const quoteBlogSchema = new Schema<IQuoteBlog>({
   }
 });
 
-// Export model
+
 const QuoteBlog = model<IQuoteBlog>('QuoteBlog', quoteBlogSchema);
 export default QuoteBlog;

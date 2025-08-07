@@ -1,4 +1,4 @@
-// authMiddleware.ts
+
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
@@ -13,7 +13,7 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(403).json({ message: 'Token missing' });
-    return; // Explicit return
+    return;
   }
 
   const token = authHeader.split(' ')[1];
@@ -24,14 +24,14 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
     next();
   } catch (err) {
     res.status(401).json({ message: 'Invalid token' });
-    return; // Explicit return
+    return; 
   }
 };
 
 export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction): void => {
   if (req.user?.role !== 'Admin') {
     res.status(403).json({ message: 'Admin access required' });
-    return; // Explicit return
+    return; 
   }
   next();
 };

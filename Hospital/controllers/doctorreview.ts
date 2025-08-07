@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import DoctorReview, { IReview } from '../models/doctorreview';
 
-// Create a new review
+
 export const createReview = async (req: Request, res: Response): Promise<void> => {
   try {
     const { doctor, review, rating, privacyAgreed } = req.body;
@@ -35,7 +35,7 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Fetch all reviews
+
 export const getReviews = async (req: Request, res: Response): Promise<void> => {
   try {
     const reviews = await DoctorReview.find().sort({ createdAt: -1 });
@@ -45,7 +45,7 @@ export const getReviews = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Fetch a review by ID
+
 export const getReviewById = async (req: Request, res: Response): Promise<void> => {
   try {
     const review = await DoctorReview.findById(req.params.id);
@@ -59,7 +59,7 @@ export const getReviewById = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Update a review by ID
+
 export const updateReview = async (req: Request, res: Response): Promise<void> => {
   try {
     const { nameOrInitials, department, review, rating, privacyAgreed } = req.body;
@@ -91,7 +91,7 @@ export const updateReview = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Delete a review by ID
+
 export const deleteReview = async (req: Request, res: Response): Promise<void> => {
   try {
     const deletedReview = await DoctorReview.findByIdAndDelete(req.params.id);

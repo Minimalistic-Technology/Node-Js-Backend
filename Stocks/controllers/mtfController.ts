@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import MTFStock, { MTFDocument } from '../models/mtfModel';
 
-// Add one or more MTF stocks
+
 export const addMTFStocks = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: MTFDocument[] = Array.isArray(req.body) ? req.body : [req.body];
@@ -12,7 +12,7 @@ export const addMTFStocks = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get all MTF stocks (selected fields only)
+
 export const getAllMTFStocks = async (_req: Request, res: Response): Promise<void> => {
   try {
     const data = await MTFStock.find({}, 'name price change image');
@@ -22,7 +22,6 @@ export const getAllMTFStocks = async (_req: Request, res: Response): Promise<voi
   }
 };
 
-// Get MTF stock by ID (excluding some fields)
 export const getMTFStockById = async (req: Request, res: Response): Promise<void> => {
   try {
     const stock = await MTFStock.findById(req.params.id, '-name -price -change -image -__v');
@@ -36,7 +35,7 @@ export const getMTFStockById = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Update MTF stock by ID
+
 export const updateMTFStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await MTFStock.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -50,7 +49,6 @@ export const updateMTFStock = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Delete MTF stock by ID
 export const deleteMTFStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await MTFStock.findByIdAndDelete(req.params.id);

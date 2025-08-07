@@ -9,6 +9,6 @@ router.get('/orders', getAllOrders);
 router.put('/orders/:id', updateOrderStatus);
 router.delete('/orders/:id', deleteOrder);
 router.get('/cancel-reasons', getCancelReasons);
-router.post('/orders/:id/cancel', cancelOrder); // New route for canceling orders
+router.post('/orders/:id/cancel', cancelOrder);
 
 export default router;

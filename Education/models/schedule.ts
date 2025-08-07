@@ -12,13 +12,13 @@ export interface ISchedule extends Document {
 
 const ScheduleSchema: Schema = new Schema(
   {
-    days: { type: [String], required: true }, // e.g., ["Monday", "Wednesday"]
+    days: { type: [String], required: true }, 
     subject: { type: String, required: true },
-    startTime: { type: String, required: true }, // e.g., "09:00 AM"
-    endTime: { type: String, required: true }, // e.g., "10:00 AM"
+    startTime: { type: String, required: true }, 
+    endTime: { type: String, required: true }, 
     faculty: { type: String, required: true },
   },
-  { timestamps: true } // Automatically adds createdAt and updatedAt
+  { timestamps: true } 
 );
 
 export default mongoose.model<ISchedule>('Schedule', ScheduleSchema);

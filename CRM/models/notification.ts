@@ -24,11 +24,11 @@ const NotificationSchema = new Schema<INotification>(
   { timestamps: true }
 );
 
-// Auto-expire notifications 90 days after being marked as read
+
 NotificationSchema.index(
   { readAt: 1 },
   {
-    expireAfterSeconds: 60 * 60 * 24 * 90, // 90 days
+    expireAfterSeconds: 60 * 60 * 24 * 90, 
     partialFilterExpression: { read: true },
   }
 );

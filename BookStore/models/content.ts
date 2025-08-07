@@ -15,7 +15,6 @@ interface Category {
     name: string;
 }
 
-// Fetch valid categories from external API
 async function getValidCategories(): Promise<string[]> {
     try {
         const response = await axios.get('http://localhost:5000/api/bookstore/categories');
@@ -23,11 +22,10 @@ async function getValidCategories(): Promise<string[]> {
         return categories.map(category => category.name);
     } catch (error) {
         console.error('Error fetching categories:', error);
-        return ['school-books', 'college-books', 'professional-books', 'other']; // Fallback categories
+        return ['school-books', 'college-books', 'professional-books', 'other'];  
     }
 }
 
-// Custom validator for category
 const categoryValidator = async (value: string) => {
     const validCategories = await getValidCategories();
     return validCategories.includes(value);

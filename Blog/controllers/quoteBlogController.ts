@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import QuoteBlog from '../models/QuoteBlog';
 
-// Create a new quote
+
 export const createQuote = async (req: Request, res: Response): Promise<void> => {
   try {
     const quote = new QuoteBlog(req.body);
@@ -12,7 +12,7 @@ export const createQuote = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Get latest quotes from the last 3 months
+
 export const getLatestQuotes = async (_req: Request, res: Response): Promise<void> => {
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
@@ -28,7 +28,7 @@ export const getLatestQuotes = async (_req: Request, res: Response): Promise<voi
   }
 };
 
-// Delete a quote by ID
+
 export const deleteQuote = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

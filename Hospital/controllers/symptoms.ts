@@ -2,11 +2,11 @@ import { Request, Response } from 'express';
 import Symptom from '../models/symptoms';
 import { Types } from 'mongoose';
 
-// A-Z helper letters
+
 const validLetters: string[] = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
 const isValidLetter = (char: string): boolean => validLetters.includes(char.toUpperCase());
 
-// GET: A-Z Alphabets
+
 export const getAlphabets = async (req: Request, res: Response) => {
   try {
     res.json(validLetters);
@@ -15,7 +15,7 @@ export const getAlphabets = async (req: Request, res: Response) => {
   }
 };
 
-// GET: Symptoms by Letter
+
 export const getSymptomsByLetter = async (req: Request, res: Response) => {
   try {
     const letter = req.params.letter.toUpperCase();
@@ -30,7 +30,7 @@ export const getSymptomsByLetter = async (req: Request, res: Response) => {
   }
 };
 
-// POST: Single symptom by letter
+
 export const createSymptomForLetter = async (req: Request, res: Response) => {
   try {
     const letter = req.params.letter.toUpperCase();
@@ -56,7 +56,7 @@ export const createSymptomForLetter = async (req: Request, res: Response) => {
   }
 };
 
-// POST: Bulk symptoms for a letter
+
 export const createSymptomsBulk = async (req: Request, res: Response) => {
   try {
     const letter = req.params.letter.toUpperCase();
@@ -91,7 +91,7 @@ export const createSymptomsBulk = async (req: Request, res: Response) => {
   }
 };
 
-// PUT: Update symptom by ID
+
 export const updateSymptomById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -129,7 +129,7 @@ export const updateSymptomById = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE: Symptom by ID
+
 export const deleteSymptomById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -151,7 +151,7 @@ export const deleteSymptomById = async (req: Request, res: Response) => {
   }
 };
 
-// POST: Create all symptoms (A-Z, bulk)
+
 export const createAllSymptoms = async (req: Request, res: Response) => {
   try {
     const symptoms: Array<{ name: string; description?: string }> = req.body;

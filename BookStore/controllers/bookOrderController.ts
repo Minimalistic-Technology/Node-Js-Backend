@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { Order } from "../models/order"; // Import the Order model from order.ts
-
-// CREATE
+import { Order } from "../models/order"; 
 export const createOrder = async (req: Request, res: Response): Promise<void> => {
   try {
     const {
@@ -19,7 +17,6 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
       date,
     } = req.body;
 
-    // Validate required fields
     if (!customerName || !email || !mobileNumber || !address || !paymentType || !quantity || !price || !status || !condition || !bookId) {
       res.status(400).json({ error: "Missing required fields" });
       return;
@@ -36,7 +33,7 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
       status,
       condition,
       bookId,
-      date: date || Date.now(), // Use provided date or default to now
+      date: date || Date.now(), 
     });
 
     const savedOrder = await newOrder.save();
@@ -46,13 +43,13 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// READ ALL
+
 export const getAllOrders = async (_req: Request, res: Response): Promise<void> => {
   const orders = await Order.find().sort({ createdAt: -1 });
   res.json(orders);
 };
 
-// READ ONE
+
 export const getOrderById = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const order = await Order.findById(id);
@@ -63,7 +60,7 @@ export const getOrderById = async (req: Request, res: Response): Promise<void> =
   res.json(order);
 };
 
-// UPDATE STATUS
+
 export const updateOrderStatus = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const { status } = req.body;
@@ -75,7 +72,7 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
   res.json(updated);
 };
 
-// DELETE ORDER
+
 export const deleteOrder = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const deleted = await Order.findByIdAndDelete(id);
@@ -86,7 +83,7 @@ export const deleteOrder = async (req: Request, res: Response): Promise<void> =>
   res.json({ message: "Order deleted successfully" });
 };
 
-// CANCEL ORDER
+
 export const cancelOrder = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const updated = await Order.findByIdAndUpdate(id, { status: "Cancelled" }, { new: true });
@@ -97,7 +94,7 @@ export const cancelOrder = async (req: Request, res: Response): Promise<void> =>
   res.json(updated);
 };
 
-// REFUND ORDER
+
 export const refundOrder = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const updated = await Order.findByIdAndUpdate(id, { status: "Refunded" }, { new: true });

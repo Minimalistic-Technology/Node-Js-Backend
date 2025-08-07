@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UserProfileModel } from "../models/userProfile";
 
-// CREATE
+
 export const createUserProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = new UserProfileModel(req.body);
@@ -13,7 +13,6 @@ export const createUserProfile = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// GET ALL
 export const getAllProfiles = async (_req: Request, res: Response): Promise<void> => {
   try {
     const profiles = await UserProfileModel.find().lean();
@@ -24,7 +23,7 @@ export const getAllProfiles = async (_req: Request, res: Response): Promise<void
   }
 };
 
-// GET BY ID
+
 export const getProfileById = async (req: Request, res: Response): Promise<void> => {
   try {
     const profile = await UserProfileModel.findById(req.params.id).lean();
@@ -39,7 +38,6 @@ export const getProfileById = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// UPDATE
 export const updateUserProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await UserProfileModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -54,7 +52,7 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// DELETE
+
 export const deleteUserProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await UserProfileModel.findByIdAndDelete(req.params.id);

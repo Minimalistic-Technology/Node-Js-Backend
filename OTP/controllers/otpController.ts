@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import sendMail from "../utils/sendMail";
 import generateOtp from "../utils/generateOTP";
 
-// Temporary in-memory OTP store
+
 const otpStore = new Map<string, string>();
 
 export const sendOtp = async (req: Request, res: Response): Promise<void> => {
@@ -19,7 +19,7 @@ export const sendOtp = async (req: Request, res: Response): Promise<void> => {
     await sendMail({
       email,
       subject: "Your OTP Code",
-      template: "otp-template.ejs", // Ensure this exists in /mails
+      template: "otp-template.ejs", 
       data: { name, otp },
     });
 

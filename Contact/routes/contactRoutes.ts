@@ -12,7 +12,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-  //  await sendEmail({name, email, message});
+
     res.status(200).json({ message: "Email sent successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to send email" });

@@ -7,7 +7,7 @@ import { updateAccessToken } from "../controllers/authController";
 import userModel from "../models/User";
 
 
-// authenticated user
+
 export const isAuthenticated = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const access_token = req.cookies.access_token as string;
@@ -24,7 +24,7 @@ export const isAuthenticated = CatchAsyncError(
       return next(new ErrorHandler("access token is not valid", 400));
     }
 
-    // check if the access token is expired
+  
     if (decoded.exp && decoded.exp <= Date.now() / 1000) {
       try {
         await updateAccessToken(req, res);
@@ -33,7 +33,7 @@ export const isAuthenticated = CatchAsyncError(
       }
     } else {
       const user = await userModel.findOne({ _id : decoded.id }) 
-      // await redis.get(decoded.id);
+      
 
       if (!user) {
         return next(
@@ -47,7 +47,7 @@ export const isAuthenticated = CatchAsyncError(
   }
 );
 
-// validate user role
+
 export const authorizeRoles = (...roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore

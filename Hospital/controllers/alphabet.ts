@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import Disease, { IDisease } from '../models/Disease';
 import Alphabet, { IAlphabet } from '../models/alphabet';
 
-// Define a literal type for valid alphabet letters
+
 type ValidLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' |
   'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' | '#';
 

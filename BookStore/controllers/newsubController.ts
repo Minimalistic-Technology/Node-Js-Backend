@@ -34,7 +34,7 @@ const sendSubscriberEmail = async (
   }
 };
 
-// POST /api/subscribers/send
+
 export const sendEmailHandler: RequestHandler = async (req, res) => {
   const { name, email, subject, body } = req.body;
 
@@ -59,7 +59,7 @@ export const sendEmailHandler: RequestHandler = async (req, res) => {
   }
 };
 
-// GET /api/subscribers
+
 export const getSubscribersHandler: RequestHandler = async (_req: Request, res: Response) => {
   try {
     const subscribers = await Subscriber.find().sort({ createdAt: -1 });
@@ -69,7 +69,7 @@ export const getSubscribersHandler: RequestHandler = async (_req: Request, res: 
   }
 };
 
-// DELETE /api/subscribers/:id
+
 export const deleteSubscriberHandler: RequestHandler = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

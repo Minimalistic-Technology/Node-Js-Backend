@@ -1,7 +1,7 @@
 import Broker from '../models/Broker';
 import { Request, Response } from 'express';
 
-// Create a new broker
+
 export const createBroker = async (req: Request, res: Response): Promise<void> => {
   try {
     const broker = await Broker.create(req.body);
@@ -12,7 +12,7 @@ export const createBroker = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get all brokers
+
 export const getBrokers = async (_req: Request, res: Response): Promise<void> => {
   try {
     const brokers = await Broker.find();
@@ -23,7 +23,6 @@ export const getBrokers = async (_req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Get a single broker
 export const getBrokerById = async (req: Request, res: Response): Promise<void> => {
   try {
     const broker = await Broker.findById(req.params.id);
@@ -35,7 +34,6 @@ export const getBrokerById = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Update broker
 export const updateBroker = async (req: Request, res: Response): Promise<void> => {
   try {
     const broker = await Broker.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -47,7 +45,7 @@ export const updateBroker = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Delete broker
+
 export const deleteBroker = async (req: Request, res: Response): Promise<void> => {
   try {
     const broker = await Broker.findByIdAndDelete(req.params.id);

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { AccountModel } from "../models/account";
 import { NotificationModel } from "../models/notification";
 
-// Create Account
+
 export const createAccount = async (req: Request, res: Response): Promise<void> => {
   try {
     const account = new AccountModel(req.body);
@@ -11,13 +11,13 @@ export const createAccount = async (req: Request, res: Response): Promise<void> 
     await NotificationModel.create({
       userId: req.body.owner,
       message: `New account created: ${account.name}`,
-      type: "account", // MUST match enum: "account", not "Account"
+      type: "account", 
     });
 
     res.status(201).json(account);
   } catch (err: any) {
     if (err.code === 11000) {
-      // Duplicate key error
+      
       res.status(400).json({ error: "Account number already exists. Please use a unique number." });
     } else {
       res.status(400).json({ error: err.message || "Failed to create account" });
@@ -25,7 +25,6 @@ export const createAccount = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Get All Accounts
 export const getAllAccounts = async (_req: Request, res: Response): Promise<void> => {
   try {
     const accounts = await AccountModel.find();
@@ -35,7 +34,7 @@ export const getAllAccounts = async (_req: Request, res: Response): Promise<void
   }
 };
 
-// Get Account by ID (ensure valid ObjectId)
+
 export const getAccountById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -55,7 +54,7 @@ export const getAccountById = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Update Account
+
 export const updateAccount = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await AccountModel.findByIdAndUpdate(req.params.id, req.body, {
@@ -79,7 +78,7 @@ export const updateAccount = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Delete Account
+
 export const deleteAccount = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await AccountModel.findByIdAndDelete(req.params.id);

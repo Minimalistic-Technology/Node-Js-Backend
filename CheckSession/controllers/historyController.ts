@@ -5,7 +5,7 @@ interface AuthRequest extends Request {
   user?: any;
 }
 
-// CREATE
+
 export const createHistory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const history = new HistoryModel(req.body);
@@ -16,7 +16,7 @@ export const createHistory = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-// READ ALL (Admin only)
+
 export const getAllHistories = async (_req: AuthRequest, res: Response): Promise<void> => {
   try {
     const histories = await HistoryModel.find().sort({ createdAt: -1 });
@@ -26,7 +26,7 @@ export const getAllHistories = async (_req: AuthRequest, res: Response): Promise
   }
 };
 
-// READ ONE (User sees own)
+
 export const getHistoryByUserId = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (req.user.role !== 'Admin' && req.user.id !== req.params.userId) {
@@ -42,7 +42,6 @@ export const getHistoryByUserId = async (req: AuthRequest, res: Response): Promi
   }
 };
 
-// UPDATE
 export const updateHistory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (req.user.role !== 'Admin' && req.user.id !== req.params.userId) {
@@ -62,7 +61,7 @@ export const updateHistory = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-// DELETE (Admin only)
+
 export const deleteHistory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     await HistoryModel.findOneAndDelete({ userId: req.params.userId });

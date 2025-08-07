@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { TestModel } from '../models/test';
 
-// Get tests by first letter
+
 export const getTestsByLetter = async (req: Request, res: Response): Promise<void> => {
   try {
     const { letter } = req.params;
@@ -17,7 +17,7 @@ export const getTestsByLetter = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// Post multiple tests at once
+
 export const addMultipleTests = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = Array.isArray(req.body) ? req.body : [req.body];
@@ -34,7 +34,7 @@ export const addMultipleTests = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// Post additional info to an existing test by ID
+
 export const appendToTestById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -53,7 +53,6 @@ export const appendToTestById = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// Update test by ID
 export const updateTestById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -72,7 +71,7 @@ export const updateTestById = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Delete test by ID
+
 export const deleteTestById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -89,7 +88,7 @@ export const deleteTestById = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Append one or more tests under a specific starting letter
+
 export const appendTestsByLetter = async (req: Request, res: Response): Promise<void> => {
   try {
     const { letter } = req.params;

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import IndexModel, { IIndex } from '../models/Indices';
 
-// Add single or multiple index stocks
+
 export const addTopStocks = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: Partial<IIndex>[] = Array.isArray(req.body) ? req.body : [req.body];
@@ -13,7 +13,7 @@ export const addTopStocks = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get all index stocks (selected fields only)
+
 export const getTopStocks = async (_req: Request, res: Response): Promise<void> => {
   try {
     const data = await IndexModel.find({}, 'name price change image');
@@ -23,7 +23,7 @@ export const getTopStocks = async (_req: Request, res: Response): Promise<void> 
   }
 };
 
-// Get index stock by ID (excluding specific fields)
+
 export const getTopStockById = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id;
@@ -44,7 +44,7 @@ export const getTopStockById = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Update index stock by ID
+
 export const updateTopStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id;
@@ -69,7 +69,7 @@ export const updateTopStock = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Delete index stock by ID
+
 export const deleteTopStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id;

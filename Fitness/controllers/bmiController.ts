@@ -2,13 +2,13 @@
 import { Request, Response } from 'express';
 import { BmiPlan } from '../models/bmi';
 
-// Helper to calculate BMI
+
 const calculateBMI = (weight: number, height: number): number => {
   const hMeters = height / 100;
   return parseFloat((weight / (hMeters * hMeters)).toFixed(1));
 };
 
-// Determine BMI category
+
 const getBMICategory = (bmi: number): string => {
   if (bmi < 18.5) return 'Underweight';
   if (bmi < 24.0) return 'Normal';
@@ -16,7 +16,7 @@ const getBMICategory = (bmi: number): string => {
   return 'Obese';
 };
 
-// Plan structure
+
 type Plan = {
   calorieTarget: number;
   foodPlan: {
@@ -25,7 +25,7 @@ type Plan = {
   }[];
 };
 
-// Get plan based on BMI category
+
 const getPlanByBMICategory = (category: string): Plan | undefined => {
   switch (category) {
     case 'Underweight':
@@ -73,7 +73,7 @@ const getPlanByBMICategory = (category: string): Plan | undefined => {
   }
 };
 
-// ✅ POST - create BMI plan
+
 export const generateBmiPlan = async (req: Request, res: Response): Promise<void> => {
   try {
     const { height, weight, age, gender, activityLevel } = req.body;
@@ -105,10 +105,10 @@ export const generateBmiPlan = async (req: Request, res: Response): Promise<void
   }
 };
 
-// ✅ GET - all BMI plans
+
 export const getAllBmiPlans = async (_req: Request, res: Response): Promise<void> => {
   try {
-    // Exclude foodPlan using projection
+   
    const plans = await BmiPlan.find({}, { foodPlan: 0 });
     res.json(plans);
   } catch (error) {
@@ -133,7 +133,7 @@ export const getBmiFoodPlanById = async (req: Request, res: Response): Promise<v
 };
 
 
-// ✅ PUT - update plan by ID
+
 export const updateBmiPlanById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -150,7 +150,6 @@ export const updateBmiPlanById = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// ✅ DELETE - delete plan by ID
 export const deleteBmiPlanById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

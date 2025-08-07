@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import Profile, { IProfile } from '../models/Profile';
 
-// Create Profile
 export const createProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const profile = new Profile(req.body as IProfile);
@@ -13,7 +12,7 @@ export const createProfile = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Get Profile by Email
+
 export const getProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email } = req.query;
@@ -35,7 +34,6 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Update Profile
 export const updateProfile = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, firstName, lastName, password, confirmPassword } = req.body;

@@ -3,15 +3,15 @@ import { signup, login, refreshToken, logout, getAllUsers, updateUserRole, getUs
 
 const router: Router = Router();
 
-// Routes
+
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/refresh-token', refreshToken);
 router.post('/logout', logout);
 
-// Protected routes (require authentication)
-router.get('/users', getAllUsers); // Get all users (without passwords)
-router.patch('/users/:id/role', authenticateToken, updateUserRole); // Update user role
-router.get('/user', authenticateToken, getUserByToken); // Get user by token
+
+router.get('/users', getAllUsers); 
+router.patch('/users/:id/role', authenticateToken, updateUserRole); 
+router.get('/user', authenticateToken, getUserByToken); 
 
 export default router;

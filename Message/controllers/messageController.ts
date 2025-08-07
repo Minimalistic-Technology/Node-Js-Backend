@@ -14,7 +14,7 @@ interface MessageEntry {
 
 let messageLog: MessageEntry[] = [];
 
-// Email Log Model
+
 interface EmailLogDocument extends Document {
   subject: string;
   recipients: string[];
@@ -33,7 +33,7 @@ const emailLogSchema = new mongoose.Schema<EmailLogDocument>({
 
 const EmailLog: Model<EmailLogDocument> = mongoose.model<EmailLogDocument>("EmailLog", emailLogSchema);
 
-// Nodemailer transporter
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -42,7 +42,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Simulated message sending (WhatsApp logic unchanged)
+
 export const sendMessage = async (req: Request, res: Response): Promise<void> => {
   const { number, message } = req.body;
 
@@ -60,7 +60,6 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Send email to subscribers
 export const sendEmail = async (req: Request, res: Response): Promise<void> => {
   const { subject, body, recipients } = req.body;
 
@@ -111,7 +110,7 @@ export const sendEmail = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Get email logs
+
 export const getEmailLogs: RequestHandler = async (_req: Request, res: Response) => {
   try {
     const logs = await EmailLog.find().sort({ timestamp: -1 });

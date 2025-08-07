@@ -1,4 +1,4 @@
-// File: orderroutes.ts
+
 import express from 'express';
 import { createOrder, getAllOrders, updateOrderStatus, deleteOrder } from '../controllers/ordercontroller';
 

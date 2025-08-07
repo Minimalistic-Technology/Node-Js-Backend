@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { LeadModel } from "../models/lead";
 import { NotificationModel } from "../models/notification";
 
-// Create Lead
+
 export const createLead = async (req: Request, res: Response): Promise<void> => {
   try {
     const lead = new LeadModel(req.body);
@@ -21,7 +21,7 @@ export const createLead = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Get All Leads
+
 export const getAllLeads = async (_req: Request, res: Response): Promise<void> => {
   try {
     const leads = await LeadModel.find();
@@ -32,7 +32,7 @@ export const getAllLeads = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get Lead by ID
+
 export const getLeadById = async (req: Request, res: Response): Promise<void> => {
   try {
     const lead = await LeadModel.findById(req.params.id);
@@ -47,7 +47,7 @@ export const getLeadById = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Update Lead
+
 export const updateLead = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await LeadModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -69,7 +69,7 @@ export const updateLead = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Delete Lead
+
 export const deleteLead = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await LeadModel.findByIdAndDelete(req.params.id);

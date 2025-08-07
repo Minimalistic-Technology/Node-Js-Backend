@@ -1,13 +1,13 @@
 import { Document, Schema, model } from 'mongoose';
 
-// Define the structure of an answer
+
 interface IAnswer {
   questionId: Schema.Types.ObjectId;
   selectedOption: string;
   isCorrect: boolean;
 }
 
-// Define the structure of a quiz result
+
 export interface IQuizResult extends Document {
   user: Schema.Types.ObjectId;
   course: Schema.Types.ObjectId;
@@ -16,12 +16,12 @@ export interface IQuizResult extends Document {
   score: number;
   totalQuestions: number;
   completionDate: Date;
-  task: string[]; // Array of strings to store tasks
-  isPassed: boolean; // Boolean to indicate pass or fail
+  task: string[]; 
+  isPassed: boolean;
   calculatePassOrFail: (score: number,totalQuestions: number,passingScore: number) => string;
 }
 
-// Create a Mongoose schema for the quiz result
+
 const quizResultSchema = new Schema<IQuizResult>(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -37,8 +37,8 @@ const quizResultSchema = new Schema<IQuizResult>(
     score: { type: Number, required: true },
     totalQuestions: { type: Number, required: true },
     completionDate: { type: Date, default: Date.now },
-    task: { type: [String], default: [] }, // Array of strings for tasks
-    isPassed: { type: Boolean, required: true }, // Pass or fail check
+    task: { type: [String], default: [] }, 
+    isPassed: { type: Boolean, required: true }, 
   },
   { timestamps: true }
 );

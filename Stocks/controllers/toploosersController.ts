@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import TopLosers, { ITopLoser } from '../models/toploosersModel';
 
-// Create stock(s)
+
 export const createStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: ITopLoser[] = Array.isArray(req.body) ? req.body : [req.body];
@@ -12,7 +12,7 @@ export const createStock = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Get categories
+
 export const getTopLosers = async (req: Request, res: Response): Promise<void> => {
   try {
     res.status(200).json({
@@ -25,7 +25,7 @@ export const getTopLosers = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get stocks by category
+
 export const getStocksByCategory = async (
   req: Request<{ category: string }>,
   res: Response
@@ -49,7 +49,6 @@ export const getStocksByCategory = async (
   }
 };
 
-// Get stock details
 export const getStockDetails = async (
   req: Request<{ category: string; id: string }>,
   res: Response
@@ -77,7 +76,7 @@ export const getStockDetails = async (
   }
 };
 
-// Update stock
+
 export const updateStock = async (
   req: Request<{ id: string }>,
   res: Response
@@ -99,7 +98,7 @@ export const updateStock = async (
   }
 };
 
-// Delete stock
+
 export const deleteStock = async (
   req: Request<{ id: string }>,
   res: Response

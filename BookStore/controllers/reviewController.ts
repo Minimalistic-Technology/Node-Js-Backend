@@ -50,19 +50,18 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
   try {
     const { bookId, name, email, rating, comment, categoryName } = req.body;
 
-    // Validate input
+    
     if (!bookId || !name || !rating || !comment || !categoryName) {
       res.status(400).json({ error: 'Missing required fields: bookId, name, rating, comment, or categoryName' });
       return;
     }
 
-    // Validate bookId as ObjectId
+   
     if (!mongoose.Types.ObjectId.isValid(bookId)) {
       res.status(400).json({ error: 'Invalid bookId format' });
       return;
     }
 
-    // Validate rating
     if (rating < 1 || rating > 5) {
       res.status(400).json({ error: 'Rating must be between 1 and 5' });
       return;

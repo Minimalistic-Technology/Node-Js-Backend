@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { DealModel } from "../models/deal";
 import { NotificationModel } from "../models/notification";
 
-// Create Deal
+
 export const createDeal = async (req: Request, res: Response): Promise<void> => {
   try {
     const deal = new DealModel(req.body);
@@ -21,7 +21,7 @@ export const createDeal = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Get All Deals
+
 export const getAllDeals = async (_req: Request, res: Response): Promise<void> => {
   try {
     const deals = await DealModel.find();
@@ -32,7 +32,6 @@ export const getAllDeals = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get Deal by ID
 export const getDealById = async (req: Request, res: Response): Promise<void> => {
   try {
     const deal = await DealModel.findById(req.params.id);
@@ -47,7 +46,7 @@ export const getDealById = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Update Deal
+
 export const updateDeal = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await DealModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -69,7 +68,7 @@ export const updateDeal = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Delete Deal
+
 export const deleteDeal = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await DealModel.findByIdAndDelete(req.params.id);

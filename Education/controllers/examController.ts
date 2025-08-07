@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ExamModel } from "../models/exam";
 
-// Create
+
 export const createExam = async (req: Request, res: Response): Promise<void> => {
   try {
     const exam = new ExamModel(req.body);
@@ -12,7 +12,7 @@ export const createExam = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Read All
+
 export const getAllExams = async (_req: Request, res: Response): Promise<void> => {
   try {
     const exams = await ExamModel.find();
@@ -22,7 +22,7 @@ export const getAllExams = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
-// Read by ID
+
 export const getExamById = async (req: Request, res: Response): Promise<void> => {
   try {
     const exam = await ExamModel.findById(req.params.id);
@@ -33,7 +33,7 @@ export const getExamById = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Update
+
 export const updateExam = async (req: Request, res: Response): Promise<void> => {
   try {
     const updatedExam = await ExamModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -44,7 +44,7 @@ export const updateExam = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Delete
+
 export const deleteExam = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await ExamModel.findByIdAndDelete(req.params.id);

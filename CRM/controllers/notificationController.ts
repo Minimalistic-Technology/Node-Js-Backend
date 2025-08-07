@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { NotificationModel } from "../models/notification";
 
-// Create a new notification
+
 export const createNotification = async (req: Request, res: Response): Promise<void> => {
   try {
     const notification = await NotificationModel.create(req.body);
@@ -12,7 +12,6 @@ export const createNotification = async (req: Request, res: Response): Promise<v
   }
 };
 
-// Get all notifications for a user
 export const getUserNotifications = async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId } = req.params;
@@ -24,7 +23,7 @@ export const getUserNotifications = async (req: Request, res: Response): Promise
   }
 };
 
-// Mark a notification as read
+
 export const markAsRead = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -44,7 +43,7 @@ export const markAsRead = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Delete a notification
+
 export const deleteNotification = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await NotificationModel.findByIdAndDelete(req.params.id);

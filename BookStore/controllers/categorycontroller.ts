@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Category } from '../models/category';
 
 export class CategoryController {
-  // Get all categories
+ 
   static async getAllCategories(req: Request, res: Response) {
     try {
       const categories = await Category.find();
@@ -12,7 +12,7 @@ export class CategoryController {
     }
   }
 
-  // Get single category by ID
+ 
   static async getCategoryById(req: Request, res: Response): Promise<void> {
     try {
       const category = await Category.findById(req.params.id);
@@ -26,7 +26,7 @@ export class CategoryController {
     }
   }
 
-  // Create new category
+ 
   static async createCategory(req: Request, res: Response): Promise<void> {
     try {
       const categoryData = {
@@ -43,7 +43,7 @@ export class CategoryController {
     }
   }
 
-  // Update category
+ 
   static async updateCategory(req: Request, res: Response): Promise<void> {
     try {
       const category = await Category.findById(req.params.id);
@@ -63,7 +63,7 @@ export class CategoryController {
     }
   }
 
-  // Delete category
+  
   static async deleteCategory(req: Request, res: Response): Promise<void> {
     try {
       const category = await Category.findById(req.params.id);
