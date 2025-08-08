@@ -165,6 +165,39 @@ class BookController {
     }
   }
 
+  static async getBookById(req: Request, res: Response): Promise<void> {
+    try {
+      const { bookId } = req.params;
+      const book = (await BookModel.findById(bookId).lean()) as IBook;
+      if (!book) {
+        res.status(404).json({ error: 'Book not found' });
+        return;
+      }
+
+      const category = (await BookCategoryModel.findOne({
+        name: { $regex: new RegExp(`^${book.categoryName}$`, 'i') },
+      }).lean()) as IBookCategory;
+      const subCat = category?.subCategories.find(
+        (sub) => sub.name.toLowerCase() === book.subCategory?.toLowerCase()
+      );
+
+      const effectiveDiscount =
+        subCat?.subCategoryDiscount && subCat.subCategoryDiscount > 0
+          ? subCat.subCategoryDiscount
+          : category?.categoryDiscount && category.categoryDiscount > 0
+          ? category.categoryDiscount
+          : book.condition === 'new'
+          ? book.discountNew || 0
+          : book.discountOld || 0;
+      const discountedPrice = book.price ? book.price * (1 - effectiveDiscount / 100) : book.price;
+
+      res.status(200).json({ ...book, effectiveDiscount, discountedPrice });
+    } catch (err: any) {
+      console.error('Error fetching book by ID:', err);
+      res.status(404).json({ error: 'Failed to fetch book', details: err.message });
+    }
+  }
+
   static async createCategory(req: Request, res: Response): Promise<void> {
     try {
       console.log('Request body:', req.body);
@@ -508,7 +541,7 @@ class BookController {
         (sub: any) => sub.name.toLowerCase() !== decodeURIComponent(subCategoryName).toLowerCase()
       );
       category.books = category.books.filter(
-        (bookId:any) =>
+        (bookId: any) =>
           !subCategory.books.some((subBookId: any) => subBookId.toString() === bookId.toString())
       );
       await category.save();
@@ -595,7 +628,7 @@ class BookController {
         subCategory: { $regex: new RegExp(`^${decodeURIComponent(subCategory)}$`, 'i') },
         subSubCategory: { $regex: new RegExp(`^${decodeURIComponent(subSubCategoryName)}$`, 'i') },
       });
-      category.books = category.books.filter((bookId:any) =>
+      category.books = category.books.filter((bookId: any) =>
         BookModel.findById(bookId).then((book: any) =>
           !(book.subCategory?.toLowerCase() === decodeURIComponent(subCategory).toLowerCase() &&
             book.subSubCategory?.toLowerCase() === decodeURIComponent(subSubCategoryName).toLowerCase())

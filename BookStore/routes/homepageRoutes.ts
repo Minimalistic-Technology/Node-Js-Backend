@@ -12,7 +12,7 @@ import BookRequestController from '../controllers/addbookController';
 
 const router = express.Router();
 
-
+// Category Routes
 router.get('/book-categories', BookController.getAllCategories);
 router.post('/book-categories', BookController.createCategory);
 router.post('/book-categories/bulk', BookController.createBulkCategories);
@@ -24,39 +24,40 @@ router.delete('/book-categories/:id', BookController.deleteCategory);
 router.post('/book-categories/:categoryName/discount', BookController.setCategoryDiscount);
 router.post('/book-categories/:categoryName/:subCategory/discount', BookController.setSubCategoryDiscount);
 
-
+// Subcategory Routes
 router.post('/book-categories/:categoryName/subcategories', BookController.createSubCategory);
 router.delete('/book-categories/:categoryName/subcategories/:subCategoryName', BookController.deleteSubCategory);
 
-
+// Sub-subcategory Routes
 router.post('/book-categories/:categoryName/:subCategory/subsubcategories', BookController.createSubSubCategory);
 router.delete(
   '/book-categories/:categoryName/:subCategory/subsubcategories/:subSubCategoryName',
   BookController.deleteSubSubCategory
 );
 
-
+// Tag Routes
 router.get('/book-categories/:categoryName/tags', BookController.getTagsByCategory);
 router.post('/book-categories/:categoryName/tags', BookController.createTag);
 router.put('/book-categories/:categoryName/tags/:tagName', BookController.updateTag);
 router.delete('/book-categories/:categoryName/tags/:tagName', BookController.deleteTag);
-
 
 router.get('/book-categories/:categoryName/:subCategory/:subSubCategory/tags', BookController.getTagsByCategory);
 router.post('/book-categories/:categoryName/:subCategory/:subSubCategory/tags', BookController.createTag);
 router.put('/book-categories/:categoryName/:subCategory/:subSubCategory/tags/:tagName', BookController.updateTag);
 router.delete('/book-categories/:categoryName/:subCategory/:subSubCategory/tags/:tagName', BookController.deleteTag);
 
-
+// Book Routes
 router.post('/book-categories/:categoryName/:subCategory/:subSubCategory', BookController.createBook);
 router.get('/book-categories/:categoryName/:subCategory/:subSubCategory/:bookId', BookController.getBookDetailsById);
 router.put('/book-categories/:categoryName/:subCategory/:subSubCategory/:bookId', BookController.updateBook);
 router.delete('/book-categories/:categoryName/:subCategory/:subSubCategory/:bookId', BookController.deleteBook);
+router.get('/books/:bookId', BookController.getBookById); // New endpoint for direct book fetching
 
+// Delete All Routes
 router.delete('/book-categories', BookController.deleteAllCategories);
 router.delete('/books', BookController.deleteAllBooks);
 
-
+// Review Routes
 router.get('/reviews', getReviews);
 router.get('/reviews/book/:bookId', getApprovedReviewsByBookId);
 router.post('/reviews', createReview);
@@ -64,7 +65,7 @@ router.get('/reviews/:id', getReviewById);
 router.put('/reviews/:id', updateReview);
 router.delete('/reviews/:id', deleteReview);
 
-
+// Book Request Routes
 router.post('/book-requests', BookRequestController.createBookRequest);
 router.get('/book-requests', BookRequestController.getBookRequests);
 
