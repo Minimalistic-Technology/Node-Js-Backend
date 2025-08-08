@@ -4,14 +4,16 @@ import { LocationModel } from '../models/location';
 
 export const createLocation = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = (req.user as { _id: string })._id;
+    const userId = (req.user as { id: string }).id;  
     const location = new LocationModel({ ...req.body, userId });
     await location.save();
     res.status(201).json(location);
   } catch (err) {
+    console.error('CREATE LOCATION ERROR:', err);
     res.status(500).json({ error: 'Failed to create location' });
   }
 };
+
 
 
 export const getAllLocations = async (_req: Request, res: Response): Promise<void> => {
