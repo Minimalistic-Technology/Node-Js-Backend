@@ -5,6 +5,7 @@ export interface IBookOrder extends Document {
   amount: number;
   date: Date;
   status: string; 
+}
 
 const BookOrderSchema = new Schema<IBookOrder>({
   customerName: { type: String, required: true },
