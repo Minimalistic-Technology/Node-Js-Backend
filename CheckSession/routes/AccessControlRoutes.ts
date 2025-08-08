@@ -5,21 +5,22 @@ import {
   getAllUsers,
   updateUser,
   deleteUser,
-  getLoggedInUser
+  getLoggedInUser,
+  getUserById
 } from '../controllers/authAccessController';
+import { verifyToken, isAdmin } from '../middleware/authMiddleware';
 
 const router = express.Router();
-
 
 router.post('/access-control/signup', signup);
 router.post('/access-control/login', login);
 
+router.get('/access-control/users', verifyToken, isAdmin, getAllUsers);
+router.get('/access-control/user/:id', verifyToken, isAdmin, getUserById);
 
-router.get('/access-control/users', getAllUsers);
+router.put('/access-control/user/:id', verifyToken, isAdmin, updateUser);
+router.delete('/access-control/user/:id', verifyToken, isAdmin, deleteUser);
 
-
-router.put('/access-control/user/:id', updateUser);
-router.delete('/access-control/user/:id', deleteUser);
-router.get('/access-control/me', getLoggedInUser);
+router.get('/access-control/me', verifyToken, getLoggedInUser);
 
 export default router;

@@ -5,7 +5,6 @@ import jwt from 'jsonwebtoken';
 
 const SECRET_KEY = process.env.JWT_SECRET || 'your_fallback_secret';
 
-
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, email, password, role } = req.body;
@@ -40,10 +39,9 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body; 
+    const { email, password } = req.body;
     const user = await AuthUserModel.findOne({ email });
     if (!user) {
       res.status(404).json({ message: 'User not found' });
@@ -56,20 +54,19 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-   
     const accessToken = jwt.sign({ id: user._id, role: user.role }, SECRET_KEY, { expiresIn: '1d' });
     const refreshToken = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '7d' });
 
     const accessTokenOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000, 
+      maxAge: 24 * 60 * 60 * 1000,
     };
 
     const refreshTokenOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     };
 
     res.cookie("access_token", accessToken, accessTokenOptions);
@@ -91,10 +88,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-
 export const getAllUsers = async (_req: Request, res: Response): Promise<void> => {
   try {
-    const users = await AuthUserModel.find({}, { password: 0 }); // Exclude password
+    const users = await AuthUserModel.find({}, { password: 0 });
     res.status(200).json(users);
   } catch (err) {
     console.error(err);
@@ -102,21 +98,30 @@ export const getAllUsers = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
+export const getUserById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const user = await AuthUserModel.findById(req.params.id).select('-password');
+    if (!user) res.status(404).json({ message: 'User not found' });
+    res.status(200).json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch user data' });
+  }
+};
 
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const updates = req.body;
 
-   
     if (updates.password) {
       updates.password = await bcrypt.hash(updates.password, 10);
     }
 
     const updatedUser = await AuthUserModel.findByIdAndUpdate(id, updates, {
       new: true,
-      runValidators: true
-    }).select('-password'); 
+      runValidators: true,
+    }).select('-password');
 
     if (!updatedUser) {
       res.status(404).json({ message: 'User not found' });
@@ -146,7 +151,6 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     res.status(500).json({ error: 'Failed to delete user' });
   }
 };
-
 
 export const getLoggedInUser = async (req: Request, res: Response): Promise<void> => {
   try {
