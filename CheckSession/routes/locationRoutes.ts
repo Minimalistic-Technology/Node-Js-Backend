@@ -11,9 +11,9 @@ import { verifyToken } from '../middleware/authMiddleware';
 const router = express.Router();
 
 router.post('/location', verifyToken, createLocation);
-router.get('/location', getAllLocations);
-router.get('/location/:id', getLocationById);
-router.put('/location/:id', updateLocation);
-router.delete('/location/:id', deleteLocation);
+router.get('/location', verifyToken, getAllLocations);
+router.get('/location/:id', verifyToken, getLocationById);
+router.put('/location/:id', verifyToken, updateLocation);
+router.delete('/location/:id', verifyToken, deleteLocation);
 
 export default router;
