@@ -15,9 +15,23 @@ export const createHistory = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-export const getAllHistories = async (_req: AuthRequest, res: Response): Promise<void> => {
+export const getAllHistories = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const histories = await HistoryModel.find().sort({ createdAt: -1 });
+    const isAdmin = req.user?.role === 'Admin';
+    const userId = req.user?.id;
+
+    let query = {};
+    if (!isAdmin) {
+      query = { userId }; 
+    }
+
+    const histories = await HistoryModel.find(query).sort({ createdAt: -1 });
+
+    if (!isAdmin && histories.length === 0) {
+      res.status(404).json({ message: 'History not found' });
+      return;
+    }
+
     res.json(histories);
   } catch (err) {
     res.status(500).json({ error: 'Failed to get histories' });

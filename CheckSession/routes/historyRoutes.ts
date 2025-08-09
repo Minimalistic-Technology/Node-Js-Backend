@@ -11,10 +11,8 @@ import { verifyToken, isAdmin } from '../middleware/authMiddleware';
 const router = express.Router();
 
 router.post('/history', verifyToken, createHistory);
-
-router.get('/history', verifyToken, isAdmin, getAllHistories);
+router.get('/history', verifyToken, getAllHistories);
 router.delete('/history/:userId', verifyToken, isAdmin, deleteHistory);
-
 
 router.get('/history/:userId', verifyToken, getHistoryByUserId);
 router.put('/history/:userId', verifyToken, updateHistory);
