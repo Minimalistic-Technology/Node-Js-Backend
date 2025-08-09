@@ -5,7 +5,6 @@ interface AuthRequest extends Request {
   user?: any;
 }
 
-
 export const createHistory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const history = new HistoryModel(req.body);
@@ -16,7 +15,6 @@ export const createHistory = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-
 export const getAllHistories = async (_req: AuthRequest, res: Response): Promise<void> => {
   try {
     const histories = await HistoryModel.find().sort({ createdAt: -1 });
@@ -26,15 +24,21 @@ export const getAllHistories = async (_req: AuthRequest, res: Response): Promise
   }
 };
 
-
 export const getHistoryByUserId = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (req.user.role !== 'Admin' && req.user.id !== req.params.userId) {
-       res.status(403).json({ message: 'Access denied' });
+    const isAdmin = req.user?.role === 'Admin';
+    const isOwner = req.user?.id === req.params.userId;
+
+    if (!isAdmin && !isOwner) {
+      res.status(403).json({ message: 'Access denied' });
+      return;
     }
 
     const history = await HistoryModel.findOne({ userId: req.params.userId });
-    if (!history)  res.status(404).json({ message: 'History not found' });
+    if (!history) {
+      res.status(404).json({ message: 'History not found' });
+      return;
+    }
 
     res.json(history);
   } catch (err) {
@@ -44,8 +48,12 @@ export const getHistoryByUserId = async (req: AuthRequest, res: Response): Promi
 
 export const updateHistory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (req.user.role !== 'Admin' && req.user.id !== req.params.userId) {
-       res.status(403).json({ message: 'Access denied' });
+    const isAdmin = req.user?.role === 'Admin';
+    const isOwner = req.user?.id === req.params.userId;
+
+    if (!isAdmin && !isOwner) {
+      res.status(403).json({ message: 'Access denied' });
+      return;
     }
 
     const history = await HistoryModel.findOneAndUpdate(
@@ -54,13 +62,16 @@ export const updateHistory = async (req: AuthRequest, res: Response): Promise<vo
       { new: true }
     );
 
-    if (!history)  res.status(404).json({ message: 'History not found' });
+    if (!history) {
+      res.status(404).json({ message: 'History not found' });
+      return;
+    }
+
     res.json(history);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update history' });
   }
 };
-
 
 export const deleteHistory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
