@@ -17,18 +17,11 @@ export const createHistory = async (req: AuthRequest, res: Response): Promise<vo
 
 export const getAllHistories = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const isAdmin = req.user?.role === 'Admin';
-    const userId = req.user?.id;
+   
+    const histories = await HistoryModel.find({ userId: req.user?.id }).sort({ createdAt: -1 });
 
-    let query = {};
-    if (!isAdmin) {
-      query = { userId }; 
-    }
-
-    const histories = await HistoryModel.find(query).sort({ createdAt: -1 });
-
-    if (!isAdmin && histories.length === 0) {
-      res.status(404).json({ message: 'History not found' });
+    if (histories.length === 0) {
+      res.status(403).json({ message: 'History not found' });
       return;
     }
 
@@ -41,14 +34,13 @@ export const getAllHistories = async (req: AuthRequest, res: Response): Promise<
 export const getHistoryByUserId = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const isAdmin = req.user?.role === 'Admin';
-    const isOwner = req.user?.id === req.params.userId;
-
-    if (!isAdmin && !isOwner) {
+    
+    if (!isAdmin) {
       res.status(403).json({ message: 'Access denied' });
       return;
     }
 
-    const history = await HistoryModel.findOne({ userId: req.params.userId });
+    const history = await HistoryModel.find({ userId: req.params.userId });
     if (!history) {
       res.status(404).json({ message: 'History not found' });
       return;
