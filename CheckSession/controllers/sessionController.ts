@@ -20,18 +20,25 @@ export const checkOut = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { time } = req.body;
+
     const updated = await SessionModel.findByIdAndUpdate(
       id,
-      { checkOut: time },
+      { checkOut: time || new Date() }, 
       { new: true }
     );
-    if (!updated)  res.status(404).json({ message: 'Session not found' });
+
+    if (!updated) {
+      res.status(404).json({ message: 'Session not found' });
+      return;
+    }
+
     res.status(200).json({ message: 'Check-out successful', session: updated });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Check-out failed' });
   }
 };
+
 
 export const updateCheckIn = async (req: Request, res: Response): Promise<void> => {
   try {
