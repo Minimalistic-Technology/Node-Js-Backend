@@ -5,7 +5,12 @@ const WorkoutSchema = new mongoose.Schema({
   description: String,
   duration: Number,
   image: String,
-  video: String
+  video: String,
+  type: { 
+    type: String, 
+    enum: ['strength', 'cardio', 'hiit', 'yoga'],
+    required: true
+  }
 });
 
 export default mongoose.model('Workout', WorkoutSchema);
