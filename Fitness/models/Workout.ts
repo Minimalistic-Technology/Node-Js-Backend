@@ -10,6 +10,10 @@ const WorkoutSchema = new mongoose.Schema({
     type: String, 
     enum: ['strength', 'cardio', 'hiit', 'yoga'],
     required: true
+  },
+  isFavorite: {
+    type: Boolean,
+    default: false
   }
 });
 
