@@ -160,8 +160,8 @@ app.use('/api/bookstore', contentRoutes);
 app.use('/api/bookstore', bannerRoutes);
 
 
-app.use('/api/checksession', AccessControlRoutes);
-app.use('/api/checksession', historyRoutes);
+app.use('/api/hrm', AccessControlRoutes);
+app.use('/api/hrm', historyRoutes);
 app.use('/api/checksession', locationRoutes);
 app.use('/api/checksession', sessionRoutes);
 
