@@ -84,9 +84,9 @@ import scheduleRoutes from './Education/routes/scheduleRoutes';
 import studentGradeRoutes from './Education/routes/studentGradeRoutes';
 import studentProfileRoutes from './Education/routes/studentProfileRoutes';
 import studyMaterialRoutes from './Education/routes/studyMaterialRoutes';
+import fitnessAuthRoutes from './Fitness/routes/fitnessAuthRoutes';
 import bmiRoutes from './Fitness/routes/bmiRoutes';
 import fitnessProfileRoutes from "./Fitness/routes/fitnessProfileRoutes";
-import imageRoutes from './Fitness/routes/imageRoutes';
 import workoutProgressRoutes from './Fitness/routes/workoutProgressRoutes';
 import workoutRoutes from './Fitness/routes/workoutRoutes';
 import goldpriceRoutes from './GoldPrice/routes/goldpriceRoutes';
@@ -203,11 +203,11 @@ app.use('/api/education', studentGradeRoutes);
 app.use('/api/education', studentProfileRoutes);
 app.use('/api/education', studyMaterialRoutes);
 
+app.use('/api/fitness', fitnessAuthRoutes);
 app.use('/api/fitness', bmiRoutes);
-app.use('/api/fitness', fitnessProfileRoutes);
-app.use('/api/fitness', imageRoutes);
 app.use('/api/fitness', workoutProgressRoutes);
 app.use('/api/fitness', workoutRoutes);
+app.use('/api/fitness', fitnessProfileRoutes);
 
 app.use('/api/property', propertyRoutes);
 app.use('/api/property', redevelopmentRoutes);

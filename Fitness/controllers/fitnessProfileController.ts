@@ -1,20 +1,16 @@
 import { Request, Response } from "express";
 import FitnessProfile from "../models/FitnessProfile";
 import Workout from "../models/Workout";
+import { AuthRequest } from "../middleware/authMiddleware";
 
-export const createFitnessProfile = async (req: Request, res: Response): Promise<void> => {
+export const getFitnessProfile = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const newProfile = await FitnessProfile.create(req.body);
-    res.status(201).json(newProfile);
-  } catch (error) {
-    res.status(400).json({ message: "Error creating fitness profile", error });
-  }
-};
+    if (!req.userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
 
-export const getFitnessProfile = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { userId } = req.params;
-    const profile = await FitnessProfile.findById(userId).populate("favourites");
+    const profile = await FitnessProfile.findById(req.userId).populate("favourites");
 
     if (!profile) {
       res.status(404).json({ message: "Profile not found" });
@@ -37,10 +33,9 @@ export const getFitnessProfile = async (req: Request, res: Response): Promise<vo
   }
 };
 
-export const updateFitnessProfile = async (req: Request, res: Response): Promise<void> => {
+export const updateFitnessProfile = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { userId } = req.params;
-    const updatedProfile = await FitnessProfile.findByIdAndUpdate(userId, req.body, {
+    const updatedProfile = await FitnessProfile.findByIdAndUpdate(req.userId, req.body, {
       new: true,
     });
     res.json(updatedProfile);
@@ -49,20 +44,19 @@ export const updateFitnessProfile = async (req: Request, res: Response): Promise
   }
 };
 
-export const deleteFitnessProfile = async (req: Request, res: Response): Promise<void> => {
+export const deleteFitnessProfile = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { userId } = req.params;
-    await FitnessProfile.findByIdAndDelete(userId);
+    await FitnessProfile.findByIdAndDelete(req.userId);
     res.json({ message: "Fitness profile deleted" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting fitness profile", error });
   }
 };
 
-export const addFavouriteWorkout = async (req: Request, res: Response): Promise<void> => {
+export const addFavouriteWorkout = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { userId, workoutId } = req.params;
-    const profile = await FitnessProfile.findById(userId);
+    const { workoutId } = req.params;
+    const profile = await FitnessProfile.findById(req.userId);
     if (!profile) {
       res.status(404).json({ message: "Profile not found" });
       return;
@@ -79,10 +73,10 @@ export const addFavouriteWorkout = async (req: Request, res: Response): Promise<
   }
 };
 
-export const removeFavouriteWorkout = async (req: Request, res: Response): Promise<void> => {
+export const removeFavouriteWorkout = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { userId, workoutId } = req.params;
-    const profile = await FitnessProfile.findById(userId);
+    const { workoutId } = req.params;
+    const profile = await FitnessProfile.findById(req.userId);
     if (!profile) {
       res.status(404).json({ message: "Profile not found" });
       return;

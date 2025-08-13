@@ -1,6 +1,6 @@
 import { Router } from "express";
+import { auth } from "../middleware/authMiddleware";
 import {
-  createFitnessProfile,
   getFitnessProfile,
   updateFitnessProfile,
   deleteFitnessProfile,
@@ -10,12 +10,11 @@ import {
 
 const router = Router();
 
-router.post("/create", createFitnessProfile);
-router.get("/:userId", getFitnessProfile);
-router.put("/:userId", updateFitnessProfile);
-router.delete("/:userId", deleteFitnessProfile);
+router.get("/me", auth, getFitnessProfile);
+router.put("/me", auth, updateFitnessProfile);
+router.delete("/me", auth, deleteFitnessProfile);
 
-router.post("/:userId/favourites/:workoutId", addFavouriteWorkout);
-router.delete("/:userId/favourites/:workoutId", removeFavouriteWorkout);
+router.post("/favourites/:workoutId", auth, addFavouriteWorkout);
+router.delete("/favourites/:workoutId", auth, removeFavouriteWorkout);
 
 export default router;
