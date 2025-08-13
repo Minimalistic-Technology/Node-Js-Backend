@@ -113,6 +113,8 @@ import practiceProblemRoutes from './GFG/routes/practiceProblemRoutes';
 import searchEntryRoutes from './GFG/routes/searchEntryRoutes';
 import dashboardStatRoutes from './GFG/routes/dashboardStatRoutes';
 import notificationGFGRoutes from './GFG/routes/notificationGFGRoutes';
+import PropertyRequirement from "./Property/models/PropertyRequirement";
+import propertyRequirementRoutes from "./Property/routes/propertyRequirementRoutes";
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -210,7 +212,7 @@ app.use('/api/property', propertyRoutes);
 app.use('/api/property', redevelopmentRoutes);
 app.use('/api/property', commercialRoutes);
 app.use('/api/property', brokerRoutes);
-app.use('/api/property', propertyReuirementRoutes);
+app.use('/api/property', propertyRequirementRoutes);
 app.use('/api/property', propertyMessageRoutes);
 
 app.use('/api/hospital', doctorreviewRoutes);
