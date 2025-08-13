@@ -85,6 +85,7 @@ import studentGradeRoutes from './Education/routes/studentGradeRoutes';
 import studentProfileRoutes from './Education/routes/studentProfileRoutes';
 import studyMaterialRoutes from './Education/routes/studyMaterialRoutes';
 import bmiRoutes from './Fitness/routes/bmiRoutes';
+import fitnessProfileRoutes from "./Fitness/routes/fitnessProfileRoutes";
 import imageRoutes from './Fitness/routes/imageRoutes';
 import workoutProgressRoutes from './Fitness/routes/workoutProgressRoutes';
 import workoutRoutes from './Fitness/routes/workoutRoutes';
@@ -99,7 +100,7 @@ import propertyRoutes from './Property/routes/propertyRoutes';
 import redevelopmentRoutes from "./Property/routes/redevelopmentRoutes";
 import commercialRoutes from "./Property/routes/commercialRoutes";
 import brokerRoutes from "./Property/routes/brokerRoutes";
-import propertyReuirementRoutes from "./Property/routes/propertyRequirementRoutes";
+import propertyRequirementRoutes from "./Property/routes/propertyRequirementRoutes";
 import propertyMessageRoutes from "./Property/routes/propertyMessageRoutes";
 import stockRoutes from './Stocks/routes/stockRoutes';
 import teamRoutes from './Team/routes/teamRoutes';
@@ -113,8 +114,7 @@ import practiceProblemRoutes from './GFG/routes/practiceProblemRoutes';
 import searchEntryRoutes from './GFG/routes/searchEntryRoutes';
 import dashboardStatRoutes from './GFG/routes/dashboardStatRoutes';
 import notificationGFGRoutes from './GFG/routes/notificationGFGRoutes';
-import PropertyRequirement from "./Property/models/PropertyRequirement";
-import propertyRequirementRoutes from "./Property/routes/propertyRequirementRoutes";
+
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -204,6 +204,7 @@ app.use('/api/education', studentProfileRoutes);
 app.use('/api/education', studyMaterialRoutes);
 
 app.use('/api/fitness', bmiRoutes);
+app.use('/api/fitness', fitnessProfileRoutes);
 app.use('/api/fitness', imageRoutes);
 app.use('/api/fitness', workoutProgressRoutes);
 app.use('/api/fitness', workoutRoutes);
