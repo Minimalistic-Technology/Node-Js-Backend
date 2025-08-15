@@ -13,13 +13,13 @@ interface AuthRequest extends Request {
 export const getAllUserHistoryByUserId = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const isAdmin = req.user?.role === 'Admin';
-    
+
     if (!isAdmin) {
       res.status(403).json({ message: 'Access denied' });
       return;
     }
 
-    const histories = await HistoryModel.find({ userId: req.params.userId  }).sort({ createdAt: -1 });
+    const histories = await HistoryModel.find({ userId: new mongoose.Types.ObjectId(req.params.userId) }).sort({ createdAt: -1 });
     if (!history) {
       res.status(404).json({ message: 'History not found' });
       return;
@@ -35,8 +35,8 @@ export const getAllUserHistoryByUserId = async (req: AuthRequest, res: Response)
 
 export const getHistoryByUserId = async (req: Request, res: Response): Promise<void> => {
   try {
-    const histories = await HistoryModel.find({ userId: req.params.userId  }).sort({ createdAt: -1 });
-    if (!history) {
+    const histories = await HistoryModel.find({ userId: new mongoose.Types.ObjectId(req.params.userId) }).sort({ createdAt: -1 });
+    if (!histories) {
       res.status(404).json({ message: 'History not found' });
       return;
     }
@@ -85,12 +85,12 @@ export const checkIn = async (
 
     const existingHistory = await HistoryModel.findOne({ userId });
 
-    const checkPreviousCheckOut = async () => {
+    const checkPreviousCheckOut = () => {
       if (existingHistory && existingHistory.history.length > 0) {
         const lastIndex = existingHistory.history.length - 1;
         const previousHistory = existingHistory.history[lastIndex];
 
-        if (previousHistory.checkOut === null && previousHistory.checkIn.dateTime.getDate() <= new Date().getDate()) {
+        if (previousHistory.checkOut === null && previousHistory.checkIn.dateTime.getDate() < new Date().getDate()) {
           const setCheckoutDate = previousHistory.checkIn.dateTime;
           setCheckoutDate.setHours(23, 59, 0, 0);
           previousHistory.checkOut = {
@@ -100,10 +100,9 @@ export const checkIn = async (
             country: checkInData.country,
             ip: checkInData.ip
           };
-          await existingHistory.save();
         }
         else if (previousHistory.checkOut === null && previousHistory.checkIn.dateTime.getDate() === new Date().getDate()) {
-          res.status(500).json({ error: 'Kindly CheckOut first.' });
+          res.status(403).json({ error: 'Kindly CheckOut first.' });
         }
       }
     }

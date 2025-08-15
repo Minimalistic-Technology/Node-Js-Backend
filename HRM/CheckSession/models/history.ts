@@ -24,7 +24,7 @@ const CheckInCheckOutSchema = new Schema<ICheckInCheckOut>({
   state: { type: String, required: true },
   country: { type: String, required: true },
   ip: { type: String, required: true }
-})
+}, { _id: false })
 
 const historyEntrySchema = new Schema<IHistoryEntry>({
   checkIn: { type: CheckInCheckOutSchema, required: true },
