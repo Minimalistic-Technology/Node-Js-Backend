@@ -20,7 +20,7 @@ export const getAllUserHistoryByUserId = async (req: AuthRequest, res: Response)
     }
 
     const histories = await HistoryModel.find({ userId: new mongoose.Types.ObjectId(req.params.userId) }).sort({ createdAt: -1 });
-    if (!history) {
+    if (!histories) {
       res.status(404).json({ message: 'History not found' });
       return;
     }
