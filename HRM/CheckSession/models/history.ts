@@ -1,8 +1,16 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+export interface ICheckInCheckOut {
+  dateTime: Date,
+  city: String,
+  state: String,
+  country: String,
+  ip: String
+}
+
 export interface IHistoryEntry {
-  checkIn: Date;
-  checkOut: Date | null;
+  checkIn: ICheckInCheckOut;
+  checkOut: ICheckInCheckOut | null;
 }
 
 export interface IHistory extends Document {
@@ -10,10 +18,19 @@ export interface IHistory extends Document {
   history: IHistoryEntry[];
 }
 
+const CheckInCheckOutSchema = new Schema<ICheckInCheckOut>({
+  dateTime: { type: Date, required: true },
+  city: { type: String, required: true },
+  state: { type: String, required: true },
+  country: { type: String, required: true },
+  ip: { type: String, required: true }
+}, { _id: false })
+
 const historyEntrySchema = new Schema<IHistoryEntry>({
-  checkIn: { type: Date, required: true },
-  checkOut: { type: Date, default: null }
-});
+  checkIn: { type: CheckInCheckOutSchema, required: true },
+  checkOut: { type: CheckInCheckOutSchema, default: null }
+},
+  { timestamps: true });
 
 const historySchema = new Schema<IHistory>(
   {
@@ -23,8 +40,7 @@ const historySchema = new Schema<IHistory>(
       required: true
     },
     history: [historyEntrySchema]
-  },
-  { timestamps: true }
+  }
 );
 
-export const HistoryModel = mongoose.model<IHistory>('UserHistory', historySchema);
+export const HistoryModel = mongoose.model<IHistory>('HRMUserHistory', historySchema);
