@@ -93,6 +93,8 @@ export const checkIn = async (
         if (previousHistory.checkOut === null && previousHistory.checkIn.dateTime.getDate() < new Date().getDate()) {
           const setCheckoutDate = previousHistory.checkIn.dateTime;
           setCheckoutDate.setHours(23, 59, 0, 0);
+          console.log('Setting checkout date to end of day:', setCheckoutDate);
+          console.log('Previous check-in date:', previousHistory.checkIn.dateTime);
           previousHistory.checkOut = {
             dateTime: setCheckoutDate,
             city: checkInData.city,
@@ -103,12 +105,16 @@ export const checkIn = async (
         }
         else if (previousHistory.checkOut === null && previousHistory.checkIn.dateTime.getDate() === new Date().getDate()) {
           res.status(403).json({ error: 'Kindly CheckOut first.' });
+          return false;
         }
       }
+      return true;
     }
 
     if (existingHistory) {
-      checkPreviousCheckOut();
+      const canCheckIn = checkPreviousCheckOut();
+      if (!canCheckIn) return;
+
       existingHistory.history.push(newHistoryEntry);
       await existingHistory.save();
     } else {
