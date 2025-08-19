@@ -112,6 +112,7 @@ import practiceProblemRoutes from './GFG/routes/practiceProblemRoutes';
 import searchEntryRoutes from './GFG/routes/searchEntryRoutes';
 import dashboardStatRoutes from './GFG/routes/dashboardStatRoutes';
 import notificationGFGRoutes from './GFG/routes/notificationGFGRoutes';
+import EmailRoutes from './E-mail/routes/EmailRoutes';
 
 
 require('dotenv').config();
@@ -249,6 +250,7 @@ app.use("/api/gfg", dashboardStatRoutes);
 app.use("/api/gfg/notification", notificationGFGRoutes);
 app.use("/api/gfg", searchEntryRoutes);
 
+app.use("/api/email", EmailRoutes);
 
 // api requests limit
 // const limiter = rateLimit({
