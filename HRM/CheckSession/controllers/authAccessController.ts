@@ -98,16 +98,17 @@ export const getAllUsers = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
-export const getUserById = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const user = await AuthUserModel.findById(req.params.id).select('-password');
-    if (!user) res.status(404).json({ message: 'User not found' });
-    res.status(200).json(user);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch user data' });
-  }
-};
+// Not in use
+// export const getUserById = async (req: Request, res: Response): Promise<void> => {
+//   try {
+//     const user = await AuthUserModel.findById(req.params.id).select('-password');
+//     if (!user) res.status(404).json({ message: 'User not found' });
+//     res.status(200).json(user);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Failed to fetch user data' });
+//   }
+// };
 
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {

@@ -6,7 +6,7 @@ import {
   updateUser,
   deleteUser,
   getLoggedInUser,
-  getUserById
+  // getUserById
 } from '../controllers/authAccessController';
 import { verifyToken, isAdmin } from '../middleware/authMiddleware';
 
@@ -16,7 +16,7 @@ router.post('/access-control/signup', signup);
 router.post('/access-control/login', login);
 
 router.get('/access-control/users', verifyToken, isAdmin, getAllUsers);
-router.get('/access-control/user/:id', verifyToken, isAdmin, getUserById);
+// router.get('/access-control/user/:id', verifyToken, isAdmin, getUserById);
 
 router.put('/access-control/user/:id', verifyToken, isAdmin, updateUser);
 router.delete('/access-control/user/:id', verifyToken, isAdmin, deleteUser);

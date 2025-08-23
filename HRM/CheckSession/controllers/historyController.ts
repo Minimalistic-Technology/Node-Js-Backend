@@ -66,7 +66,8 @@ export const checkIn = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { userId, history } = req.body;
+    const userId = req.user;
+    const { history } = req.body;
     const { checkIn, checkOut } = history;
     const { city, state, country, ip } = checkIn;
 
@@ -91,7 +92,7 @@ export const checkIn = async (
         const previousHistory = existingHistory.history[lastIndex];
 
         if (previousHistory.checkOut === null && previousHistory.checkIn.dateTime.getDate() < new Date().getDate()) {
-          const setCheckoutDate = previousHistory.checkIn.dateTime;
+          const setCheckoutDate = structuredClone(previousHistory.checkIn.dateTime);
           setCheckoutDate.setHours(23, 59, 0, 0);
           console.log('Setting checkout date to end of day:', setCheckoutDate);
           console.log('Previous check-in date:', previousHistory.checkIn.dateTime);
