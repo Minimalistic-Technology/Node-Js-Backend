@@ -147,7 +147,7 @@ interface ICheckOutRequestBody {
 
 export const checkOut = async (req: Request<{ userId: string }, {}, ICheckOutRequestBody>, res: Response): Promise<void> => {
   try {
-    const userId = new mongoose.Types.ObjectId(req.params.userId);
+    const userId = req.user;
     const { checkOut } = req.body;
     const existingHistory = await HistoryModel.findOne({ userId });
     const lastIndex = existingHistory!.history.length - 1;
