@@ -153,17 +153,17 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-export const getLoggedInUser = async (req: Request, res: Response): Promise<void> => {
+export const getLoggedInUser = async (req: any, res: Response): Promise<void> => {
   try {
-    const token = req.cookies.access_token;
+    const userId = req.user?.id;
 
-    if (!token) {
+    if (!userId) {
       res.status(401).json({ message: 'Not authenticated' });
       return;
     }
 
-    const decoded: any = jwt.verify(token, SECRET_KEY);
-    const user = await AuthUserModel.findById(decoded.id).select('-password');
+    // const decoded: any = jwt.verify(token, SECRET_KEY);
+    const user = await AuthUserModel.findById(userId).select('-password');
 
     if (!user) {
       res.status(404).json({ message: 'User not found' });

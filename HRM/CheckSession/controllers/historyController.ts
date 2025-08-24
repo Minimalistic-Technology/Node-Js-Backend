@@ -1,48 +1,56 @@
-import { Request, Response } from 'express';
-import { HistoryModel } from '../models/history';
-import mongoose, { ObjectId } from 'mongoose';
+import { Request, Response } from "express";
+import { HistoryModel } from "../models/history";
+import mongoose, { ObjectId } from "mongoose";
+import { JwtPayload } from "jsonwebtoken";
 
 interface AuthRequest extends Request {
   user?: any;
 }
 
-
 //-------------------Adimn -> See User History
 
-
-export const getAllUserHistoryByUserId = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getAllUserHistoryByUserId = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
   try {
-    const isAdmin = req.user?.role === 'Admin';
+    const isAdmin = req.user?.role === "Admin";
 
     if (!isAdmin) {
-      res.status(403).json({ message: 'Access denied' });
+      res.status(403).json({ message: "Access denied" });
       return;
     }
 
-    const histories = await HistoryModel.find({ userId: new mongoose.Types.ObjectId(req.params.userId) }).sort({ createdAt: -1 });
+    const histories = await HistoryModel.find({
+      userId: new mongoose.Types.ObjectId(req.params.userId),
+    }).sort({ createdAt: -1 });
     if (!histories) {
-      res.status(404).json({ message: 'History not found' });
+      res.status(404).json({ message: "History not found" });
       return;
     }
     res.json(histories);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to get histories' });
+    res.status(500).json({ error: "Failed to get histories" });
   }
 };
 
 //------------------- User -> See Self History
 
-
-export const getHistoryByUserId = async (req: Request, res: Response): Promise<void> => {
+export const getHistoryByUserId = async (
+  req: any,
+  res: Response
+): Promise<void> => {
   try {
-    const histories = await HistoryModel.find({ userId: new mongoose.Types.ObjectId(req.params.userId) }).sort({ createdAt: -1 });
+    const histories = await HistoryModel.find({
+      userId: req.user?.id,
+    }).sort({ createdAt: -1 });
     if (!histories) {
-      res.status(404).json({ message: 'History not found' });
+      res.status(404).json({ message: "History not found" });
       return;
     }
     res.json(histories);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to get histories' });
+    res.status(500).json({ error: "Failed to get histories" });
   }
 };
 
@@ -57,16 +65,18 @@ interface ICheckInRequestBody {
       country: string;
       ip: string;
     };
-    checkOut: null
+    checkOut: null;
   };
 }
 
 export const checkIn = async (
-  req: Request<{}, {}, ICheckInRequestBody>,
+  // we have to declare type
+  req: any,
   res: Response
 ): Promise<void> => {
   try {
-    const userId = req.user;
+    const userId = req.user.id;
+    console.log(req.user);
     const { history } = req.body;
     const { checkIn, checkOut } = history;
     const { city, state, country, ip } = checkIn;
@@ -76,12 +86,12 @@ export const checkIn = async (
       city,
       state,
       country,
-      ip
+      ip,
     };
 
     const newHistoryEntry = {
       checkIn: checkInData,
-      checkOut
+      checkOut,
     };
 
     const existingHistory = await HistoryModel.findOne({ userId });
@@ -91,26 +101,36 @@ export const checkIn = async (
         const lastIndex = existingHistory.history.length - 1;
         const previousHistory = existingHistory.history[lastIndex];
 
-        if (previousHistory.checkOut === null && previousHistory.checkIn.dateTime.getDate() < new Date().getDate()) {
-          const setCheckoutDate = structuredClone(previousHistory.checkIn.dateTime);
+        if (
+          previousHistory.checkOut === null &&
+          previousHistory.checkIn.dateTime.getDate() < new Date().getDate()
+        ) {
+          const setCheckoutDate = structuredClone(
+            previousHistory.checkIn.dateTime
+          );
           setCheckoutDate.setHours(23, 59, 0, 0);
-          console.log('Setting checkout date to end of day:', setCheckoutDate);
-          console.log('Previous check-in date:', previousHistory.checkIn.dateTime);
+          console.log("Setting checkout date to end of day:", setCheckoutDate);
+          console.log(
+            "Previous check-in date:",
+            previousHistory.checkIn.dateTime
+          );
           previousHistory.checkOut = {
             dateTime: setCheckoutDate,
             city: checkInData.city,
             state: checkInData.state,
             country: checkInData.country,
-            ip: checkInData.ip
+            ip: checkInData.ip,
           };
-        }
-        else if (previousHistory.checkOut === null && previousHistory.checkIn.dateTime.getDate() === new Date().getDate()) {
-          res.status(403).json({ error: 'Kindly CheckOut first.' });
+        } else if (
+          previousHistory.checkOut === null &&
+          previousHistory.checkIn.dateTime.getDate() === new Date().getDate()
+        ) {
+          res.status(403).json({ error: "Kindly CheckOut first." });
           return false;
         }
       }
       return true;
-    }
+    };
 
     if (existingHistory) {
       const canCheckIn = checkPreviousCheckOut();
@@ -121,20 +141,19 @@ export const checkIn = async (
     } else {
       const checkInDetails = new HistoryModel({
         userId,
-        history: [newHistoryEntry]
+        history: [newHistoryEntry],
       });
       await checkInDetails.save();
     }
 
-    res.status(201).json({ message: 'Check-in successful' });
+    res.status(201).json({ message: "Check-in successful" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Check-in failed' });
+    res.status(500).json({ error: "Check-in failed" });
   }
 };
 
 //-------------------CheckOut
-
 
 interface ICheckOutRequestBody {
   checkOut: {
@@ -142,28 +161,29 @@ interface ICheckOutRequestBody {
     state: string;
     country: string;
     ip: string;
-  }
+  };
 }
 
-export const checkOut = async (req: Request<{ userId: string }, {}, ICheckOutRequestBody>, res: Response): Promise<void> => {
+export const checkOut = async (req: any, res: Response): Promise<void> => {
   try {
-    const userId = req.user;
+    const userId = req.user?.id;
     const { checkOut } = req.body;
+    console.log(req.body,checkOut)
     const existingHistory = await HistoryModel.findOne({ userId });
     const lastIndex = existingHistory!.history.length - 1;
     const HistoryRecord = existingHistory!.history[lastIndex];
     HistoryRecord.checkOut = {
       dateTime: new Date(),
-      city: checkOut.city,
-      state: checkOut.state,
-      country: checkOut.country,
-      ip: checkOut.ip
+      city: checkOut?.city,
+      state: checkOut?.state,
+      country: checkOut?.country,
+      ip: checkOut?.ip,
     };
 
     await existingHistory!.save();
-    res.status(200).json({ message: 'Check-out successful' });
-  } catch (err) {
+    res.status(200).json({ message: "Check-out successful" });
+  } catch (err:any) {
     console.error(err);
-    res.status(500).json({ error: 'Check-out failed' });
+    res.status(500).json({ error: "Check-out failed: " + err.message });
   }
 };
