@@ -1,11 +1,13 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ICheckInCheckOut {
-  dateTime: Date,
-  city: String,
-  state: String,
-  country: String,
-  ip: String
+  dateTime: Date;
+  city?: string;
+  state?: string;
+  country?: string;
+  ip?: string;
+  lat?: number;
+  long?: number;
 }
 
 export interface IHistoryEntry {
@@ -18,29 +20,34 @@ export interface IHistory extends Document {
   history: IHistoryEntry[];
 }
 
-const CheckInCheckOutSchema = new Schema<ICheckInCheckOut>({
-  dateTime: { type: Date, required: true },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  country: { type: String, required: true },
-  ip: { type: String, required: true }
-}, { _id: false })
-
-const historyEntrySchema = new Schema<IHistoryEntry>({
-  checkIn: { type: CheckInCheckOutSchema, required: true },
-  checkOut: { type: CheckInCheckOutSchema, default: null }
-},
-  { timestamps: true });
-
-const historySchema = new Schema<IHistory>(
+const CheckInCheckOutSchema = new Schema<ICheckInCheckOut>(
   {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'AuthUser',
-      required: true
-    },
-    history: [historyEntrySchema]
-  }
+    dateTime: { type: Date, required: true },
+    city: { type: String, required: false },
+    state: { type: String, required: false },
+    country: { type: String, required: false },
+    ip: { type: String, required: false },
+    lat: { type: Number, required: false },
+    long: { type: Number, required: false },
+  },
+  { _id: false }
 );
+
+const historyEntrySchema = new Schema<IHistoryEntry>(
+  {
+    checkIn: { type: CheckInCheckOutSchema, required: true },
+    checkOut: { type: CheckInCheckOutSchema, default: null },
+  },
+  { timestamps: true }
+);
+
+const historySchema = new Schema<IHistory>({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'AuthUser',
+    required: true,
+  },
+  history: [historyEntrySchema],
+});
 
 export const HistoryModel = mongoose.model<IHistory>('HRMUserHistory', historySchema);
