@@ -30,6 +30,7 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
 
 export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction): void => {
   if (req.user?.role !== 'Admin') {
+    console.log(req.user)
     res.status(403).json({ message: 'Admin access required' });
     return; 
   }

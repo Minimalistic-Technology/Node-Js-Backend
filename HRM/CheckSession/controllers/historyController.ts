@@ -6,7 +6,7 @@ interface AuthRequest extends Request {
   user?: any;
 }
 
-// ------------------- Admin -> See User History -------------------
+// ------------------- Admin -> See User History ------------------- 
 export const getAllUserHistoryByUserId = async (
   req: AuthRequest,
   res: Response
@@ -57,7 +57,7 @@ export const getHistoryByUserId = async (
 
 // ------------------- Check-In -------------------
 interface ICheckInRequestBody {
-  userId: ObjectId;
+  userId: ObjectId;                 // !!!  can't get user id from req.body , as we have to take ot from middleware  !!!
   history: {
     checkIn: {
       city?: string;
@@ -74,8 +74,10 @@ interface ICheckInRequestBody {
 export const checkIn = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user.id;
-    const { history }: ICheckInRequestBody = req.body;
-    const { checkIn, checkOut } = history;
+    // const { history }: ICheckInRequestBody = req.body;
+    // const { checkIn, checkOut } = history;
+    const { checkIn , checkOut } = req.body;
+    
     const { city, state, country, ip, lat, long } = checkIn;
 
     const checkInData = {

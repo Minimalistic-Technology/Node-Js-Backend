@@ -7,7 +7,7 @@ const SECRET_KEY = process.env.JWT_SECRET || 'your_fallback_secret';
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { username, email, password, role } = req.body;
+    const { eid , username, email, password, role , address , contact , doj  } = req.body;
 
     const existing = await AuthUserModel.findOne({ email });
     if (existing) {
@@ -15,12 +15,25 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    const parsedEid = Number(eid);
+    if (isNaN(parsedEid)) {
+       res.status(400).json({ message: 'Invalid EID' });
+    }
+
+    const normalizedDate = doj ? new Date(doj) : new Date();
+    normalizedDate.setHours(0, 0, 0, 0);                       // rmoving time from doj if frontend send default date 
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = new AuthUserModel({
+      eid,
       username,
       email,
       password: hashedPassword,
       role,
+      address,
+      contact, 
+      doj 
     });
 
     await user.save();
@@ -28,9 +41,13 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       message: 'User registered successfully',
       user: {
         id: user._id,
+        eid : user.eid,
         username: user.username,
         email: user.email,
         role: user.role,
+        address:user.address,
+        contact:user.contact, 
+        doj: user.doj.toISOString().split('T')[0],
       },
     });
   } catch (err) {
