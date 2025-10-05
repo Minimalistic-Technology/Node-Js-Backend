@@ -1,6 +1,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { AuthUserModel } from '../models/authUser';
 
 const SECRET_KEY = process.env.JWT_SECRET || 'default_secret';
 
@@ -8,7 +9,7 @@ interface AuthRequest extends Request {
   user?: any;
 }
 
-export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
+export const verifyToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -19,14 +20,22 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded;
+    const decoded: any = jwt.verify(token, SECRET_KEY);
+
+    const user = await AuthUserModel.findById(decoded.id).lean();
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    req.user = user;  
     next();
   } catch (err) {
     res.status(401).json({ message: 'Invalid token' });
-    return; 
+    return;
   }
 };
+
 
 export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction): void => {
   if (req.user?.role !== 'Admin') {
