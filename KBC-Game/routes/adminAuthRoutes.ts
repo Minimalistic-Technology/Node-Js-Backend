@@ -7,10 +7,10 @@ import {
   resetPassword,
   me,
   logout,
-} from "../controllers/adminAuthController";
+} from "../controllers/adminAuthcontroller";
 
 
-import { requireAdminAuth } from "../middlewares/authmiddleware";
+import { requireAdminAuth } from "../middlewares/authMiddleware";
 import { limiter } from "../middlewares/rateLimiter";
 
 const router = Router();
