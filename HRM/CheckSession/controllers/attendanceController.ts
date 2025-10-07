@@ -14,19 +14,17 @@ export const checkIn = async (req: AuthRequest, res: Response): Promise<void> =>
   try {
   
     const userId = req.user?._id;
-    const eid = req.user?.eid;
-    if (!userId && !eid ) {
+    if (!userId ) {
       res.status(401).json({ message: "Unauthorized: user not found in token" });
       return;
     }
 
-   
 
     const { city, state, country, ip, lat, long } = req.body;
 
     const today = new Date().toISOString().split("T")[0];
 
-    let attendance = await AttendanceModel.findOne({  eid, date: today });
+    let attendance = await AttendanceModel.findOne({  user : userId , date: today });
 
   
     const checkInData: ICheckInCheckOut = {
@@ -41,7 +39,7 @@ export const checkIn = async (req: AuthRequest, res: Response): Promise<void> =>
 
     if (!attendance) {
       attendance = new AttendanceModel({
-       eid,
+       user : userId,
         date: today,
         sessions: [{ checkIn: checkInData }],
       });
@@ -72,8 +70,7 @@ export const checkIn = async (req: AuthRequest, res: Response): Promise<void> =>
 export const checkOut = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?._id;
-    const eid = req.user?.eid;
-    if (!userId && !eid) {
+    if (!userId) {
       res.status(401).json({ message: "Unauthorized: user not found in token" });
       return;
     }
@@ -82,7 +79,7 @@ export const checkOut = async (req: AuthRequest, res: Response): Promise<void> =
     const today = new Date().toISOString().split("T")[0];
 
    
-    const attendance = await AttendanceModel.findOne({ eid , date: today });
+    const attendance = await AttendanceModel.findOne({ user:userId , date: today });
     if (!attendance) {
       res.status(404).json({ message: "No attendance record found for today" });
       return;
@@ -137,7 +134,7 @@ export const checkOut = async (req: AuthRequest, res: Response): Promise<void> =
 export const getAttendanceByDate = async (req: Request, res: Response): Promise<void> => {
   try {
     const { date } = req.params;
-    const records = await AttendanceModel.find({ date }).populate("employee");
+    const records = await AttendanceModel.find({ date });
     res.status(200).json(records);
   } catch (error) {
     console.error("Get by date error:", error);
@@ -149,8 +146,8 @@ export const getAttendanceByDate = async (req: Request, res: Response): Promise<
 
 export const getAttendanceByEmployee = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { eid } = req.params;
-    const records = await AttendanceModel.find({ employee: eid }).sort({ date: -1 });
+    const { userId } = req.params;
+    const records = await AttendanceModel.find({ user: userId }).sort({ date: -1 });
     res.status(200).json(records);
   } catch (error) {
     console.error("Get by employee error:", error);

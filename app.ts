@@ -48,6 +48,7 @@ import siteSettingsRoutes from './BookStore/routes/siteSettingsRoutes';
 import subscriberRoutes from './BookStore/routes/subscriberRoutes';
 import AccessControlRoutes from './HRM/CheckSession/routes/AccessControlRoutes';
 import attendanceRoutes from './HRM/CheckSession/routes/attendanceRoutes'
+import leaveRoutes from './HRM/CheckSession/routes/leaveRoutes'
 import navigationcategoryRoutes from './Clothing/routes/navigationcategoryRoutes';
 import collectionRoutes from './Collection/routes/collectionRoutes';
 import contactFormRoutes from './Contact/routes/contactFormRoutes';
@@ -163,6 +164,7 @@ app.use('/api/bookstore', bannerRoutes);
 
 app.use('/api/hrm', AccessControlRoutes);
 app.use('/api/hrm', attendanceRoutes);
+app.use('/api/hrm',leaveRoutes);
 
 app.use('/api/contact', contactFormRoutes);
 app.use('/api/contact', contactRoutes);

@@ -3,7 +3,7 @@ import { AuthUserModel } from '../models/authUser';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-const SECRET_KEY = process.env.JWT_SECRET || 'your_fallback_secret';
+const SECRET_KEY = process.env.JWT_SECRET || 'anysecret';
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
