@@ -7,7 +7,7 @@ import {
   resetPassword,
   me,
   logout,
-} from "../controllers/adminAuthcontroller";
+} from "../controllers/adminAuthController";
 
 
 import { requireAdminAuth } from "../middlewares/authMiddleware";
