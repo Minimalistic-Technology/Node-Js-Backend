@@ -14,6 +14,7 @@ import errorMiddleware from "./middleware/error";
 // import layoutRouter from "./routes/layout.route";
 import { rateLimit } from 'express-rate-limit'
 import adminAuthRoutes from "./routes/adminAuthRoutes";
+import questionBankRoutes from "./routes/questionBankRoutes";
 // import CouponCodeModel from "./models/coupon.models";
 // import { couponRouter } from "./routes/coupon.router";
 // import { maintenanceRouter } from "./routes/maintenance.route";
@@ -35,6 +36,7 @@ const bodyParser = require('body-parser');
 app.use(cookieParser());
 
 app.use("/auth", adminAuthRoutes);
+app.use("/api/questions", questionBankRoutes);
 
 
 
