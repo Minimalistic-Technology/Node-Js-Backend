@@ -154,3 +154,37 @@ export const getAttendanceByEmployee = async (req: Request, res: Response): Prom
     res.status(500).json({ message: "Server error fetching attendance by employee" });
   }
 };
+
+
+export const getAttendanceByEmployeeSelf = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?._id;
+    const records = await AttendanceModel.find({ user: userId }).sort({ date: -1 });
+    res.status(200).json(records);
+  } catch (error) {
+    console.error("Get by employee error:", error);
+    res.status(500).json({ message: "Server error fetching attendance by employee" });
+  }
+};
+
+
+export const getAbsentEmployee = async (req: Request , res: Response): Promise<void> => {
+  try {
+    const { date } = req.params;
+
+    const allUsers = await AuthUserModel.find({}, "_id username email");
+    
+    const presentRecords = await AttendanceModel.find({ date }, "user");
+    const presentUserIds = presentRecords.map((r) => r.user.toString());
+    
+    const absentUsers = allUsers.filter(
+      (user) => !presentUserIds.includes(user._id.toString())
+    );
+
+    res.status(200).json({ date, absentUsers });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch absent users" });
+  }
+
+}

@@ -11,6 +11,7 @@ interface AuthRequest extends Request {
 
 export const verifyToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
+  
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(403).json({ message: 'Token missing' });
@@ -18,7 +19,6 @@ export const verifyToken = async (req: AuthRequest, res: Response, next: NextFun
   }
 
   const token = authHeader.split(' ')[1];
-
   try {
     const decoded: any = jwt.verify(token, SECRET_KEY);
 

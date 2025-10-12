@@ -12,19 +12,23 @@ interface AuthRequest extends Request {
 export const applyLeave = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const eid = req.user?.eid;
+    const email = req.user?.email;
+
+    console.log(email)
     if (!eid) {
       res.status(401).json({ message: "Unauthorized: user not found in token" });
       return;
     }
 
     const { from, to, reason } = req.body;
-    if (!from || !to || !reason) {
+    if (!from || !to || !reason || !email ) {
       res.status(400).json({ message: "Missing required fields: from, to, reason" });
       return;
     }
 
     const leave = new LeaveModel({
       eid,
+      email,
       from,
       to,
       reason,
@@ -190,11 +194,11 @@ export const deleteLeave = async (req: AuthRequest, res: Response): Promise<void
       res.status(404).json({ message: "Leave not found" });
       return;
     }
-
-    if ( req.user?.role !== "Admin") {
-      res.status(403).json({ message: "Forbidden: cannot delete this leave" });
-      return;
-    }
+  // only user can delete if pending only 
+    // if ( req.user?.role !== "Admin") {
+    //   res.status(403).json({ message: "Forbidden: cannot delete this leave" });
+    //   return;
+    // }
 
     await leave.deleteOne();
     res.status(200).json({ message: "Leave deleted successfully" });
