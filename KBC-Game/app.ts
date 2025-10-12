@@ -13,8 +13,9 @@ import errorMiddleware from "./middleware/error";
 // import analyticsRouter from "./routes/analytics.route";
 // import layoutRouter from "./routes/layout.route";
 import { rateLimit } from 'express-rate-limit'
-import adminAuthRoutes from "./routes/adminAuthRoutes";
-import questionBankRoutes from "./routes/questionBankRoutes";
+import adminAuthRoutes from "../KBC-Game/routes/adminAuthRoutes";
+import questionBankRoutes from "../KBC-Game/routes/questionBankRoutes";
+import questionRoutes from "../KBC-Game/routes/questionRoutes";
 // import CouponCodeModel from "./models/coupon.models";
 // import { couponRouter } from "./routes/coupon.router";
 // import { maintenanceRouter } from "./routes/maintenance.route";
@@ -37,6 +38,7 @@ app.use(cookieParser());
 
 app.use("/auth", adminAuthRoutes);
 app.use("/api/questions", questionBankRoutes);
+app.use("/api", questionRoutes);
 
 
 
