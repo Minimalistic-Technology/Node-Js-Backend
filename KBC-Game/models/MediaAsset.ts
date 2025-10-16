@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IMediaAsset extends Document {
-  _id: string; // Cloudinary public_id or unique ID
+  _id: string;
   provider: string;
   url: string;
   metadata?: any;

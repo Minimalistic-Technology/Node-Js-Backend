@@ -12,7 +12,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
     const existing = await Admin.findOne({ email });
     if (existing) {
-      res.status(400).json({ message: "Email in use" });
+      res.status(403).json({ message: "Email in use" });
       return;
     }
 
@@ -26,15 +26,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       verifyTokenExpires: new Date(Date.now() + 60 * 60 * 1000),
     });
 
-const verifyUrl = `${req.protocol}://${req.get("host")}/auth/admins/verify?token=${verifyToken}`;
- await sendEmail(email, "Verify your account", `<a href="${verifyUrl}">Verify</a>`);
+    const verifyUrl = `${req.protocol}://${req.get("host")}/auth/admins/verify?token=${verifyToken}`;
+    await sendEmail(email, "Verify your account", `<a href="${verifyUrl}">Verify</a>`);
 
-    res.status(201).json({ message: "Registered, check email",
-      devVerifyToken: verifyToken
-     });
+    res.status(201).json({ message: "Registered, check email", devVerifyToken: verifyToken });
     return;
   } catch (err: any) {
-    console.log("error", err); 
+    console.log("error", err);
     res.status(500).json({ error: err.message });
     return;
   }
@@ -48,7 +46,7 @@ export const verify = async (req: Request, res: Response): Promise<void> => {
       verifyTokenExpires: { $gt: new Date() },
     });
     if (!admin) {
-      res.status(400).json({ message: "Invalid/expired token" });
+      res.status(403).json({ message: "Invalid/expired token" });
       return;
     }
 
@@ -70,13 +68,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
     const admin = await Admin.findOne({ email });
     if (!admin) {
-      res.status(400).json({ message: "Invalid credentials" });
+      res.status(403).json({ message: "Invalid credentials" });
       return;
     }
 
     const match = await bcrypt.compare(password, admin.passwordHash);
     if (!match) {
-      res.status(400).json({ message: "Invalid credentials" });
+      res.status(403).json({ message: "Invalid credentials" });
       return;
     }
 
@@ -109,7 +107,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     const { email } = req.body;
     const admin = await Admin.findOne({ email });
     if (!admin) {
-      res.status(400).json({ message: "No account found" });
+      res.status(403).json({ message: "No account found" });
       return;
     }
 
@@ -137,7 +135,7 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
       resetTokenExpires: { $gt: new Date() },
     });
     if (!admin) {
-      res.status(400).json({ message: "Invalid/expired token" });
+      res.status(403).json({ message: "Invalid/expired token" });
       return;
     }
 
