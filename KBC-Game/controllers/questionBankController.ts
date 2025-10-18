@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import QuestionBank from "../models/QuestionBank";
-import validatePrizeLadder from "../userUtils/validatePrizeLadder";
 
 export const getBanks = async (req: Request, res: Response): Promise<void> => {
   const { published, tag, ordered } = req.query;
@@ -16,29 +15,35 @@ export const getBanks = async (req: Request, res: Response): Promise<void> => {
 export const createBank = async (req: Request, res: Response): Promise<void> => {
   const data = req.body;
 
-  const isValid = validatePrizeLadder(data.prizeLadder);
-  if (!isValid.success)  res.status(400).json({ error: isValid.error });
-
   const count = await QuestionBank.countDocuments();
   data.position = count + 1;
   data.label = data.label || `Q${data.position}`;
 
-  const bank = await QuestionBank.create(data);
+  const bank = await QuestionBank.create({
+    ...data,
+    createdBy: (req as any).admin?._id || "admin",
+  });
   res.status(201).json(bank);
 };
 
 export const getBank = async (req: Request, res: Response): Promise<void> => {
   const bank = await QuestionBank.findById(req.params.id);
-  if (!bank)  res.status(404).json({ error: "Bank not found" });
+  if (!bank) {
+    res.status(404).json({ error: "Bank not found" });
+    return;
+  }
   res.json(bank);
 };
 
 export const updateBank = async (req: Request, res: Response): Promise<void> => {
   const data = req.body;
-  const isValid = validatePrizeLadder(data.prizeLadder);
-  if (!isValid.success)  res.status(400).json({ error: isValid.error });
-
-  const bank = await QuestionBank.findByIdAndUpdate(req.params.id, data, { new: true });
+  const bank = await QuestionBank.findByIdAndUpdate(req.params.id, data, {
+    new: true,
+  });
+  if (!bank) {
+    res.status(404).json({ error: "Bank not found" });
+    return;
+  }
   res.json(bank);
 };
 

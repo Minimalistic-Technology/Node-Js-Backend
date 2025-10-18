@@ -1,18 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface PrizeLevel {
-  level: number;
-  amount: number;
-  safeCheckpoint?: boolean;
-}
-
 export interface IQuestionBank extends Document {
   name: string;
   slug: string;
   description?: string;
   categories: string[];
   defaultTimer: number;
-  prizeLadder: PrizeLevel[];
+  bankImage?: string; 
+  safePoint?: boolean;
   position: number;
   label: string;
   enabled: boolean;
@@ -22,12 +17,6 @@ export interface IQuestionBank extends Document {
   updatedAt: Date;
 }
 
-const PrizeLevelSchema = new Schema<PrizeLevel>({
-  level: { type: Number, required: true },
-  amount: { type: Number, required: true },
-  safeCheckpoint: { type: Boolean, default: false },
-});
-
 const QuestionBankSchema = new Schema<IQuestionBank>(
   {
     name: { type: String, required: true },
@@ -35,7 +24,8 @@ const QuestionBankSchema = new Schema<IQuestionBank>(
     description: String,
     categories: [String],
     defaultTimer: { type: Number, default: 30 },
-    prizeLadder: { type: [PrizeLevelSchema], required: true },
+    bankImage: { type: String },
+    safePoint: { type: Boolean, default: false },
     position: { type: Number, unique: true },
     label: { type: String },
     enabled: { type: Boolean, default: true },

@@ -10,7 +10,6 @@ import {
 } from "../controllers/questionBankController";
 import { requireAdminAuth } from "../middlewares/authMiddleware";
 
-
 const router = express.Router();
 
 router.get("/banks", requireAdminAuth, getBanks);
