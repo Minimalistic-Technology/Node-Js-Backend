@@ -5,9 +5,9 @@ export interface IQuestionBank extends Document {
   slug: string;
   description?: string;
   categories: string[];
+  ageGroup?: string;
   defaultTimer: number;
   bankImage?: string; 
-  safePoint?: boolean;
   position: number;
   label: string;
   enabled: boolean;
@@ -23,9 +23,9 @@ const QuestionBankSchema = new Schema<IQuestionBank>(
     slug: { type: String, required: true, unique: true },
     description: String,
     categories: [String],
+    ageGroup: { type: String, enum: ["child", "teen", "adult"] },
     defaultTimer: { type: Number, default: 30 },
     bankImage: { type: String },
-    safePoint: { type: Boolean, default: false },
     position: { type: Number, unique: true },
     label: { type: String },
     enabled: { type: Boolean, default: true },

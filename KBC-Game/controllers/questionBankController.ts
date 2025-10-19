@@ -2,10 +2,12 @@ import { Request, Response } from "express";
 import QuestionBank from "../models/QuestionBank";
 
 export const getBanks = async (req: Request, res: Response): Promise<void> => {
-  const { published, tag, ordered } = req.query;
+  const { published, tag, ageGroup, ordered } = req.query;
   const filter: any = {};
+
   if (published) filter.published = published === "true";
   if (tag) filter.categories = tag;
+  if (ageGroup) filter.ageGroup = ageGroup;
 
   let banks = await QuestionBank.find(filter);
   if (ordered) banks = banks.sort((a, b) => a.position - b.position);
