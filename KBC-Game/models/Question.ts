@@ -16,10 +16,8 @@ export interface IQuestion extends Document {
   text: string;
   options: Option[];
   correctIndex: number;
-  difficulty?: string;
   categories: string[];
   mediaRefs: string[];
-  lifelinesAllowed: string[];
   status: "draft" | "published";
   versions: QuestionVersion[];
   scheduledAt?: Date;
@@ -55,10 +53,8 @@ const QuestionSchema = new Schema<IQuestion>(
       validate: [(v: Option[]) => v.length === 4, "Options must have exactly 4 entries."],
     },
     correctIndex: { type: Number, required: true, min: 0, max: 3 },
-    difficulty: String,
     categories: [String],
     mediaRefs: [String],
-    lifelinesAllowed: [String],
     status: { type: String, enum: ["draft", "published"], default: "draft" },
     versions: [VersionSchema],
     scheduledAt: Date,

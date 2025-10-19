@@ -3,7 +3,6 @@ import Question from "../models/Question";
 import { verifyMediaRefs } from "../userUtils/mediaValidator";
 import { importQuestionsFromJSON } from "../userUtils/importQuestions";
 
-
 export const getQuestions = async (req: Request, res: Response): Promise<void> => {
   const { bankId, status, q } = req.query;
   const filter: any = { deleted: false };
@@ -18,10 +17,10 @@ export const getQuestions = async (req: Request, res: Response): Promise<void> =
 export const createQuestion = async (req: Request, res: Response): Promise<void> => {
   const data = req.body;
   const { missing } = await verifyMediaRefs(data.mediaRefs || []);
-  if (missing.length > 0)  res.status(400).json({ error: `Missing media refs: ${missing.join(", ")}` });
+  if (missing.length > 0) res.status(400).json({ error: `Missing media refs: ${missing.join(", ")}` });
 
   const question = await Question.create({
-    ...data,
+    ...data, 
     createdBy: (req as any).admin?._id || "admin",
   });
   res.status(201).json(question);
@@ -82,8 +81,6 @@ export const previewQuestion = async (req: Request, res: Response): Promise<void
     text: question.text,
     options: question.options.map((o) => o.text),
     media: question.mediaRefs,
-    lifelines: question.lifelinesAllowed,
-    difficulty: question.difficulty,
   };
   res.json(payload);
 };
