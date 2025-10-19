@@ -11,6 +11,7 @@ import questionBankRoutes from "../KBC-Game/routes/questionBankRoutes";
 import questionRoutes from "../KBC-Game/routes/questionRoutes";
 import mediaAssetRoutes from "../KBC-Game/routes/mediaAssetRoutes";
 import ageContentRoutes from "../KBC-Game/routes/ageContentRoutes";
+import pinRoutes from "../KBC-Game/routes/pinRoutes";
 
 export const app = express();
 app.use(express.json({ limit: "50mb" }));
@@ -36,6 +37,8 @@ app.use("/api/questions", questionBankRoutes);
 app.use("/api", questionRoutes);
 app.use("/api/media", mediaAssetRoutes);
 app.use("/api/age-content", ageContentRoutes);
+app.use("/api/pin", pinRoutes);
+
 
 app.get("/test", async (req: Request, res: Response) => {
   res.status(200).json({
