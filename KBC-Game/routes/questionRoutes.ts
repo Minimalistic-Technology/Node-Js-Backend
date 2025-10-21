@@ -11,10 +11,10 @@ import {
 import { requireAdminAuth } from "../middlewares/authMiddleware";
 
 const router = express.Router();
-
+router.get("/questions/byId/:id", requireAdminAuth, getQuestionById);
 router.get("/questions", requireAdminAuth, getQuestions);
 router.post("/questions", requireAdminAuth, createQuestion);
-router.get("/questions/:id", requireAdminAuth, getQuestionById);
+
 router.put("/questions/:id", requireAdminAuth, updateQuestion);
 router.delete("/questions/:id", requireAdminAuth, deleteQuestion);
 router.post("/questions/bulk-import", requireAdminAuth, bulkImportQuestions);

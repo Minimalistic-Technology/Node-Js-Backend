@@ -26,7 +26,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       verifyTokenExpires: new Date(Date.now() + 60 * 60 * 1000),
     });
 
-    const verifyUrl = `${req.protocol}://${req.get("host")}/auth/admins/verify?token=${verifyToken}`;
+    // const verifyUrl = `${req.protocol}://${req.get("host")}/auth/admins/verify?token=${verifyToken}`;
+    // await sendEmail(email, "Verify your account", `<a href="${verifyUrl}">Verify</a>`);
+
+    const verifyUrl = `${process.env.FRONTEND_URL}/auth/verify-email?token=${verifyToken}`;
     await sendEmail(email, "Verify your account", `<a href="${verifyUrl}">Verify</a>`);
 
     res.status(201).json({ message: "Registered, check email", devVerifyToken: verifyToken });
@@ -40,11 +43,15 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
 export const verify = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { token } = req.query;
+    const token = req.query.token as string;
+    console.log("Received token:", token);
+    console.log("Hashed received token:", hashToken(token));
     const admin = await Admin.findOne({
       verifyToken: hashToken(token as string),
       verifyTokenExpires: { $gt: new Date() },
     });
+
+    console.log("Stored token in DB:", admin?.verifyToken);
     if (!admin) {
       res.status(403).json({ message: "Invalid/expired token" });
       return;
@@ -57,6 +64,8 @@ export const verify = async (req: Request, res: Response): Promise<void> => {
 
     res.json({ message: "Account verified" });
     return;
+    // return res.redirect(307, `${process.env.FRONTEND_URL}/auth/login`);
+
   } catch (err: any) {
     res.status(500).json({ error: err.message });
     return;
@@ -116,7 +125,7 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     admin.resetTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
     await admin.save();
 
-    const resetUrl = `${req.protocol}://${req.get("host")}/auth/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
     await sendEmail(email, "Reset password", `<a href="${resetUrl}">Reset</a>`);
 
     res.json({ message: "Password reset email sent" });

@@ -16,7 +16,11 @@ import pinRoutes from "../KBC-Game/routes/pinRoutes";
 export const app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',  
+    credentials: true,                
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], 
+  }));
 
 const limiter = rateLimit({
   windowMs: 60 * 1000, 
