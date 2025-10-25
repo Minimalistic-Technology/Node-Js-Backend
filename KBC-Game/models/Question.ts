@@ -11,13 +11,21 @@ export interface QuestionVersion {
   editedAt: Date;
 }
 
+export interface IMediaRef {
+  public_id: string;
+  url: string;
+  type: string;
+  format: string;
+}
+
+
 export interface IQuestion extends Document {
   bankId: mongoose.Types.ObjectId;
   text: string;
   options: Option[];
   correctIndex: number;
   categories: string[];
-  mediaRefs: string[];
+  mediaRef?: IMediaRef;
   status: "draft" | "published";
   versions: QuestionVersion[];
   scheduledAt?: Date;
@@ -44,6 +52,17 @@ const VersionSchema = new Schema<QuestionVersion>(
   { _id: false }
 );
 
+const MediaRefSchema = new Schema<IMediaRef>(
+  {
+    public_id: { type: String, required: true },
+    url: { type: String, required: true },
+    type: { type: String, required: true },
+    format : { type: String, required: true },
+  },
+  { _id: false }
+);
+
+
 const QuestionSchema = new Schema<IQuestion>(
   {
     bankId: { type: Schema.Types.ObjectId, ref: "QuestionBank", required: true },
@@ -54,7 +73,7 @@ const QuestionSchema = new Schema<IQuestion>(
     },
     correctIndex: { type: Number, required: true, min: 0, max: 3 },
     categories: [String],
-    mediaRefs: [String],
+    mediaRef: MediaRefSchema,
     status: { type: String, enum: ["draft", "published"], default: "draft" },
     versions: [VersionSchema],
     scheduledAt: Date,
@@ -65,3 +84,4 @@ const QuestionSchema = new Schema<IQuestion>(
 );
 
 export default mongoose.model<IQuestion>("Question", QuestionSchema);
+     

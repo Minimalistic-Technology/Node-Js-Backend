@@ -3,8 +3,6 @@ import cloudinary from "../userUtils/cloudinaryClient";
 import Question from "../models/Question";
 import { importQuestionsFromJSON } from "../userUtils/importQuestions";
 import stream from "stream";
-
-
 export const createQuestion = async (req: Request, res: Response) => {
   try {
     const data = req.body;
@@ -13,10 +11,7 @@ export const createQuestion = async (req: Request, res: Response) => {
     if (typeof data.options === "string") data.options = JSON.parse(data.options);
     if (typeof data.categories === "string") data.categories = JSON.parse(data.categories);
 
-    console.log(data);
-
-    // Handle media upload
-    const mediaRefs: string[] = [];
+    // Handle media upload (single file)
     if (req.file) {
       const result: any = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
@@ -37,13 +32,18 @@ export const createQuestion = async (req: Request, res: Response) => {
         bufferStream.pipe(uploadStream);
       });
 
-      mediaRefs.push(result.public_id);
+      // Assign mediaRef object
+      data.mediaRef = {
+        public_id: result.public_id,
+        url: result.secure_url,
+        type: result.resource_type,
+        format: result.format,
+      };
     }
 
     // Save question to DB
     const question = await Question.create({
-      ...data, // ✅ use parsed data, not req.body
-      mediaRefs,
+      ...data,
       createdBy: (req as any).admin?._id || "admin",
     });
 
@@ -90,6 +90,7 @@ export const getQuestionById = async (req: Request, res: Response): Promise<void
 };
 
 
+
 export const updateQuestion = async (req: Request, res: Response): Promise<void> => {
   try {
     const existing = await Question.findById(req.params.id);
@@ -107,16 +108,15 @@ export const updateQuestion = async (req: Request, res: Response): Promise<void>
 
     // Parse stringified arrays if needed
     const data = req.body;
-    if (typeof data.categories === 'string') data.categories = JSON.parse(data.categories);
-    if (typeof data.options === 'string') data.options = JSON.parse(data.options);
-    if (typeof data.correctIndex === 'string') data.correctIndex = parseInt(data.correctIndex, 10);
+    if (typeof data.categories === "string") data.categories = JSON.parse(data.categories);
+    if (typeof data.options === "string") data.options = JSON.parse(data.options);
+    if (typeof data.correctIndex === "string") data.correctIndex = parseInt(data.correctIndex, 10);
 
     // Handle media upload if a new file is sent
-    const mediaRefs: string[] = existing.mediaRefs || [];
     if (req.file) {
       const result: any = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
-           {
+         {
             resource_type: "auto",
             cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
             api_key: process.env.CLOUDINARY_API_KEY,
@@ -127,15 +127,23 @@ export const updateQuestion = async (req: Request, res: Response): Promise<void>
             else resolve(result);
           }
         );
+
         const bufferStream = new stream.PassThrough();
         bufferStream.end(req.file?.buffer);
         bufferStream.pipe(uploadStream);
       });
-      mediaRefs.push(result.public_id);
+
+      // Save single mediaRef
+       data.mediaRef = {
+        public_id: result.public_id,
+        url: result.secure_url,
+        type: result.resource_type,
+        format: result.format,
+      };
     }
 
     // Merge updates
-    Object.assign(existing, { ...data, mediaRefs });
+    Object.assign(existing, data);
 
     await existing.save();
     res.json({ success: true, question: existing });
@@ -144,7 +152,6 @@ export const updateQuestion = async (req: Request, res: Response): Promise<void>
     res.status(500).json({ error: err.message || "Something went wrong" });
   }
 };
-
 
 export const deleteQuestion = async (req: Request, res: Response): Promise<void> => {
   const q = await Question.findById(req.params.id);
@@ -173,7 +180,7 @@ export const previewQuestion = async (req: Request, res: Response): Promise<void
   const payload = {
     text: question.text,
     options: question.options.map((o) => o.text),
-    media: question.mediaRefs,
+    media: question.mediaRef,
   };
   res.json(payload);
 };
