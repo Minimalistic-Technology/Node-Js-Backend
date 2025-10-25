@@ -1,7 +1,59 @@
 import { Request, Response } from "express";
+import cloudinary from "../userUtils/cloudinaryClient";
 import Question from "../models/Question";
-import { verifyMediaRefs } from "../userUtils/mediaValidator";
 import { importQuestionsFromJSON } from "../userUtils/importQuestions";
+import stream from "stream";
+
+
+export const createQuestion = async (req: Request, res: Response) => {
+  try {
+    const data = req.body;
+
+    // Parse stringified arrays
+    if (typeof data.options === "string") data.options = JSON.parse(data.options);
+    if (typeof data.categories === "string") data.categories = JSON.parse(data.categories);
+
+    console.log(data);
+
+    // Handle media upload
+    const mediaRefs: string[] = [];
+    if (req.file) {
+      const result: any = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            resource_type: "auto",
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+
+        const bufferStream = new stream.PassThrough();
+        bufferStream.end(req.file?.buffer);
+        bufferStream.pipe(uploadStream);
+      });
+
+      mediaRefs.push(result.public_id);
+    }
+
+    // Save question to DB
+    const question = await Question.create({
+      ...data, // ✅ use parsed data, not req.body
+      mediaRefs,
+      createdBy: (req as any).admin?._id || "admin",
+    });
+
+    res.status(201).json({ success: true, question });
+  } catch (err: any) {
+    console.error("Error in createQuestion:", err);
+    res.status(500).json({ error: err.message || "Something went wrong" });
+  }
+};
+
 
 export const getQuestions = async (req: Request, res: Response): Promise<void> => {
   const { bankId, status, q } = req.query;
@@ -14,17 +66,19 @@ export const getQuestions = async (req: Request, res: Response): Promise<void> =
   res.json(questions);
 };
 
-export const createQuestion = async (req: Request, res: Response): Promise<void> => {
-  const data = req.body;
-  const { missing } = await verifyMediaRefs(data.mediaRefs || []);
-  if (missing.length > 0) res.status(400).json({ error: `Missing media refs: ${missing.join(", ")}` });
+// export const createQuestion = async (req: Request, res: Response): Promise<void> => {
+//   const data = req.body;
+//   const { missing } = await verifyMediaRefs(data.mediaRefs || []);
+//   if (missing.length > 0) res.status(400).json({ error: `Missing media refs: ${missing.join(", ")}` });
 
-  const question = await Question.create({
-    ...data, 
-    createdBy: (req as any).admin?._id || "admin",
-  });
-  res.status(201).json(question);
-};
+//   const question = await Question.create({
+//     ...data, 
+//     createdBy: (req as any).admin?._id || "admin",
+//   });
+//   res.status(201).json(question);
+// };
+
+
 
 export const getQuestionById = async (req: Request, res: Response): Promise<void> => {
   const question = await Question.findById(req.params.id);
@@ -35,23 +89,62 @@ export const getQuestionById = async (req: Request, res: Response): Promise<void
   res.json(question);
 };
 
+
 export const updateQuestion = async (req: Request, res: Response): Promise<void> => {
-  const existing = await Question.findById(req.params.id);
-  if (!existing) {
-    res.status(404).json({ error: "Question not found" });
-    return;
+  try {
+    const existing = await Question.findById(req.params.id);
+    if (!existing) {
+      res.status(404).json({ error: "Question not found" });
+      return;
+    }
+
+    // Push old version to versions array
+    existing.versions.push({
+      snapshot: existing.toObject(),
+      editedBy: (req as any).admin?._id || "admin",
+      editedAt: new Date(),
+    });
+
+    // Parse stringified arrays if needed
+    const data = req.body;
+    if (typeof data.categories === 'string') data.categories = JSON.parse(data.categories);
+    if (typeof data.options === 'string') data.options = JSON.parse(data.options);
+    if (typeof data.correctIndex === 'string') data.correctIndex = parseInt(data.correctIndex, 10);
+
+    // Handle media upload if a new file is sent
+    const mediaRefs: string[] = existing.mediaRefs || [];
+    if (req.file) {
+      const result: any = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+           {
+            resource_type: "auto",
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        const bufferStream = new stream.PassThrough();
+        bufferStream.end(req.file?.buffer);
+        bufferStream.pipe(uploadStream);
+      });
+      mediaRefs.push(result.public_id);
+    }
+
+    // Merge updates
+    Object.assign(existing, { ...data, mediaRefs });
+
+    await existing.save();
+    res.json({ success: true, question: existing });
+  } catch (err: any) {
+    console.error("Error in updateQuestion:", err);
+    res.status(500).json({ error: err.message || "Something went wrong" });
   }
-
-  existing.versions.push({
-    snapshot: existing.toObject(),
-    editedBy: (req as any).admin?._id || "admin",
-    editedAt: new Date(),
-  });
-
-  Object.assign(existing, req.body);
-  await existing.save();
-  res.json(existing);
 };
+
 
 export const deleteQuestion = async (req: Request, res: Response): Promise<void> => {
   const q = await Question.findById(req.params.id);
