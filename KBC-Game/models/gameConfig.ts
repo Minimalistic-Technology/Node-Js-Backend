@@ -1,6 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-// --- Types ---
 interface IMediaAsset {
   url: string;
   fileName: string;
@@ -29,7 +28,6 @@ export interface IGameConfig extends Document {
   lifelines: ILifeline;
 }
 
-// --- Schemas ---
 const MediaAssetSchema = new Schema({
   url: { type: String, required: true },
   fileName: { type: String, required: true },
@@ -50,7 +48,6 @@ const LifelineSchema = new Schema({
   'Flip Question': { type: Boolean, required: true },
 }, { _id: false });
 
-// --- Main Model ---
 const GameConfigSchema = new Schema<IGameConfig>({
   configName: { type: String, required: true, trim: true },
   isActive: { type: Boolean, default: false, index: true },
@@ -58,7 +55,7 @@ const GameConfigSchema = new Schema<IGameConfig>({
   prizeLadder: [PrizeLevelSchema],
   lifelines: { type: (LifelineSchema as any), required: true },
 }, { 
-  timestamps: true // Adds createdAt and updatedAt
+  timestamps: true 
 });
 
 export default mongoose.model<IGameConfig>('GameConfig', GameConfigSchema);

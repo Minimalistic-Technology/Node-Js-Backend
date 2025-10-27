@@ -12,8 +12,9 @@ import questionRoutes from "../KBC-Game/routes/questionRoutes";
 import mediaAssetRoutes from "../KBC-Game/routes/mediaAssetRoutes";
 import ageContentRoutes from "../KBC-Game/routes/ageContentRoutes";
 import pinRoutes from "../KBC-Game/routes/pinRoutes";
+import gameConfigRoutes from '../KBC-Game/routes/gameConfigRoutes';
+import userRoutes from '../KBC-Game/routes/userRoutes';
 
-import gameConfigRoutes from './routes/gameConfig.routes';
 export const app = express();
 app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
@@ -43,9 +44,8 @@ app.use("/api", questionRoutes);
 app.use("/api/media", mediaAssetRoutes);
 app.use("/api/age-content", ageContentRoutes);
 app.use("/api/pin", pinRoutes);
-// --- API Routes ---
 app.use('/api/v1/game-config', gameConfigRoutes);
-
+app.use('/api/users', userRoutes);
 
 
 app.get("/test", async (req: Request, res: Response) => {

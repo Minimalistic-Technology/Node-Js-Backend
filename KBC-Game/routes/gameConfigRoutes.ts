@@ -5,12 +5,11 @@ import {
   getGameConfigById,
   updateGameConfig,
   deleteGameConfig
-} from '../controllers/gameConfig.controller';
+} from '../controllers/gameConfigController';
 import { requireAdminAuth } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-// All routes are protected by admin auth
 router.post('/', requireAdminAuth, createGameConfig);
 router.get('/', requireAdminAuth, getAllGameConfigs);
 router.get('/:id', requireAdminAuth, getGameConfigById);

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { gameConfigSchema, updateGameConfigSchema } from '../validation/gameConfigValidation';
-import GameConfig from '../models/gameConfig.model';
+import GameConfig from '../models/gameConfig';
 
 // --- Helper function to ensure only one config is active ---
 const deactivateAllConfigs = async (excludeId: string | null = null) => {

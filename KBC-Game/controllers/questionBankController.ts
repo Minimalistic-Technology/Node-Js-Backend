@@ -98,7 +98,7 @@ export const togglePublish = async (req: Request, res: Response): Promise<void> 
 //   res.json({ message: "Reordered successfully 1" });
 // };
 
-export const reorderBanks = async (req: Request, res: Response) => {
+export const reorderBanks = async (req: Request, res: Response): Promise<void> => {
   try {
     const { position } = req.body;
     const id = req.params.id;
@@ -106,13 +106,13 @@ export const reorderBanks = async (req: Request, res: Response) => {
     const allBanks = await QuestionBank.find().sort({ position: 1 });
     const currentIndex = allBanks.findIndex(b => b._id.toString() === id);
 
-    if (currentIndex === -1) return res.status(404).json({ error: "Bank not found" });
+    if (currentIndex === -1)  res.status(404).json({ error: "Bank not found" });
 
     const [currentBank] = allBanks.splice(currentIndex, 1);
     const newIndex = Math.min(Math.max(position - 1, 0), allBanks.length);
 
     if (currentIndex === newIndex) {
-      return res.json({ message: "Bank already at this position" });
+      res.json({ message: "Bank already at this position" });
     }
 
     allBanks.splice(newIndex, 0, currentBank);
