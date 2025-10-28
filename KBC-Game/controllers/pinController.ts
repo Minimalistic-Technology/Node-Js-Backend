@@ -19,8 +19,22 @@ export const createPin = CatchAsyncError(async (req: Request, res: Response, nex
   res.status(201).json({ success: true, message: "PIN created successfully" });
 });
 
+ export const getPin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const admin = (req as any).admin;
+    const pin = await Pin.findOne({ userId: admin._id });
+    res.status(200).json({ hasPin: !!pin });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 export const verifyPin = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-  const { userId, pin } = req.body;
+  const {  pin } = req.body;
+  const admin = (req as any).admin;
+  const userId = admin._id;
+  console.log(userId);
 
   if (!isValidPinFormat(pin)) return next(new ErrorHandler("PIN must be 4 digits", 400));
 
