@@ -3,6 +3,7 @@ import GameConfig from "../models/gameConfig";
 import Question from "../models/Question";
 import QuestionBank from "../models/QuestionBank";
 import GameResult from "../models/GameResult";
+import mongoose from "mongoose";
 
 export const getGameConfig = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -22,32 +23,63 @@ export const getGameConfig = async (req: Request, res: Response): Promise<void> 
   }
 };
 
+
+const getRandomQuestion = async (bankId: string) => {
+  // Step 1: Pick one random unasked question
+  const randomQuestion = await Question.aggregate([
+    {
+      $match: {
+        bankId: new mongoose.Types.ObjectId(bankId),
+        status: "published",
+        isAsked: false,
+      },
+    },
+    { $sample: { size: 1 } },
+  ]);
+
+  if (!randomQuestion.length) return null;
+
+  // Step 2: Atomically update it (in case of race condition)
+  const updated = await Question.findOneAndUpdate(
+    { _id: randomQuestion[0]._id, isAsked: false },
+    { $set: { isAsked: true } },
+    { new: true }
+  );
+
+  return updated;
+};
+
 export const startGameSession = async (req: Request, res: Response): Promise<void> => {
   try {
     const activeConfig = await GameConfig.findOne({ isActive: true });
+
     if (!activeConfig) {
       res.status(404).json({ message: "No active game configuration found" });
       return;
     }
 
+    const selectedQuestions: any[] = [];
 
-    const selectedQuestions = [];
-
-    for (const _id of activeConfig.selectedBanks) {
-      const bank = await QuestionBank.findById(_id);
+    // Loop through each selected bank
+    for (const bankId of activeConfig.selectedBanks) {
+      const bank = await QuestionBank.findById(bankId);
       if (!bank) continue;
 
-      const questions = await Question.find({
-        bankId: bank._id,
-        status: "published",
-      });
+      // Step 1: Try to get one random unasked question
+      let randomQuestion = await getRandomQuestion(bank._id);
 
+      // Step 2: If all are asked, reset and retry once
+      if (!randomQuestion) {
+        await Question.updateMany(
+          { bankId: bank._id, status: "published" },
+          { $set: { isAsked: false } }
+        );
 
-      if (questions.length > 0) {
-        const randomQuestion =
-          questions[Math.floor(Math.random() * questions.length)];
-        selectedQuestions.push(randomQuestion);
+        randomQuestion = await getRandomQuestion(bank._id);
       }
+
+      // Step 3: Push to selected list if found
+      if (randomQuestion) selectedQuestions.push(randomQuestion);
     }
 
     res.status(200).json({
@@ -62,6 +94,8 @@ export const startGameSession = async (req: Request, res: Response): Promise<voi
   }
 };
 
+
+
 export const flipQuestion = async (req: Request, res: Response): Promise<void> => {
   try {
     const { currentQuestionBankId, askedQuestionIds } = req.body;
@@ -71,14 +105,29 @@ export const flipQuestion = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    const availableQuestions = await Question.find({
+    let availableQuestions = await Question.find({
       bankId: currentQuestionBankId,
       _id: { $nin: askedQuestionIds || [] },
       status: "published",
+      isAsked:"false"
     });
 
+      if (availableQuestions.length === 0) {
+      await Question.updateMany(
+        { bankId: currentQuestionBankId, status: "published" },
+        { $set: { isAsked: false } }
+      );
+
+      availableQuestions = await Question.find({
+        bankId: currentQuestionBankId,
+        status: "published",
+        isAsked: false,
+      });
+    }
+
+    // 🔹 If still no questions found after reset (empty bank)
     if (availableQuestions.length === 0) {
-      res.status(404).json({ message: "No more questions available in this bank" });
+      res.status(404).json({ message: "No questions available in this bank" });
       return;
     }
 
@@ -89,6 +138,12 @@ export const flipQuestion = async (req: Request, res: Response): Promise<void> =
       message: "New question fetched successfully",
       question: randomQuestion,
     });
+
+    await Question.findByIdAndUpdate(randomQuestion._id, {
+          isAsked: true,
+        });
+
+    
   } catch (error) {
     console.error("Error in flipQuestion:", error);
     res.status(500).json({ message: "Server error", error });

@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { boolean } from "zod";
 
 export interface Option {
   text: string;
@@ -33,6 +34,7 @@ export interface IQuestion extends Document {
   deleted?: boolean;
   createdAt: Date;
   updatedAt: Date;
+  isAsked: Boolean;
 }
 
 const OptionSchema = new Schema<Option>(
@@ -79,6 +81,7 @@ const QuestionSchema = new Schema<IQuestion>(
     scheduledAt: Date,
     createdBy: String,
     deleted: { type: Boolean, default: false },
+    isAsked:{type:Boolean , default: false}
   },
   { timestamps: true }
 );
