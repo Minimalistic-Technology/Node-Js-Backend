@@ -15,7 +15,7 @@ export const getGameConfig = async (req: Request, res: Response): Promise<void> 
     res.status(200).json({
       totalQuestions: activeConfig.selectedBanks.length,
       lifelines: activeConfig.lifelines,
-    });
+    }); 
   } catch (error) {
     console.error("Error in getGameConfig:", error);
     res.status(500).json({ message: "Server error", error });
@@ -30,16 +30,18 @@ export const startGameSession = async (req: Request, res: Response): Promise<voi
       return;
     }
 
+
     const selectedQuestions = [];
 
-    for (const bankSlug of activeConfig.selectedBanks) {
-      const bank = await QuestionBank.findOne({ slug: bankSlug });
+    for (const _id of activeConfig.selectedBanks) {
+      const bank = await QuestionBank.findById(_id);
       if (!bank) continue;
 
       const questions = await Question.find({
         bankId: bank._id,
         status: "published",
       });
+
 
       if (questions.length > 0) {
         const randomQuestion =

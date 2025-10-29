@@ -12,8 +12,8 @@ import { requireAdminAuth } from "../middlewares/authMiddleware";
 import { uploadSingle, validateUpload } from '../middlewares/uploadStream';
 
 const router = express.Router();
-router.get("/questions/byId/:id", requireAdminAuth, getQuestionById);
-router.get("/questions", requireAdminAuth, getQuestions);
+router.get("/questions/byId/:id", getQuestionById);
+router.get("/questions", getQuestions);
 router.delete("/questions/:id", requireAdminAuth, deleteQuestion);
 router.post("/questions" , requireAdminAuth , uploadSingle('file'),   createQuestion);
 

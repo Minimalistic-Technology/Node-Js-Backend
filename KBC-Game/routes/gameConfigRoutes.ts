@@ -11,8 +11,8 @@ import { requireAdminAuth } from '../middlewares/authMiddleware';
 const router = Router();
 
 router.post('/', requireAdminAuth, createGameConfig);
-router.get('/', requireAdminAuth, getAllGameConfigs);
-router.get('/:id', requireAdminAuth, getGameConfigById);
+router.get('/', getAllGameConfigs);
+router.get('/:id', getGameConfigById);
 router.put('/:id', requireAdminAuth, updateGameConfig);
 router.delete('/:id', requireAdminAuth, deleteGameConfig);
 
