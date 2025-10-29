@@ -15,6 +15,7 @@ import pinRoutes from "../KBC-Game/routes/pinRoutes";
 import gameConfigRoutes from '../KBC-Game/routes/gameConfigRoutes';
 import userRoutes from '../KBC-Game/routes/userRoutes';
 import gameRoutes from '../KBC-Game/routes/gameRoutes';
+import AuthRoutes from "../KBC-Game/routes/authRoutes";
 
 export const app = express();
 app.use(express.json({ limit: "50mb" }));
@@ -48,6 +49,7 @@ app.use("/api/pin", pinRoutes);
 app.use("/api/v1/game-config", gameConfigRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/game", gameRoutes);
+app.use("/api/auth", AuthRoutes);
 
 
 app.get("/test", async (req: Request, res: Response) => {
