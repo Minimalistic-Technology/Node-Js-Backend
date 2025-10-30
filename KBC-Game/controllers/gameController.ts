@@ -152,30 +152,23 @@ export const flipQuestion = async (req: Request, res: Response): Promise<void> =
 
 export const completeGame = async (req: Request, res: Response): Promise<void> => {
   try {
-    const {
-      userId,
-      finalScore,
-      isWinner,
-      prize,
-      totalTimeSeconds,
-      lifelinesUsed,
-      questionHistory,
-    } = req.body;
+    const { finalScore, isWinner, prize, totalTimeSeconds, lifelinesUsed, questionHistory } = req.body;
 
-    if (!userId || !finalScore || !prize || !questionHistory) {
-      res.status(400).json({ message: "Missing required fields" });
-      return;
-    }
+  const user = (req as any).user;
+if (!user || !finalScore || !prize || !questionHistory) {
+  res.status(400).json({ message: "Missing required fields" });
+  return;
+}
 
-    const newResult = await GameResult.create({
-      userId,
-      finalScore,
-      isWinner,
-      prize,
-      totalTimeSeconds,
-      lifelinesUsed,
-      questionHistory,
-    });
+const newResult = await GameResult.create({
+  userId: user._id,
+  finalScore,
+  isWinner,
+  prize,
+  totalTimeSeconds,
+  lifelinesUsed,
+  questionHistory,
+});
 
     const allResults = await GameResult.find()
       .sort({ finalScore: -1, totalTimeSeconds: 1 })
@@ -197,6 +190,34 @@ export const completeGame = async (req: Request, res: Response): Promise<void> =
     });
   } catch (error) {
     console.error("Error in completeGame:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const fiftyFiftyLifeline = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { question } = req.body;
+
+    if (!question || !Array.isArray(question.options) || !question.answer) {
+      res.status(400).json({ message: "Invalid question data provided" });
+      return;
+    }
+
+    const { options, answer } = question;
+
+    const incorrectOptions = options.filter((opt: string) => opt !== answer);
+
+    for (let i = incorrectOptions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [incorrectOptions[i], incorrectOptions[j]] = [incorrectOptions[j], incorrectOptions[i]];
+    }
+
+    const removedOptions = incorrectOptions.slice(0, 2);
+
+    res.status(200).json({ removedOptions });
+
+  } catch (error) {
+    console.error("Error in fiftyFiftyLifeline:", error);
     res.status(500).json({ message: "Server error", error });
   }
 };
