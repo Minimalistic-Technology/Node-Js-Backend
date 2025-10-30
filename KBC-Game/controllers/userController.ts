@@ -3,9 +3,9 @@ import RegisteredUser from "../models/RegisteredUser";
 
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { firstName, lastName, email, phone, age } = req.body;
+    const { firstName, lastName, email, phone, age, password } = req.body;
 
-    if (!firstName || !lastName || !email || !phone || !age) {
+    if (!firstName || !lastName || !email || !phone || !age || !password) {
       res.status(400).json({ message: "All fields are required" });
       return;
     }
@@ -16,7 +16,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    const user = await RegisteredUser.create({ firstName, lastName, email, phone, age });
+    const user = await RegisteredUser.create({ firstName, lastName, email, phone, age, password });
     res.status(201).json({ message: "User created successfully", user });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
