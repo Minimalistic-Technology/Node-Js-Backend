@@ -16,11 +16,8 @@ import gameConfigRoutes from '../KBC-Game/routes/gameConfigRoutes';
 import userRoutes from '../KBC-Game/routes/userRoutes';
 import gameRoutes from '../KBC-Game/routes/gameRoutes';
 import AuthRoutes from "../KBC-Game/routes/authRoutes";
-<<<<<<< HEAD
 import importExportRoutes from "../KBC-Game/routes/importExportRoutes";
-=======
 import activeSessionRoutes from "../KBC-Game/routes/activeSessionRoutes";
->>>>>>> 760b3f5a65d6cc8b78a98ff8a7fbd4591cfa89a5
 
 export const app = express();
 app.use(express.json({ limit: "50mb" }));
@@ -55,11 +52,8 @@ app.use("/api/v1/game-config", gameConfigRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/game", gameRoutes);
 app.use("/api/auth", AuthRoutes);
-<<<<<<< HEAD
 app.use("/api/import-export", importExportRoutes);
-=======
 app.use("/api/session", activeSessionRoutes);
->>>>>>> 760b3f5a65d6cc8b78a98ff8a7fbd4591cfa89a5
 
 
 app.get("/test", async (req: Request, res: Response) => {
