@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import GameConfig from "../models/gameConfig";
 import Question from "../models/Question";
 import QuestionBank from "../models/QuestionBank";
 import GameResult from "../models/GameResult";
+import GameConfig from "../models/GameConfig";
 import mongoose from "mongoose";
 
 export const getGameConfig = async (req: Request, res: Response): Promise<void> => {
@@ -87,6 +87,7 @@ export const startGameSession = async (req: Request, res: Response): Promise<voi
       questions: selectedQuestions,
       prizeLadder: activeConfig.prizeLadder,
       lifelines: activeConfig.lifelines,
+      gameConfigId:activeConfig._id,
     });
   } catch (error) {
     console.error("Error in startGameSession:", error);
