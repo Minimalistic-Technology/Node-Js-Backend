@@ -2,22 +2,28 @@ import { Request, Response } from "express";
 import ActiveSession from "../models/ActiveSession";
 import GameConfig from "../models/GameConfig";
 
-export const startOrResumeSession = async (req: Request, res: Response) => {
+export const startOrResumeSession = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = (req as any).user;
     const userId = user?._id;
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
 
     const activeConfig = await GameConfig.findOne({ isActive: true });
-    if (!activeConfig)
-      return res.status(404).json({ message: "No active game configuration found" });
+    if (!activeConfig) {
+      res.status(404).json({ message: "No active game configuration found" });
+      return;
+    }
 
     const { gameConfigId, questions, prizeLadder, lifelines } = req.body;
     if (!gameConfigId || !questions || !prizeLadder || !lifelines) {
-      return res.status(400).json({ message: "Missing required session data" });
+      res.status(400).json({ message: "Missing required session data" });
+      return;
     }
 
-    // 🧩 Step 1 — Check for unfinished session for current config
+    // Step 1 — Resume unfinished session
     let existingSession = await ActiveSession.findOne({
       userId,
       gameConfigId: activeConfig._id,
@@ -25,13 +31,14 @@ export const startOrResumeSession = async (req: Request, res: Response) => {
     });
 
     if (existingSession) {
-      return res.status(200).json({
+      res.status(200).json({
         message: "Resumed existing session",
         session: existingSession,
       });
+      return;
     }
 
-    // 🧩 Step 2 — Check if completed session exists for current config
+    // Step 2 — Already completed session
     const completedSession = await ActiveSession.findOne({
       userId,
       gameConfigId: activeConfig._id,
@@ -39,20 +46,21 @@ export const startOrResumeSession = async (req: Request, res: Response) => {
     });
 
     if (completedSession) {
-      return res.status(206).json({
+      res.status(206).json({
         message: "You have already completed this session",
         session: completedSession,
       });
+      return;
     }
 
-    // 🧩 Step 3 — Remove any old session tied to a different config
+    // Step 3 — Remove old incomplete sessions
     await ActiveSession.deleteMany({
       userId,
       gameConfigId: { $ne: activeConfig._id },
       isCompleted: false,
     });
 
-    // 🧩 Step 4 — Create new session for current config
+    // Step 4 — Create new session
     const newSession = await ActiveSession.create({
       userId,
       gameConfigId: activeConfig._id,
@@ -64,18 +72,17 @@ export const startOrResumeSession = async (req: Request, res: Response) => {
       isCompleted: false,
     });
 
-    return res.status(201).json({
+    res.status(201).json({
       message: "Game session started successfully",
       session: newSession,
     });
   } catch (error: any) {
     console.error("Error creating/resuming session:", error);
-    return res.status(500).json({ message: error.message || "Server error" });
+    res.status(500).json({ message: error.message || "Server error" });
   }
 };
 
-// 🎯 Get Active Session (current state)
-export const getActiveSession = async (req: Request, res: Response) => {
+export const getActiveSession = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = (req as any).user;
     const userId = user?._id;
@@ -83,7 +90,8 @@ export const getActiveSession = async (req: Request, res: Response) => {
     const session = await ActiveSession.findOne({ userId, isCompleted: false });
 
     if (!session) {
-      return res.status(404).json({ message: "No active session found" });
+      res.status(404).json({ message: "No active session found" });
+      return;
     }
 
     res.status(200).json({ session });
@@ -93,34 +101,22 @@ export const getActiveSession = async (req: Request, res: Response) => {
   }
 };
 
-export const updateSession = async (req: Request, res: Response) => {
+export const updateSession = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = (req as any).user;
     const userId = user?._id;
 
-    const {
-      currentQuestionIndex,
-      lifelines,
-      questionId,
-      isCorrect,
-    } = req.body;
+    const { currentQuestionIndex, lifelines, questionId, isCorrect } = req.body;
 
     const session = await ActiveSession.findOne({ userId, isCompleted: false });
     if (!session) {
-      return res.status(404).json({ message: "Active session not found" });
+      res.status(404).json({ message: "Active session not found" });
+      return;
     }
 
-    // 🔹 Update current question progress
-    if (currentQuestionIndex !== undefined) {
-      session.currentQuestionIndex = currentQuestionIndex;
-    }
+    if (currentQuestionIndex !== undefined) session.currentQuestionIndex = currentQuestionIndex;
+    if (lifelines) session.lifelines = lifelines;
 
-    // 🔹 Update lifelines
-    if (lifelines) {
-      session.lifelines = lifelines;
-    }
-
-    // 🔹 Update specific question status (optional)
     if (questionId) {
       const question = session.questions.find(
         (q: any) => q._id.toString() === questionId
@@ -131,7 +127,6 @@ export const updateSession = async (req: Request, res: Response) => {
       }
     }
 
-
     await session.save();
 
     res.status(200).json({
@@ -140,14 +135,11 @@ export const updateSession = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("Error in updateSession:", error);
-    res
-      .status(500)
-      .json({ message: error.message || "Internal Server Error" });
+    res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };
 
-// 🏁 Complete Session
-export const completeSession = async (req: Request, res: Response) => {
+export const completeSession = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = (req as any).user;
     const userId = user?._id;
@@ -159,7 +151,8 @@ export const completeSession = async (req: Request, res: Response) => {
     );
 
     if (!session) {
-      return res.status(404).json({ message: "No active session found" });
+      res.status(404).json({ message: "No active session found" });
+      return;
     }
 
     res.status(200).json({
