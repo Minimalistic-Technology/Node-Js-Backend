@@ -17,6 +17,7 @@ import userRoutes from '../KBC-Game/routes/userRoutes';
 import gameRoutes from '../KBC-Game/routes/gameRoutes';
 import AuthRoutes from "../KBC-Game/routes/authRoutes";
 import activeSessionRoutes from "../KBC-Game/routes/activeSessionRoutes";
+import gameresultRoutes from "../KBC-Game/routes/gameResultRoutes"
 
 export const app = express();
 app.use(express.json({ limit: "50mb" }));
@@ -52,8 +53,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/game", gameRoutes);
 app.use("/api/auth", AuthRoutes);
 app.use("/api/session", activeSessionRoutes);
-
-
+app.use("/api/score", gameresultRoutes);
 app.get("/test", async (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
