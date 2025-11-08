@@ -1,15 +1,18 @@
 import Question from "../models/Question";
 import { verifyMediaRefs } from "../userUtils/mediaValidator";
 import ImportJob from "../models/ImportJob";
-import csvParser from "csv-parse/sync";
+import { parse as parseCsv } from "csv-parse/sync";
 
-export async function importQuestionsFromJSON(rows: any[], jobId?: string) {
+export async function importQuestionsFromJSON(rows: any[], jobId?: string, bankId?: string) {
   const report: any[] = [];
   let successCount = 0;
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     try {
+      // ✅ attach bankId if not in row
+      if (!row.bankId && bankId) row.bankId = bankId;
+
       if (!row.bankId || !row.text) throw new Error("bankId and text required");
       if (!Array.isArray(row.options) || row.options.length !== 4)
         throw new Error("options must be array of 4");
@@ -48,7 +51,7 @@ export function parseInputData(fileBuffer: Buffer, mimetype: string) {
   if (mimetype.includes("json")) {
     return JSON.parse(fileBuffer.toString());
   } else if (mimetype.includes("csv")) {
-    const records = csvParser.parse(fileBuffer.toString(), {
+    const records = parseCsv(fileBuffer.toString(), {
       columns: true,
       skip_empty_lines: true,
     });

@@ -22,6 +22,7 @@ export interface IQuestionLite {
 
 export interface IGameResult extends Document {
   userId: mongoose.Types.ObjectId;
+  userName:string;
   gameConfigId: mongoose.Types.ObjectId;
   finalScore: number;           
   isWinner: boolean;
@@ -65,6 +66,7 @@ const QuestionLiteSchema = new Schema<IQuestionLite>(
 const GameResultSchema = new Schema<IGameResult>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "RegisteredUser", required: true },
+    userName:{ type: String  },
     gameConfigId: { type: Schema.Types.ObjectId, ref: "GameConfig", required: true },
 
     finalScore: { type: Number, required: true },

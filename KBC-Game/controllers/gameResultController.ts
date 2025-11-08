@@ -9,6 +9,11 @@ export const createGameResult = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const userId = user?._id;
+    const userF = user?.firstName;
+    const userL = user?.lastName;
+    const userName = `${userF} ${userL}`;
+
+
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     
@@ -69,6 +74,7 @@ export const createGameResult = async (req: Request, res: Response) => {
 
     const doc = await GameResult.create({
       userId,
+      userName,
       gameConfigId,
       finalScore,
       isWinner,
@@ -122,6 +128,7 @@ export const getScoresForGameConfig = async (req: Request, res: Response) => {
       GameResult.find(filter)
         .select({
           userId: 1,
+          userName: 1,
           finalScore: 1,
           isWinner: 1,
           totalTimeSeconds: 1,
