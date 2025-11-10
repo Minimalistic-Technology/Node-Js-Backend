@@ -55,16 +55,72 @@ export const createGameResult = async (req: Request, res: Response) => {
       : [];
 
 
-    const safeQuestions = questions.map((q: any) => ({
-      id: q.id,
-      bankId: q.bankId,
-      question: q.question ?? q.text,    
-      options: Array.isArray(q.options) ? q.options.map(String) : [],
-      status: q.status ?? undefined,
-      categories: Array.isArray(q.categories) ? q.categories : [],
-      answer: q.answer ?? null,
-      media: q.media ?? null,             
-    }));
+    // --- helpers ---
+    const toStringArray = (arr: any): string[] => {
+      if (!Array.isArray(arr)) return [];
+      // Accept either ["A","B"] or [{text:"A"},{text:"B"}]
+      return arr.map((v) => (typeof v === "string" ? v : (v?.text ?? String(v ?? ""))));
+    };
+
+    const normalizeLangPack = (pack: any) => {
+      if (!pack || typeof pack !== "object") return undefined;
+      return {
+        text: typeof pack.text === "string" ? pack.text : "",
+        options: toStringArray(pack.options),
+        categories: Array.isArray(pack.categories) ? pack.categories : [],
+      };
+    };
+
+    const pickId = (q: any) =>
+      q?.id ??
+      q?._id ??
+      (q?._id?.$oid ?? q?._id?.toString?.()) ??
+      (typeof q?._id === "string" ? q._id : undefined);
+
+    const pickBankId = (q: any) =>
+      q?.bankId ??
+      q?.bankID ??
+      (q?.bankId?.$oid ?? q?.bankId?.toString?.()) ??
+      (typeof q?.bankId === "string" ? q.bankId : undefined);
+
+    // --- NEW multilingual safeQuestions ---
+    const safeQuestions = questions.map((q: any) => {
+      const hasLangObject = q?.lang && typeof q.lang === "object";
+
+      // Build lang map for all provided languages (en/hi/gu/…)
+      const langObj: Record<string, { text: string; options: string[]; categories: string[] }> = {};
+      if (hasLangObject) {
+        for (const [k, v] of Object.entries(q.lang)) {
+          const normalized = normalizeLangPack(v);
+          if (normalized) langObj[k] = normalized;
+        }
+      } else {
+        // Backward-compat: old shape -> synthesize 'en'
+        langObj["en"] = {
+          text: q.question ?? q.text ?? "",
+          options: toStringArray(q.options),
+          categories: Array.isArray(q.categories) ? q.categories : [],
+        };
+      }
+
+      const correctIndex: number =
+        Number.isInteger(q?.correctIndex) && q.correctIndex >= 0 ? q.correctIndex : 0;
+
+      const media =
+        q?.media ??
+        (q?.mediaRef
+          ? { url: q.mediaRef.url, type: q.mediaRef.type, public_id: q.mediaRef.public_id }
+          : null);
+
+      return {
+        id: String(pickId(q) ?? ""),
+        bankId: String(pickBankId(q) ?? ""),
+        lang: langObj,        // <-- full multilingual content
+        correctIndex,         // <-- single truth for the correct option
+        status: q?.status ?? undefined,
+        media: media ?? null, // <-- { url, type, public_id? } or null
+      };
+    });
 
     const totalQuestions = safeQuestions.length;
     const finalScore =

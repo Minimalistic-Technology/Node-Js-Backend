@@ -1,47 +1,175 @@
+
 import { Request, Response } from "express";
 import cloudinary from "../userUtils/cloudinaryClient";
 import Question from "../models/Question";
 import { importQuestionsFromJSON } from "../userUtils/importQuestions";
 import stream from "stream";
+
+/* ------------------------- Utils ------------------------- */
+
+const parseMaybeJSON = <T = any>(v: any): T => {
+  if (v == null) return v as T;
+  if (typeof v === "string") {
+    try { return JSON.parse(v); } catch { return v as T; }
+  }
+  return v as T;
+};
+
+type LangKey = "en" | "hi" | "gu";
+const LANG_KEYS: LangKey[] = ["en", "hi", "gu"];
+
+type LooseLangBlock = {
+  text?: any;
+  options?: any;
+  categories?: any;
+};
+
+/** Only materialize a language block if it has meaningful content */
+const normalizeLangBlock = (block?: LooseLangBlock) => {
+  if (!block) return undefined;
+
+  const text =
+    typeof block.text === "string"
+      ? block.text
+      : block.text?.toString?.() ?? "";
+
+  let options = parseMaybeJSON(block.options);
+  let categories = parseMaybeJSON(block.categories);
+
+  if (Array.isArray(options)) {
+    options = options.slice(0, 4); // ensure max 4
+  } else {
+    options = undefined;
+  }
+
+  if (!Array.isArray(categories)) {
+    categories = [];
+  }
+
+  const hasContent =
+    (text?.trim()?.length ?? 0) > 0 ||
+    (Array.isArray(options) && options.length > 0) ||
+    (Array.isArray(categories) && categories.length > 0);
+
+  if (!hasContent) return undefined;
+
+  return { text, options, categories };
+};
+
+/** Map legacy top-level {text, options, categories} to lang.en if no lang object */
+const coerceLegacyToLang = (data: any) => {
+  const hasNew = data.lang && typeof data.lang === "object";
+  if (hasNew) return data;
+
+  const text = data.text;
+  let options = parseMaybeJSON(data.options);
+  let categories = parseMaybeJSON(data.categories);
+  if (!Array.isArray(categories)) categories = categories ? [String(categories)] : [];
+  return {
+    ...data,
+    lang: {
+      en: { text, options, categories }
+    }
+  };
+};
+
+/** Validate that each present language (en required) has exactly 4 options */
+const ensureOptionsCounts = (lang: any) => {
+  if (!lang?.en) throw new Error("lang.en is required.");
+  const check = (b?: any) => !b || (Array.isArray(b.options) && b.options.length === 4);
+  if (!check(lang.en)) throw new Error("lang.en must have exactly 4 options.");
+  if (!check(lang.hi)) throw new Error("lang.hi must have exactly 4 options when provided.");
+  if (!check(lang.gu)) throw new Error("lang.gu must have exactly 4 options when provided.");
+};
+
+/** Build $or filter for q across existing language texts */
+const buildTextSearch = (q: string) => {
+  const regex = { $regex: q, $options: "i" };
+  return {
+    $or: [
+      { "lang.en.text": regex },
+      { "lang.hi.text": regex },
+      { "lang.gu.text": regex },
+    ]
+  };
+};
+
+/** Parse JSON-like fields from multipart/form-data */
+const parseIncomingJsonFields = (data: any) => {
+  if (typeof data.lang === "string") {
+    try { data.lang = JSON.parse(data.lang); } catch {}
+  }
+  if (typeof data.correctIndex === "string") {
+    data.correctIndex = parseInt(data.correctIndex, 10);
+  }
+  if (typeof data.options === "string") {
+    try { data.options = JSON.parse(data.options); } catch {}
+  }
+  if (typeof data.categories === "string") {
+    try { data.categories = JSON.parse(data.categories); } catch {}
+  }
+  return data;
+};
+
+/** Cloudinary single upload from req.file -> mediaRef */
+const uploadSingleToCloudinary = async (file?: Express.Multer.File) => {
+  if (!file) return undefined;
+  const result: any = await new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "auto",
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+      },
+      (error, result) => (error ? reject(error) : resolve(result))
+    );
+    const bufferStream = new stream.PassThrough();
+    bufferStream.end(file.buffer);
+    bufferStream.pipe(uploadStream);
+  });
+
+  return {
+    public_id: result.public_id,
+    url: result.secure_url,
+    type: result.resource_type,
+    format: result.format,
+  };
+};
+
+/* ------------------------- Controllers ------------------------- */
+
 export const createQuestion = async (req: Request, res: Response) => {
   try {
-    const data = req.body;
+    let data: any = req.body || {};
 
-    // Parse stringified arrays
-    if (typeof data.options === "string") data.options = JSON.parse(data.options);
-    if (typeof data.categories === "string") data.categories = JSON.parse(data.categories);
+    // 1) parse JSON-like fields first
+    data = parseIncomingJsonFields(data);
 
-    // Handle media upload (single file)
-    if (req.file) {
-      const result: any = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            resource_type: "auto",
-            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-            api_key: process.env.CLOUDINARY_API_KEY,
-            api_secret: process.env.CLOUDINARY_API_SECRET,
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
+    // 2) accept legacy top-level fields if lang absent
+    data = coerceLegacyToLang(data);
 
-        const bufferStream = new stream.PassThrough();
-        bufferStream.end(req.file?.buffer);
-        bufferStream.pipe(uploadStream);
-      });
-
-      // Assign mediaRef object
-      data.mediaRef = {
-        public_id: result.public_id,
-        url: result.secure_url,
-        type: result.resource_type,
-        format: result.format,
-      };
+    // 3) normalize language blocks
+    const incomingLang = data.lang || {};
+    const normalizedLang: any = {};
+    for (const k of LANG_KEYS) {
+      normalizedLang[k] = normalizeLangBlock(incomingLang[k]);
     }
 
-    // Save question to DB
+    // 4) Ensure en exists, remove empty optional blocks
+    if (!normalizedLang.en) throw new Error("English (lang.en) is required.");
+    if (!normalizedLang.hi) delete normalizedLang.hi;
+    if (!normalizedLang.gu) delete normalizedLang.gu;
+
+    // 5) media (optional)
+    const mediaRef = await uploadSingleToCloudinary(req.file);
+    if (mediaRef) data.mediaRef = mediaRef;
+
+    // 6) attach lang + validate
+    data.lang = normalizedLang;
+    ensureOptionsCounts(data.lang);
+
+    // 7) persist
     const question = await Question.create({
       ...data,
       createdBy: (req as any).admin?._id || "admin",
@@ -54,42 +182,38 @@ export const createQuestion = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getQuestions = async (req: Request, res: Response): Promise<void> => {
-  const { bankId, status, q } = req.query;
-  const filter: any = { deleted: false };
-  if (bankId) filter.bankId = bankId;
-  if (status) filter.status = status;
-  if (q) filter.text = { $regex: q, $options: "i" };
+  try {
+    const { bankId, status, q } = req.query;
+    const filter: any = { deleted: false };
+    if (bankId) filter.bankId = bankId;
+    if (status) filter.status = status;
 
-  const questions = await Question.find(filter).sort({ createdAt: -1 });
-  res.json(questions);
+    if (q && typeof q === "string" && q.trim()) {
+      Object.assign(filter, buildTextSearch(q.trim()));
+    }
+
+    const questions = await Question.find(filter).sort({ createdAt: -1 });
+    res.json(questions);
+  } catch (err: any) {
+    console.error("Error in getQuestions:", err);
+    res.status(500).json({ error: err.message || "Something went wrong" });
+  }
 };
-
-// export const createQuestion = async (req: Request, res: Response): Promise<void> => {
-//   const data = req.body;
-//   const { missing } = await verifyMediaRefs(data.mediaRefs || []);
-//   if (missing.length > 0) res.status(400).json({ error: `Missing media refs: ${missing.join(", ")}` });
-
-//   const question = await Question.create({
-//     ...data, 
-//     createdBy: (req as any).admin?._id || "admin",
-//   });
-//   res.status(201).json(question);
-// };
-
-
 
 export const getQuestionById = async (req: Request, res: Response): Promise<void> => {
-  const question = await Question.findById(req.params.id);
-  if (!question || question.deleted) {
-    res.status(404).json({ error: "Question not found" });
-    return;
+  try {
+    const question = await Question.findById(req.params.id);
+    if (!question || question.deleted) {
+      res.status(404).json({ error: "Question not found" });
+      return;
+    }
+    res.json(question);
+  } catch (err: any) {
+    console.error("Error in getQuestionById:", err);
+    res.status(500).json({ error: err.message || "Something went wrong" });
   }
-  res.json(question);
 };
-
-
 
 export const updateQuestion = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -99,51 +223,50 @@ export const updateQuestion = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // Push old version to versions array
-    existing.versions.push({
+    // versioning snapshot
+    (existing as any).versions.push({
       snapshot: existing.toObject(),
       editedBy: (req as any).admin?._id || "admin",
       editedAt: new Date(),
     });
 
-    // Parse stringified arrays if needed
-    const data = req.body;
-    if (typeof data.categories === "string") data.categories = JSON.parse(data.categories);
-    if (typeof data.options === "string") data.options = JSON.parse(data.options);
-    if (typeof data.correctIndex === "string") data.correctIndex = parseInt(data.correctIndex, 10);
+    // 1) parse JSON-like fields
+    const raw: any = parseIncomingJsonFields(req.body || {});
 
-    // Handle media upload if a new file is sent
-    if (req.file) {
-      const result: any = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-         {
-            resource_type: "auto",
-            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-            api_key: process.env.CLOUDINARY_API_KEY,
-            api_secret: process.env.CLOUDINARY_API_SECRET,
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
+    // 2) legacy -> lang.en if needed
+    const merged = coerceLegacyToLang({ ...raw });
+
+    // 3) prepare next lang (merge with existing)
+    const nextLang: any =
+      (existing as any).lang?.toObject?.() ||
+      (existing as any).lang ||
+      {};
+
+    if (merged.lang) {
+      for (const k of LANG_KEYS) {
+        if (merged.lang[k] !== undefined) {
+          const normalized = normalizeLangBlock(merged.lang[k]);
+          if (normalized) {
+            nextLang[k] = { ...(nextLang[k] || {}), ...normalized };
+          } else if (k !== "en") {
+            // allow clearing optional langs by sending "empty" block
+            delete nextLang[k];
           }
-        );
-
-        const bufferStream = new stream.PassThrough();
-        bufferStream.end(req.file?.buffer);
-        bufferStream.pipe(uploadStream);
-      });
-
-      // Save single mediaRef
-       data.mediaRef = {
-        public_id: result.public_id,
-        url: result.secure_url,
-        type: result.resource_type,
-        format: result.format,
-      };
+        }
+      }
     }
 
-    // Merge updates
-    Object.assign(existing, data);
+    // 4) media replacement (optional)
+    const mediaRef = await uploadSingleToCloudinary(req.file as any);
+    if (mediaRef) (merged as any).mediaRef = mediaRef;
+
+    // 5) apply lang + other fields
+    (existing as any).lang = nextLang;
+    const { lang: _discard, ...rest } = merged;
+    Object.assign(existing, rest);
+
+    // 6) validate languages & options
+    ensureOptionsCounts((existing as any).lang);
 
     await existing.save();
     res.json({ success: true, question: existing });
@@ -154,33 +277,17 @@ export const updateQuestion = async (req: Request, res: Response): Promise<void>
 };
 
 export const deleteQuestion = async (req: Request, res: Response): Promise<void> => {
-  const q = await Question.findById(req.params.id);
-  if (!q) {
-    res.status(404).json({ error: "Question not found" });
-    return;
+  try {
+    const q = await Question.findById(req.params.id);
+    if (!q) {
+      res.status(404).json({ error: "Question not found" });
+      return;
+    }
+    (q as any).deleted = true;
+    await q.save();
+    res.json({ message: "Question soft-deleted" });
+  } catch (err: any) {
+    console.error("Error in deleteQuestion:", err);
+    res.status(500).json({ error: err.message || "Something went wrong" });
   }
-  q.deleted = true;
-  await q.save();
-  res.json({ message: "Question soft-deleted" });
-};
-
-export const bulkImportQuestions = async (req: Request, res: Response): Promise<void> => {
-  const rows = req.body;
-  const report = await importQuestionsFromJSON(rows);
-  res.json(report);
-};
-
-export const previewQuestion = async (req: Request, res: Response): Promise<void> => {
-  const question = await Question.findById(req.params.id);
-  if (!question) {
-    res.status(404).json({ error: "Question not found" });
-    return;
-  }
-
-  const payload = {
-    text: question.text,
-    options: question.options.map((o) => o.text),
-    media: question.mediaRef,
-  };
-  res.json(payload);
 };
