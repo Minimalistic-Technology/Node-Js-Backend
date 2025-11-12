@@ -1,14 +1,6 @@
-import type { Request, Response } from "express";
-import ImportJob from "../models/ImportJob";
-import { importQuestionsFromJSON } from "../userUtils/importQuestions";
 import Question from "../models/Question";
 import QuestionBank from "../models/QuestionBank"; 
 import mongoose from "mongoose";
-import {
-  parseInputData,
-  normalizeRow,
-  IMPORT_MAX_ROWS,
-} from "../userUtils/importHelpers";
 
 import {
   buildExportRows,
@@ -20,47 +12,33 @@ import {
 type Status = "published" | "draft" | "all";
 type Format = "csv" | "excel" | "xlsx";
 
-
+import type { Request, Response } from "express";
+import ImportJob from "../models/ImportJob";
+import { IMPORT_MAX_ROWS, parseInputData, normalizeRow } from "../userUtils/importHelpers";
+import { importQuestionsFromJSON } from "../userUtils/importQuestions";
 
 export const importQuestions = async (req: Request, res: Response) => {
   try {
-    if (!req.file) {
-      res.status(400).json({ error: "File required" });
-      return;
-    }
-    const { bankId } = req.body as { bankId?: string };
-    if (!bankId) {
-      res.status(400).json({ error: "bankId required" });
-      return;
-    }
+    if (!req.file) return res.status(400).json({ error: "File required" });
 
-    // 1️⃣ Parse rows
-    const rawRows = parseInputData(
-      req.file.buffer,
-      req.file.mimetype,
-      req.file.originalname
-    ).filter((r: any) =>
-      Object.values(r).some((v) => String(v ?? "").trim() !== "")
-    );
+    // ✅ ONLY here (params/body), not from Excel
+    const bankId = (req.params.bankId as string) || (req.body.bankId as string);
+    if (!bankId) return res.status(400).json({ error: "bankId required (params or body)" });
+    if (!mongoose.isValidObjectId(bankId)) return res.status(400).json({ error: "Invalid bankId" });
 
-    // 2️⃣ Normalize to expected shape
+    const rawRows = parseInputData(req.file.buffer, req.file.mimetype, req.file.originalname)
+      .filter((r: any) => Object.values(r).some((v) => String(v ?? "").trim() !== ""));
+    if (rawRows.length === 0) return res.status(400).json({ error: "No data rows found" });
+
+    // Excel -> { lang:{en,hi?,gu?}, correctIndex, status }
     const rows = rawRows.map(normalizeRow);
 
-    // 3️⃣ Decide inline vs background
     if (rows.length > IMPORT_MAX_ROWS) {
-      const job = await ImportJob.create({
-        status: "processing",
-        totalRows: rows.length,
-        bankId,
-      });
-
-      importQuestionsFromJSON(rows, job._id.toString(), bankId);
-
-      res.json({ message: "Import started in background", jobId: job._id });
-      return;
+      const job = await ImportJob.create({ status: "processing", totalRows: rows.length, bankId });
+      importQuestionsFromJSON(rows, job._id.toString(), bankId); // fire-and-forget
+      return res.json({ message: "Import started in background", jobId: job._id });
     }
 
-    // Small imports run inline
     const report = await importQuestionsFromJSON(rows, undefined, bankId);
     res.json({ report });
   } catch (err: any) {
@@ -68,8 +46,6 @@ export const importQuestions = async (req: Request, res: Response) => {
     res.status(500).json({ error: err.message ?? "Import failed" });
   }
 };
-
-
 
 export const exportQuestions = async (req: Request, res: Response) => {
   try {
@@ -85,51 +61,38 @@ export const exportQuestions = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid format (csv, xlsx, json allowed)" });
     }
 
-    // 🔍 Common filter for question status
     const statusFilter: any = status !== "all" ? { status } : {};
 
     let questions: any[] = [];
     let filenamePrefix = "";
 
-    // 🏦 Case 1: ALL banks
+    // ALL banks
     if (bankId === "all") {
       const banks = await QuestionBank.find({ enabled: true }).select({ _id: 1, name: 1 }).lean();
 
-      // Fetch questions for all banks
       const all = await Question.find({
         deleted: { $ne: true },
         ...statusFilter,
       })
         .select({
           bankId: 1,
-          text: 1,
-          options: 1,
+          lang: 1,
           correctIndex: 1,
-          categories: 1,
           status: 1,
         })
         .lean();
 
-      // Map bank names into each question for export clarity
       const bankNameMap = new Map(banks.map((b) => [b._id.toString(), b.name]));
-      questions = all.map((q) => ({
-        ...q,
-        bankName: bankNameMap.get(q.bankId.toString()) || "Unknown Bank",
-      }));
+      questions = all.map((q) => ({ ...q, bankName: bankNameMap.get(String(q.bankId)) || "Unknown" }));
 
       filenamePrefix = "all_banks";
-    }
-    // 🏦 Case 2: Single bank
-    else {
+    } else {
+      // Single bank
       if (!mongoose.isValidObjectId(bankId)) {
         return res.status(400).json({ error: "Invalid bankId" });
       }
 
-      const bank = await QuestionBank.findById(bankId)
-        .select({ name: 1 })
-        .lean()
-        .catch(() => null);
-
+      const bank = await QuestionBank.findById(bankId).select({ name: 1 }).lean().catch(() => null);
       const bankName = bank?.name || `bank_${bankId.slice(-6)}`;
 
       questions = await Question.find({
@@ -138,24 +101,22 @@ export const exportQuestions = async (req: Request, res: Response) => {
         ...statusFilter,
       })
         .select({
-          text: 1,
-          options: 1,
+          lang: 1,
           correctIndex: 1,
-          categories: 1,
           status: 1,
         })
         .lean();
 
-      // Add bank name for consistency
+      // attach consistent bankName for downstream
       questions = questions.map((q) => ({ ...q, bankName }));
       filenamePrefix = bankName;
     }
 
-    // 🧩 Build rows (add bank column)
-    const rows = buildExportRows(questions, true); // true = include Bank column
+    // Build rows (include Bank column if exporting multiple banks)
+    const includeBank = bankId === "all";
+    const rows = buildExportRows(questions, includeBank);
     const baseName = sanitizeFilename(`${filenamePrefix}_${status}_questions`);
 
-    // 🧾 Handle formats
     if (format === "json") {
       res
         .setHeader("Content-Type", "application/json")
@@ -167,10 +128,7 @@ export const exportQuestions = async (req: Request, res: Response) => {
     if (format === "xlsx" || format === "excel") {
       const buf = rowsToXlsxBuffer(rows, "Questions");
       res
-        .setHeader(
-          "Content-Type",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+        .setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         .setHeader("Content-Disposition", `attachment; filename="${baseName}.xlsx"`)
         .send(buf);
     } else {
