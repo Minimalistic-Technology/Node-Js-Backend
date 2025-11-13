@@ -200,24 +200,26 @@ export const createUserrec = async (req: Request, res: Response): Promise<void> 
   }
 
   try {
-
     const { uid, name, email, role, address, contact, dateOfJoin } = req.body;
 
-    // Check if user already exists
-    const existingUser = await AuthUserModel.findOne({ uid });
+    // ✅ Check if UID or email already exists
+    const existingUser = await AuthUserModel.findOne({
+      $or: [{ uid }, { email }]
+    });
+
     if (existingUser) {
-      res.status(400).json({ message: "User already exists" });
+      res.status(400).json({ message: "User with this UID or email already exists" });
       return;
     }
 
     const newUser = new AuthUserModel({
       uid,
-      name: name, // map name to username
+      name,
       email,
-      role: role || "User", // default role
+      role: role || "User",
       address,
       contact,
-      doj: dateOfJoin ? new Date(dateOfJoin) : new Date(), // default today
+      dateOfJoin: dateOfJoin ? new Date(dateOfJoin) : new Date(),
     });
 
     await newUser.save();
@@ -228,6 +230,7 @@ export const createUserrec = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ message: error.message });
   }
 };
+
 
 export const getUserByUid = async (req: Request, res: Response): Promise<void> => {
   try {
