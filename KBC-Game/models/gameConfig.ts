@@ -1,11 +1,14 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document , Types } from 'mongoose';
 
 interface IMediaAsset {
+  public_id: string;
   url: string;
-  fileName: string;
+  type: string;
+  format: string;
 }
 
 interface IPrizeLevel {
+    _id?: Types.ObjectId;      
   level: number;
   type: 'money' | 'gift';
   value: number | string;
@@ -29,14 +32,16 @@ export interface IGameConfig extends Document {
 }
 
 const MediaAssetSchema = new Schema({
+  public_id: { type: String, required: true },
   url: { type: String, required: true },
-  fileName: { type: String, required: true },
+  type: { type: String, required: true },
+  format: { type: String, required: true },
 });
 
 const PrizeLevelSchema = new Schema({
   level: { type: Number, required: true },
   type: { type: String, enum: ['money', 'gift'], required: true },
-  value: { type: Schema.Types.Mixed, required: true },
+  value: { type: Schema.Types.Mixed, required: true},
   isSafe: { type: Boolean, default: false },
   media: { type: MediaAssetSchema, required: false },
 });
@@ -54,8 +59,8 @@ const GameConfigSchema = new Schema<IGameConfig>({
   selectedBanks: [{ type: String, required: true }],
   prizeLadder: [PrizeLevelSchema],
   lifelines: { type: (LifelineSchema as any), required: true },
-}, { 
-  timestamps: true 
+}, {
+  timestamps: true
 });
 
 export default mongoose.model<IGameConfig>('GameConfig', GameConfigSchema);

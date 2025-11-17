@@ -2,7 +2,6 @@
 import { Request, Response } from "express";
 import cloudinary from "../userUtils/cloudinaryClient";
 import Question from "../models/Question";
-import { importQuestionsFromJSON } from "../userUtils/importQuestions";
 import stream from "stream";
 
 /* ------------------------- Utils ------------------------- */

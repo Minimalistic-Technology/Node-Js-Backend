@@ -133,6 +133,7 @@ export const createGameResult = async (req: Request, res: Response) => {
       userName,
       gameConfigId,
       finalScore,
+      correctAnswered,
       isWinner,
       totalTimeSeconds,
       lifelinesUsed: lifelinesUsedFinal,
@@ -188,6 +189,7 @@ export const getScoresForGameConfig = async (req: Request, res: Response) => {
           finalScore: 1,
           isWinner: 1,
           totalTimeSeconds: 1,
+          correctAnswered:1,
           createdAt: 1,
           questions: 1 ,
         })
@@ -210,6 +212,72 @@ export const getScoresForGameConfig = async (req: Request, res: Response) => {
     console.error("[getScoresForGameConfig] Error:", err);
     return res.status(500).json({
       message: "Failed to fetch scores",
+      error: err?.message,
+    });
+  }
+};
+
+export const userGameResult = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const user = (req as any).user;
+    const userId = user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: user not found" });
+    }
+
+    const { gameConfigId } = req.body as { gameConfigId?: string };
+
+    if (!gameConfigId) {
+      return res.status(400).json({ message: "gameConfigId is required" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(gameConfigId)) {
+      return res.status(400).json({ message: "Invalid gameConfigId" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    // Filter by gameConfigId + current user
+    const filter = {
+      gameConfigId: new mongoose.Types.ObjectId(gameConfigId),
+      userId: new mongoose.Types.ObjectId(userId),
+    };
+
+    // Fetch single result (latest one if somehow multiple exist)
+    const result = await GameResult.findOne(filter)
+      .select({
+        userId: 1,
+        userName: 1,
+        finalScore: 1,
+        isWinner: 1,
+        totalTimeSeconds: 1,
+        correctAnswered: 1,
+        createdAt: 1,
+        questions: 1,
+        prizeLadder:1,
+      })
+      .sort({ createdAt: -1 }) // optional, ensures newest if duplicates
+      .lean();
+
+    if (!result) {
+      return res.status(404).json({
+        message: "No game result found for this user and game configuration",
+      });
+    }
+
+    return res.status(200).json({
+      result,
+    });
+  } catch (err: any) {
+    console.error("[userGameResult] Error:", err);
+    return res.status(500).json({
+      message: "Failed to fetch score for current user",
       error: err?.message,
     });
   }

@@ -6,6 +6,7 @@ interface IPrizeLevel {
   type: "money" | "gift";
   value: number | string;
   isSafe: boolean;
+  media?: { public_id?: string; url?: string; type?: string; format?: string } | null;
 }
 
 interface ILangPack {
@@ -31,6 +32,7 @@ export interface IGameResult extends Document {
   gameConfigId: mongoose.Types.ObjectId;
   finalScore: number;
   isWinner: boolean;
+  correctAnswered:number;
   prizeLadder: IPrizeLevel[];
   totalTimeSeconds?: number;
   lifelinesUsed: string[];
@@ -39,22 +41,23 @@ export interface IGameResult extends Document {
   updatedAt: Date;
 }
 
-const PrizeLadderSchema = new Schema<IPrizeLevel>(
-  {
-    level: { type: Number, required: true },
-    type: { type: String, enum: ["money", "gift"], required: true },
-    value: { type: Schema.Types.Mixed, required: true },
-    isSafe: { type: Boolean, required: true },
-  },
-  { _id: false }
-);
-
 const MediaSchema = new Schema(
   {
     public_id: { type: String },
     url: { type: String },
     type: { type: String },
     format: { type: String },
+  },
+  { _id: false }
+);
+
+const PrizeLadderSchema = new Schema<IPrizeLevel>(
+  {
+    level: { type: Number, required: true },
+    type: { type: String, enum: ["money", "gift"], required: true },
+    value: { type: Schema.Types.Mixed, required: true },
+    isSafe: { type: Boolean, required: true },
+    media: { type: MediaSchema, required: false, default: null },
   },
   { _id: false }
 );
@@ -117,11 +120,10 @@ const GameResultSchema = new Schema<IGameResult>(
     userId: { type: Schema.Types.ObjectId, ref: "RegisteredUser", required: true },
     userName: { type: String },
     gameConfigId: { type: Schema.Types.ObjectId, ref: "GameConfig", required: true },
-
+    correctAnswered:{ type: Number, required: true },
     finalScore: { type: Number, required: true },
     isWinner: { type: Boolean, required: true },
     totalTimeSeconds: { type: Number },
-
     lifelinesUsed: { type: [String], default: [] },
     prizeLadder: { type: [PrizeLadderSchema], default: [] },
     questions: { type: [QuestionLiteSchema], required: true, default: [] },

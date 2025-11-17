@@ -1,13 +1,14 @@
 import express from "express";
 import { requireUserAuth } from "../middlewares/userAuthMiddleware";
 import { createGameResult,
-         getScoresForGameConfig,      
+         getScoresForGameConfig,    
+         userGameResult,  
  } from "../controllers/gameResultController";
 
 const router = express.Router();
 
 router.post("/create", requireUserAuth, createGameResult);
 router.get("/get", requireUserAuth, getScoresForGameConfig);
-
+router.post("/user/result", requireUserAuth, userGameResult);
 
 export default router;

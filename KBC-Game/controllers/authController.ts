@@ -25,7 +25,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign({ id: user._id , role: "user"}, JWT_SECRET, { expiresIn: "1d" });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -70,5 +70,20 @@ export const getUserProfile = async (req: Request, res: Response): Promise<void>
     res.status(200).json(user);
   } catch (error) {
     res.status(401).json({ message: "Invalid or expired token", error });
+  }
+};
+
+export const logoutUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Clear the token cookie
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
 };
