@@ -150,20 +150,81 @@ export const updateGameConfig = async (req: Request, res: Response) => {
  * @desc    Delete a game config by ID
  * @route   DELETE /api/v1/game-config/:id
  */
+
+/** Helper: delete a single asset from Cloudinary */
+
+const deleteFromCloudinary = (publicId: string, type: string = "image"): Promise<any> => {
+  return new Promise((resolve, reject) => {
+
+    cloudinary.uploader.destroy(
+      publicId,
+      {
+        resource_type: type,
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+        invalidate: true,
+      } as any,
+      (error, result) => {
+        console.log("Cloudinary destroy response (GameConfig):", {
+          publicId,
+          type,
+          error,
+          result,
+        });
+
+        if (error) {
+          console.error(" Cloudinary delete FAILED:", publicId, error);
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      }
+    );
+  });
+};
+
 export const deleteGameConfig = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const deletedConfig = await GameConfig.findByIdAndDelete(id);
 
-    if (!deletedConfig) {
-      res.status(4404).json({ message: 'Configuration not found' });
+    const config = await GameConfig.findById(id);
+
+    if (!config) {
+      res.status(404).json({ message: "Configuration not found" });
       return;
     }
 
-    res.status(200).json({ message: 'Configuration deleted successfully' });
+    // prizeLadder is an ARRAY in your data
+    const prizeLadder: any[] = (config as any).prizeLadder || [];
+
+    const deletions: Promise<any>[] = [];
+
+    if (Array.isArray(prizeLadder)) {
+      for (const level of prizeLadder) {
+        // your sample: level.media.public_id
+        if (level?.media?.public_id) {
+          const publicId = level.media.public_id;
+          const type = level.media.type || "image";
+
+          
+          deletions.push(deleteFromCloudinary(publicId, type));
+        }
+      }
+    }
+
+    if (deletions.length > 0) {
+      await Promise.allSettled(deletions);
+    } else {
+      console.log("ℹ️ No media found in prizeLadder to delete.");
+    }
+
+    await GameConfig.deleteOne({ _id: id });
+
+    res.status(200).json({ message: "Configuration deleted successfully" });
   } catch (error) {
-    console.error('Error deleting game config:', error);
-    res.status(500).json({ message: 'An internal server error occurred.' });
+    console.error("Error deleting game config:", error);
+    res.status(500).json({ message: "An internal server error occurred." });
   }
 };
 

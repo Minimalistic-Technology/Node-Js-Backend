@@ -8,7 +8,6 @@ export interface IQuestionBank extends Document {
   ageGroup?: string;
   defaultTimer: number;
   bankImage?: string; 
-  position: number;
   label: string;
   enabled: boolean;
   published: boolean;
@@ -26,7 +25,6 @@ const QuestionBankSchema = new Schema<IQuestionBank>(
     ageGroup: { type: String, enum: ["child", "teen", "adult"] },
     defaultTimer: { type: Number, default: 30 },
     bankImage: { type: String },
-    position: { type: Number, unique: true },
     label: { type: String },
     enabled: { type: Boolean, default: true },
     published: { type: Boolean, default: false },

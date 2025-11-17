@@ -96,16 +96,16 @@ const buildTextSearch = (q: string) => {
 /** Parse JSON-like fields from multipart/form-data */
 const parseIncomingJsonFields = (data: any) => {
   if (typeof data.lang === "string") {
-    try { data.lang = JSON.parse(data.lang); } catch {}
+    try { data.lang = JSON.parse(data.lang); } catch { }
   }
   if (typeof data.correctIndex === "string") {
     data.correctIndex = parseInt(data.correctIndex, 10);
   }
   if (typeof data.options === "string") {
-    try { data.options = JSON.parse(data.options); } catch {}
+    try { data.options = JSON.parse(data.options); } catch { }
   }
   if (typeof data.categories === "string") {
-    try { data.categories = JSON.parse(data.categories); } catch {}
+    try { data.categories = JSON.parse(data.categories); } catch { }
   }
   return data;
 };
@@ -275,18 +275,74 @@ export const updateQuestion = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const deleteQuestion = async (req: Request, res: Response): Promise<void> => {
+// export const deleteQuestion = async (req: Request, res: Response): Promise<void> => {
+//   try {
+//     const q = await Question.findById(req.params.id);
+//     if (!q) {
+//       res.status(404).json({ error: "Question not found" });
+//       return;
+//     }
+//     (q as any).deleted = true;
+//     await q.save();
+//     res.json({ message: "Question soft-deleted" });
+//   } catch (err: any) {
+//     console.error("Error in deleteQuestion:", err);
+//     res.status(500).json({ error: err.message || "Something went wrong" });
+//   }
+// };
+
+const deleteFromCloudinary = (publicId: string, type: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(
+      publicId,
+      {
+        resource_type: type,
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+      } as any,
+      (error, result) => {
+        console.log("🔥 Cloudinary destroy response:", {
+          publicId,
+          type,
+          error,
+          result,
+        });
+
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+  });
+};
+
+export const deleteQuestion = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const q = await Question.findById(req.params.id);
     if (!q) {
       res.status(404).json({ error: "Question not found" });
       return;
     }
-    (q as any).deleted = true;
-    await q.save();
-    res.json({ message: "Question soft-deleted" });
+
+    if (q.mediaRef?.public_id) {
+      try {
+        await deleteFromCloudinary(q.mediaRef.public_id , q.mediaRef.type);
+      } catch (cloudErr) {
+        console.error("Cloudinary delete failed:", cloudErr);
+        // return res.status(500).json({ error: "Failed to delete media" });
+      }
+    }
+
+    await Question.deleteOne({ _id: q._id });
+
+    res.json({ message: "Question permanently deleted" });
   } catch (err: any) {
-    console.error("Error in deleteQuestion:", err);
-    res.status(500).json({ error: err.message || "Something went wrong" });
+    console.error("Error in deleteQuestion (hard delete):", err);
+    res
+      .status(500)
+      .json({ error: err.message || "Something went wrong" });
   }
 };
