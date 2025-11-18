@@ -63,4 +63,8 @@ const GameConfigSchema = new Schema<IGameConfig>({
   timestamps: true
 });
 
-export default mongoose.model<IGameConfig>('GameConfig', GameConfigSchema);
+const GameConfig =
+  (mongoose.models.GameConfig as mongoose.Model<IGameConfig>) ||
+  mongoose.model<IGameConfig>('GameConfig', GameConfigSchema);
+
+export default GameConfig;

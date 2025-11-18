@@ -136,6 +136,31 @@ const uploadSingleToCloudinary = async (file?: Express.Multer.File) => {
   };
 };
 
+const deleteFromCloudinary = (publicId: string, type: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(
+      publicId,
+      {
+        resource_type: type,
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+      } as any,
+      (error, result) => {
+        console.log(" Cloudinary destroy response:", {
+          publicId,
+          type,
+          error,
+          result,
+        });
+
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+  });
+};
+
 /* ------------------------- Controllers ------------------------- */
 
 export const createQuestion = async (req: Request, res: Response) => {
@@ -214,6 +239,7 @@ export const getQuestionById = async (req: Request, res: Response): Promise<void
   }
 };
 
+
 export const updateQuestion = async (req: Request, res: Response): Promise<void> => {
   try {
     const existing = await Question.findById(req.params.id);
@@ -222,20 +248,16 @@ export const updateQuestion = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // versioning snapshot
     (existing as any).versions.push({
       snapshot: existing.toObject(),
       editedBy: (req as any).admin?._id || "admin",
       editedAt: new Date(),
     });
 
-    // 1) parse JSON-like fields
     const raw: any = parseIncomingJsonFields(req.body || {});
 
-    // 2) legacy -> lang.en if needed
     const merged = coerceLegacyToLang({ ...raw });
 
-    // 3) prepare next lang (merge with existing)
     const nextLang: any =
       (existing as any).lang?.toObject?.() ||
       (existing as any).lang ||
@@ -248,23 +270,31 @@ export const updateQuestion = async (req: Request, res: Response): Promise<void>
           if (normalized) {
             nextLang[k] = { ...(nextLang[k] || {}), ...normalized };
           } else if (k !== "en") {
-            // allow clearing optional langs by sending "empty" block
             delete nextLang[k];
           }
         }
       }
     }
 
-    // 4) media replacement (optional)
-    const mediaRef = await uploadSingleToCloudinary(req.file as any);
-    if (mediaRef) (merged as any).mediaRef = mediaRef;
+    if (req.file) {
+      const oldMediaRef = (existing as any).mediaRef;
+      if (oldMediaRef?.public_id) {
+        try {
+          await deleteFromCloudinary(oldMediaRef.public_id, oldMediaRef.type || "image");
+        } catch (delErr) {
+          console.error("Error deleting old question media:", delErr);
+        }
+      }
+      const mediaRef = await uploadSingleToCloudinary(req.file as any);
+      if (mediaRef) {
+        (merged as any).mediaRef = mediaRef;
+      }
+    }
 
-    // 5) apply lang + other fields
     (existing as any).lang = nextLang;
     const { lang: _discard, ...rest } = merged;
     Object.assign(existing, rest);
 
-    // 6) validate languages & options
     ensureOptionsCounts((existing as any).lang);
 
     await existing.save();
@@ -275,46 +305,7 @@ export const updateQuestion = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// export const deleteQuestion = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     const q = await Question.findById(req.params.id);
-//     if (!q) {
-//       res.status(404).json({ error: "Question not found" });
-//       return;
-//     }
-//     (q as any).deleted = true;
-//     await q.save();
-//     res.json({ message: "Question soft-deleted" });
-//   } catch (err: any) {
-//     console.error("Error in deleteQuestion:", err);
-//     res.status(500).json({ error: err.message || "Something went wrong" });
-//   }
-// };
 
-const deleteFromCloudinary = (publicId: string, type: string): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader.destroy(
-      publicId,
-      {
-        resource_type: type,
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET,
-      } as any,
-      (error, result) => {
-        console.log("🔥 Cloudinary destroy response:", {
-          publicId,
-          type,
-          error,
-          result,
-        });
-
-        if (error) reject(error);
-        else resolve(result);
-      }
-    );
-  });
-};
 
 export const deleteQuestion = async (
   req: Request,
@@ -332,7 +323,6 @@ export const deleteQuestion = async (
         await deleteFromCloudinary(q.mediaRef.public_id , q.mediaRef.type);
       } catch (cloudErr) {
         console.error("Cloudinary delete failed:", cloudErr);
-        // return res.status(500).json({ error: "Failed to delete media" });
       }
     }
 

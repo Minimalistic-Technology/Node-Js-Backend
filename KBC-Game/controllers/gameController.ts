@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Question from "../models/Question";
 import QuestionBank from "../models/QuestionBank";
 import GameResult from "../models/GameResult";
-import GameConfig from "../models/GameConfig";
+import GameConfig from "../models/gameConfig";
 import mongoose from "mongoose";
 
 export const getGameConfig = async (req: Request, res: Response): Promise<void> => {

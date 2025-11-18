@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { gameConfigSchema, updateGameConfigSchema } from '../validation/gameConfigValidation';
-import GameConfig from '../models/GameConfig';
+import GameConfig from '../models/gameConfig';
+import { IGameConfig } from '../models/gameConfig';
 import cloudinary from "../userUtils/cloudinaryClient";
 import stream from "stream";
 
@@ -112,6 +113,7 @@ export const getGameConfigById = async (req: Request, res: Response) => {
  * @desc    Update a game config by ID
  * @route   PUT /api/v1/game-config/:id
  */
+
 export const updateGameConfig = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -145,6 +147,8 @@ export const updateGameConfig = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'An internal server error occurred.' });
   }
 };
+
+
 
 /**
  * @desc    Delete a game config by ID
@@ -234,6 +238,7 @@ export const deleteGameConfig = async (req: Request, res: Response) => {
  * @access  Admin (or whatever you use)
  */
 
+
 export const updatePrizeLadderMedia = async (req: Request, res: Response) => {
   try {
     const { configId, prizeLadderId, giftDesc } = req.body;
@@ -250,16 +255,29 @@ export const updatePrizeLadderMedia = async (req: Request, res: Response) => {
       });
     }
 
-    // 1) Upload to Cloudinary
-    const media = await uploadSingleToCloudinary(req.file);
+    const existingConfig = await GameConfig.findOne(
+      { _id: configId, "prizeLadder._id": prizeLadderId },
+      { "prizeLadder.$": 1 } // only bring the matched prize level
+    ).lean();
 
+    if (!existingConfig || !existingConfig.prizeLadder?.length) {
+      return res.status(404).json({
+        message: "GameConfig or prize level not found",
+      });
+    }
+
+    const oldPrizeLevel: any = existingConfig.prizeLadder[0];
+    const oldMedia = oldPrizeLevel.media;
+    const oldPublicId = oldMedia?.public_id;
+    const oldType = oldMedia?.type || "image";
+
+    const media = await uploadSingleToCloudinary(req.file);
     if (!media) {
       return res.status(500).json({
         message: "Failed to upload image",
       });
     }
 
-    // 2) Update type -> gift, set value -> giftDesc, set media
     const updatedConfig = await GameConfig.findOneAndUpdate(
       {
         _id: configId,
@@ -277,8 +295,16 @@ export const updatePrizeLadderMedia = async (req: Request, res: Response) => {
 
     if (!updatedConfig) {
       return res.status(404).json({
-        message: "GameConfig or prize level not found",
+        message: "GameConfig or prize level not found after update",
       });
+    }
+
+    if (oldPublicId && oldPublicId !== media.public_id) {
+      try {
+        await deleteFromCloudinary(oldPublicId, oldType);
+      } catch (err) {
+        console.error("Error deleting old media from Cloudinary:", err);
+      }
     }
 
     const updatedPrizeLevel = updatedConfig.prizeLadder.find(
@@ -296,6 +322,87 @@ export const updatePrizeLadderMedia = async (req: Request, res: Response) => {
     console.error("Error updating prize ladder media:", error);
     return res.status(500).json({
       message: "An internal server error occurred.",
+    });
+  }
+};
+
+export const removePrizeLadderMedia = async (req: Request, res: Response) => {
+  try {
+    const { configId, prizeLadderId } = req.body;
+
+    if (!configId || !prizeLadderId) {
+      return res.status(400).json({
+        message: 'configId and prizeLadderId are required',
+      });
+    }
+
+    // 1) Get current prize level to read old media
+    const existingConfig = await GameConfig.findOne(
+      { _id: configId, 'prizeLadder._id': prizeLadderId },
+      { 'prizeLadder.$': 1 } // only matched prize level
+    ).lean();
+
+    if (!existingConfig || !existingConfig.prizeLadder?.length) {
+      return res.status(404).json({
+        message: 'GameConfig or prize level not found',
+      });
+    }
+
+    const oldPrizeLevel: any = existingConfig.prizeLadder[0];
+    const oldMedia = oldPrizeLevel.media;
+    const oldPublicId = oldMedia?.public_id;
+    const oldType = oldMedia?.type || 'image';
+
+    // 2) Remove media from the document
+    const updatedConfig = await GameConfig.findOneAndUpdate(
+      {
+        _id: configId,
+        'prizeLadder._id': prizeLadderId,
+      },
+      {
+        $unset: {
+          'prizeLadder.$.media': '', // remove media field
+        },
+        // If you ALSO want to reset type/value when image is removed, you could do:
+        // $set: {
+        //   'prizeLadder.$.type': 'gift',
+        //   'prizeLadder.$.value': ''
+        // }
+      },
+      { new: true }
+    );
+
+    if (!updatedConfig) {
+      return res.status(404).json({
+        message: 'GameConfig or prize level not found after update',
+      });
+    }
+
+    // 3) Delete from Cloudinary if existed
+    if (oldPublicId) {
+      try {
+        await deleteFromCloudinary(oldPublicId, oldType);
+      } catch (err) {
+        console.error('Error deleting old media from Cloudinary:', err);
+        // not throwing so the response still succeeds
+      }
+    }
+
+    const updatedPrizeLevel = updatedConfig.prizeLadder.find(
+      (pl: any) => pl._id.toString() === prizeLadderId
+    );
+
+    return res.status(200).json({
+      message: 'Gift image removed successfully',
+      prizeLadderId: updatedPrizeLevel?._id,
+      media: updatedPrizeLevel?.media ?? null,
+      type: updatedPrizeLevel?.type,
+      value: updatedPrizeLevel?.value,
+    });
+  } catch (error) {
+    console.error('Error removing prize ladder media:', error);
+    return res.status(500).json({
+      message: 'An internal server error occurred.',
     });
   }
 };
