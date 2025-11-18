@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import mongoose, { SortOrder } from "mongoose";
-import  GameResult  from "../models/GameResult";
-import GameConfig from "../models/GameConfig";
+import GameResult from "../models/GameResult";
+import GameConfig from "../models/gameConfig";
 import Question from "../models/Question";
 
 
@@ -16,14 +16,14 @@ export const createGameResult = async (req: Request, res: Response) => {
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    
+
     const {
       gameConfigId,
-      correctAnswered,            
+      correctAnswered,
       isWinner,
       totalTimeSeconds,
-      usedLifelinesArr,          
-      lifelinesUsed,             
+      usedLifelinesArr,
+      lifelinesUsed,
       prizeLadder = [],
       questions = [],
     } = req.body;
@@ -51,8 +51,8 @@ export const createGameResult = async (req: Request, res: Response) => {
     const lifelinesUsedFinal: string[] = Array.isArray(lifelinesUsed)
       ? lifelinesUsed
       : Array.isArray(usedLifelinesArr)
-      ? usedLifelinesArr
-      : [];
+        ? usedLifelinesArr
+        : [];
 
 
     // --- helpers ---
@@ -153,10 +153,10 @@ export const createGameResult = async (req: Request, res: Response) => {
 export const getScoresForGameConfig = async (req: Request, res: Response) => {
   try {
     const activeConfig = await GameConfig.findOne({ isActive: true });
-        if (!activeConfig) {
-          res.status(404).json({ message: "No active game configuration found" });
-          return;
-        }
+    if (!activeConfig) {
+      res.status(404).json({ message: "No active game configuration found" });
+      return;
+    }
     const gameConfigId = activeConfig._id
     const { sort = "score", page = "1", limit = "50" } = req.query as {
       sort?: "score" | "recent" | string;
@@ -184,14 +184,15 @@ export const getScoresForGameConfig = async (req: Request, res: Response) => {
     const [results, total] = await Promise.all([
       GameResult.find(filter)
         .select({
+          gameConfigId: 1,
           userId: 1,
           userName: 1,
           finalScore: 1,
           isWinner: 1,
           totalTimeSeconds: 1,
-          correctAnswered:1,
+          correctAnswered: 1,
           createdAt: 1,
-          questions: 1 ,
+          questions: 1,
         })
         .sort(sortStage)
         .skip((p - 1) * l)
@@ -222,8 +223,15 @@ export const userGameResult = async (
   res: Response
 ) => {
   try {
-    const user = (req as any).user;
-    const userId = user?._id;
+    const userId =
+      (req as any).user?._id ||
+      req.body?.userId ||
+      req.query?.userId ||
+      null;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: user not found" });
+    }
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: user not found" });
@@ -252,6 +260,7 @@ export const userGameResult = async (
     // Fetch single result (latest one if somehow multiple exist)
     const result = await GameResult.findOne(filter)
       .select({
+        gameConfigId: 1,
         userId: 1,
         userName: 1,
         finalScore: 1,
@@ -260,7 +269,7 @@ export const userGameResult = async (
         correctAnswered: 1,
         createdAt: 1,
         questions: 1,
-        prizeLadder:1,
+        prizeLadder: 1,
       })
       .sort({ createdAt: -1 }) // optional, ensures newest if duplicates
       .lean();
