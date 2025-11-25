@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 export interface IRegisteredUser extends Document {
   firstName: string;
   lastName: string;
+  userName:String;
   email: string;
   phone: string;
   age: number;
@@ -15,8 +16,9 @@ const registeredUserSchema = new Schema<IRegisteredUser>(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    phone: { type: String, required: true },
+    userName:{ type: String, required: true , unique: true},
+    email: { type: String,  unique: true },
+    phone: { type: String },
     age: { type: Number, required: true },
     password: { type: String, required: true },
   },

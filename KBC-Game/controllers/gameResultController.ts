@@ -9,9 +9,7 @@ export const createGameResult = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     const userId = user?._id;
-    const userF = user?.firstName;
-    const userL = user?.lastName;
-    const userName = `${userF} ${userL}`;
+    const userName = user?.userName;
 
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });

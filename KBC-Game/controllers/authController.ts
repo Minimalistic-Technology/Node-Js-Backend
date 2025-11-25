@@ -6,14 +6,14 @@ const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const { userName, password } = req.body;
 
-    if (!email || !password) {
+    if (!userName || !password) {
       res.status(400).json({ message: "Email and password are required" });
       return;
     }
 
-    const user = await RegisteredUser.findOne({ email });
+    const user = await RegisteredUser.findOne({ userName });
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
@@ -40,8 +40,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        email: user.email,
-        phone: user.phone,
+        userName:user.userName,
         age: user.age,
       },
     });
