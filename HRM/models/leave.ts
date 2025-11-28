@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ILeave extends Document {
-  eid: number; 
+  user_id: string; 
   from: Date; 
   to: Date;  
   reason: string; 
@@ -14,7 +14,7 @@ export interface ILeave extends Document {
 
 const LeaveSchema = new Schema<ILeave>(
   {
-    eid: { type: Number, ref: 'AuthUser', required: true },
+    user_id: { type: String, required: true },
     from: { type: Date, required: true },
     to: { type: Date, required: true },
     reason: { type: String },
