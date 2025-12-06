@@ -2,8 +2,11 @@ import { z } from 'zod';
 
 // Schema for the 'media' object (used for gifts)
 const mediaAssetSchema = z.object({
+  public_id: z.string(),
   url: z.string().url(),
-  fileName: z.string().min(1),
+  type: z.string(),
+  format: z.string(),
+  _id: z.string().optional(),
 }).optional();
 
 // Schema for a single 'PrizeLevel'

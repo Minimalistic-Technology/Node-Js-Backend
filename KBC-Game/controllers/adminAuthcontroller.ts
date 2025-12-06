@@ -92,7 +92,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET!, { expiresIn: "1d" });
+    const token = jwt.sign({ id: admin._id , role: "admin" }, process.env.JWT_SECRET!, { expiresIn: "1d" });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -103,7 +103,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     admin.lastLogin = new Date();
     await admin.save();
 
-    res.json({ message: "Logged in" });
+   res.json({ status: "success", role: "admin", user: { id: admin._id, email: admin.email } });
     return;
   } catch (err: any) {
     res.status(500).json({ error: err.message });
