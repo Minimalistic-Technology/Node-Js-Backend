@@ -1,56 +1,101 @@
-require("dotenv").config();
-import { Response } from "express";
-import { IUser } from "../models/User";
-//import { redis } from "./redis";//
+import 'dotenv/config';
+import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
+import { Response } from 'express';
+import { IUser, UserRole } from '../models/User';
 
-interface ITokenOptions {
-  expires: Date;
-  maxAge: number;
-  httpOnly: boolean;
-  sameSite: "lax" | "strict" | "none" | undefined;
-  secure?: boolean;
+const {
+  JWT_ACCESS_SECRET = 'change-this-access-secret',
+  JWT_REFRESH_SECRET = 'change-this-refresh-secret',
+  ACCESS_TOKEN_EXPIRE = '15m',
+  REFRESH_TOKEN_EXPIRE = '7d',
+  NODE_ENV,
+} = process.env;
+
+export interface TokenPayload extends JwtPayload {
+  sub: string;
+  role: UserRole;
+  tokenVersion?: number;
 }
 
-// parse enviroment variables to integrates with fallback values
- const accessTokenExpire = parseInt(
-  process.env.ACCESS_TOKEN_EXPIRE || "300",
-  10
-);
-const refreshTokenExpire = parseInt(
-  process.env.REFRESH_TOKEN_EXPIRE || "1200",
-  10
-);
+const isProd = NODE_ENV === 'production';
 
-// options for cookies
-export const accessTokenOptions: ITokenOptions = {
-  expires: new Date(Date.now() + accessTokenExpire * 60  * 60 * 1000),
-  maxAge: accessTokenExpire * 60 * 60 * 1000,
-  httpOnly: true,
-  sameSite: "none",
-  secure:true,
+const parseExpiryToSeconds = (expiry: string): number => {
+  const match = expiry.match(/^(\d+)([smhd])$/i);
+  if (!match) {
+    return 60 * 15; // default 15 minutes
+  }
+
+  const value = parseInt(match[1], 10);
+  const unit = match[2].toLowerCase();
+
+  switch (unit) {
+    case 's':
+      return value;
+    case 'm':
+      return value * 60;
+    case 'h':
+      return value * 60 * 60;
+    case 'd':
+      return value * 24 * 60 * 60;
+    default:
+      return value;
+  }
 };
 
-export const refreshTokenOptions: ITokenOptions = {
-  expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
-  maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
-  httpOnly: true,
-  sameSite: "none",
-  secure: true,
+const signToken = (payload: TokenPayload, secret: string, options: SignOptions) =>
+  jwt.sign(payload, secret, options);
+
+export const signAccessToken = (user: IUser): string => {
+  const expiresIn = ACCESS_TOKEN_EXPIRE;
+  return signToken(
+    {
+      sub: user.id,
+      role: user.role,
+    },
+    JWT_ACCESS_SECRET,
+    { expiresIn }
+  );
 };
 
-export const sendToken = (user: IUser, statusCode: number, res: Response) => {
-  const accessToken = user.SignAccessToken();
-  const refreshToken = user.SignRefreshToken();
+export const signRefreshToken = (user: IUser): string => {
+  const expiresIn = REFRESH_TOKEN_EXPIRE;
+  return signToken(
+    {
+      sub: user.id,
+      role: user.role,
+      tokenVersion: 1,
+    },
+    JWT_REFRESH_SECRET,
+    { expiresIn }
+  );
+};
 
-  // upload session to redis
-  // redis.set(user._id, JSON.stringify(user) as any,);
+export const verifyAccessToken = (token: string): TokenPayload =>
+  jwt.verify(token, JWT_ACCESS_SECRET) as TokenPayload;
 
-  res.cookie("access_token", accessToken, accessTokenOptions);
-  res.cookie("refresh_token", refreshToken, refreshTokenOptions);
+export const verifyRefreshToken = (token: string): TokenPayload =>
+  jwt.verify(token, JWT_REFRESH_SECRET) as TokenPayload;
 
-  res.status(statusCode).json({
-    success: true,
-    user,
-    accessToken,
+export const attachAuthCookies = (res: Response, accessToken: string, refreshToken: string): void => {
+  const accessMaxAge = parseExpiryToSeconds(ACCESS_TOKEN_EXPIRE) * 1000;
+  const refreshMaxAge = parseExpiryToSeconds(REFRESH_TOKEN_EXPIRE) * 1000;
+
+  res.cookie('access_token', accessToken, {
+    httpOnly: true,
+    sameSite: isProd ? 'strict' : 'lax',
+    secure: isProd,
+    maxAge: accessMaxAge,
   });
+
+  res.cookie('refresh_token', refreshToken, {
+    httpOnly: true,
+    sameSite: isProd ? 'strict' : 'lax',
+    secure: isProd,
+    maxAge: refreshMaxAge,
+  });
+};
+
+export const clearAuthCookies = (res: Response): void => {
+  res.clearCookie('access_token');
+  res.clearCookie('refresh_token');
 };

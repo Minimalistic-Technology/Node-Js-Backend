@@ -14,6 +14,7 @@ import errorMiddleware from "./middleware/error";
 // import layoutRouter from "./routes/layout.route";
 import { rateLimit } from 'express-rate-limit'
 import authRoutes from './Auth/routes/authRoutes';
+import adminRoutes from './Auth/routes/adminRoutes';
 // import CouponCodeModel from "./models/coupon.models";
 // import { couponRouter } from "./routes/coupon.router";
 // import { maintenanceRouter } from "./routes/maintenance.route";
@@ -238,6 +239,8 @@ app.use(
   // progressRouter,
   // taskRouter,
 );
+
+app.use('/api/v1/admin', adminRoutes);
 
 // testing api
 app.get("/test", async (req: Request, res: Response, next: NextFunction) => {
