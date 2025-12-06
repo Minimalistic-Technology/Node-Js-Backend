@@ -30,3 +30,6 @@ Optional SMTP settings (`SMTP_HOST`, `SMTP_PORT`, `SMTP_MAIL`, `SMTP_PASSWORD`) 
 
 
 
+
+
+

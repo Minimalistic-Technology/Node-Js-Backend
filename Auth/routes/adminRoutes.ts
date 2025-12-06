@@ -26,8 +26,8 @@ router.use(authorizeRoles('admin', 'super-admin'));
 
 // user management
 router.get('/users', listUsers);
-router.patch('/users/:id/status', updateUserStatus);
-router.patch('/users/:id/role', requireSuperAdmin, updateUserRole);
+router.put('/users/:id/status', updateUserStatus);
+router.put('/users/:id/role', requireSuperAdmin, updateUserRole);
 
 // blog management
 router.post('/blogs', createBlog);
@@ -47,7 +47,7 @@ router.get('/dashboard/stats', getDashboardStats);
 
 // profile & settings
 router.get('/profile/me', getProfile);
-router.patch('/profile/me', updateProfile);
+router.put('/profile/me', updateProfile);
 
 // audit logs
 router.get('/audit-logs', getAuditLogs);
