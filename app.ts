@@ -50,7 +50,6 @@ import quoteBlogRoutes from './Blog/routes/quoteBlogRoutes';
 import collectionRoutes from './Collection/routes/collectionRoutes';
 import contactRoutes from './Contact/routes/contactRoutes';
 import courseRoutes from './Course/routes/courseRoutes';
-import messageRoutes from './Message/routes/messageRoutes';
 import imageRoutes from './Fitness/routes/imageRoutes';
 import templateRoutes from './Template/routes/templateRoutes';
 import taskRoutes from './CRM/routes/taskRoutes';
@@ -96,6 +95,8 @@ import authAccessRoutes from './Authacess/routes/authAccessRoutes';
 import subscriberRoutes from './BookStore/routes/subscriberRoutes';
 import eventTrackRoutes from './CheckSession/routes/eventTrackRoutes';
 import upcomingProductRoutes from './Agarbatti Products/routes/upcomingProductRoutes';
+import customerRoutes from "./CRM/routes/customerRoutes";
+import activityLogRoutes from "./CRM/routes/activityLogRoutes";
 
 require('dotenv').config();
 // const apiLogger = require('./controllers/apiLogger');
@@ -135,7 +136,6 @@ app.use('/api/quotes', quoteBlogRoutes);
 app.use('/api/collections', collectionRoutes);
 app.use('/api', contactRoutes);
 app.use('/api/courses', courseRoutes);
-app.use('/api', messageRoutes);
 app.use('/api', imageRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/tasks', taskRoutes);
@@ -181,6 +181,8 @@ app.use('/api', authAccessRoutes);
 app.use('/api/subscribers', subscriberRoutes);
 app.use('/api', eventTrackRoutes);
 app.use('/api', upcomingProductRoutes);
+app.use("/api/customers", customerRoutes);
+app.use("/api/activity-logs", activityLogRoutes);
 
 // body parser
 const bodyParser = require('body-parser');
