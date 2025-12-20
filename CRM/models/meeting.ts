@@ -1,10 +1,23 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const meetingSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  venue: { type: String, required: true },
-  from: { type: Date, required: true },
-  to: { type: Date, required: true }
-});
+export interface IMeeting extends Document {
+  name: string;
+  venue: string;
+  from: Date;
+  to: Date;
+  owner?: string;
+}
 
-export const MeetingModel = mongoose.model("Meeting", meetingSchema);
+const meetingSchema = new Schema<IMeeting>(
+  {
+    name: { type: String, required: true },
+    venue: { type: String, required: true },
+    from: { type: Date, required: true },
+    to: { type: Date, required: true },
+    owner: { type: String },
+  },
+  { timestamps: true }
+);
+
+export const MeetingModel =
+  mongoose.models.Meeting || mongoose.model<IMeeting>("Meeting", meetingSchema);

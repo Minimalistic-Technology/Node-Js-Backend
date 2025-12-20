@@ -133,7 +133,7 @@ router.get('/toplosers/:category/:id', getStockDetails);
 router.put('/toplosers/:id', updateStock);
 router.delete('/toplosers/:id', deleteStock);
 
-// Top Market
+
 router.post('/topmarket', topMarketController.createStock);
 router.get('/topmarket', topMarketController.getAllStocks);
 router.get('/topmarket/:id', topMarketController.getStockDetails);
@@ -141,7 +141,6 @@ router.patch('/topmarket/:name', topMarketController.updateStockByName);
 router.put('/topmarket/:id', topMarketController.updateStock);
 router.delete('/topmarket/:id', topMarketController.deleteStock);
 
-// Top Gainers
 router.post('/topgainers', topGainersController.createStock);
 router.get('/topgainers', topGainersController.getTopGainers);
 router.get('/topgainers/:category', topGainersController.getStocksByCategory);
@@ -151,31 +150,30 @@ router.delete('/topgainers/:id', topGainersController.deleteStock);
 
 
 
-// Tools
 router.post('/tools', addProductTool);
 router.get('/tools', getAllProductTools);
 router.get('/tools/:id', getProductToolById);
 router.put('/tools/:id', updateProductTool);
 router.delete('/tools/:id', deleteProductTool);
 
-// Stocks in News
+
 router.post('/stocks-in-news', addStocksInNews);
 router.get('/stocks-in-news', getAllStocksInNews);
 router.get('/stocks-in-news/:id', getStockInNewsById);
 router.put('/stocks-in-news/:id', updateStocksInNews);
 router.delete('/stocks-in-news/:id', deleteStocksInNews);
 
-// MTF
+
 router.post('/mtf', addMTFStocks);
 router.get('/mtf', getAllMTFStocks);
 router.get('/mtf/:id', getMTFStockById);
 router.put('/mtf/:id', updateMTFStock);
 router.delete('/mtf/:id', deleteMTFStock);
 
-// Most Traded on Grow
 
 
-// Top Sectors
+
+
 router.post('/addtopsectors', addTopSectors);
 router.get('/gettopsectors', getTopSectors);
 router.put('/updatetopsectors/:id', updateTopSectors);

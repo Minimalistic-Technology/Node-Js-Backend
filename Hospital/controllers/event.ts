@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Event, { IEvent } from '../models/event';
 
-// GET all events
+
 export const getAllEvents = async (req: Request, res: Response): Promise<void> => {
   try {
     const events: IEvent[] = await Event.find();
@@ -11,7 +11,7 @@ export const getAllEvents = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// GET event by ID
+
 export const getEventById = async (req: Request, res: Response): Promise<void> => {
   try {
     const event: IEvent | null = await Event.findById(req.params.id);
@@ -25,7 +25,7 @@ export const getEventById = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// POST create new event
+
 export const createEvent = async (req: Request, res: Response): Promise<void> => {
   try {
     const event = new Event(req.body);
@@ -36,7 +36,7 @@ export const createEvent = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// PUT update event
+
 export const updateEvent = async (req: Request, res: Response): Promise<void> => {
   try {
     const event: IEvent | null = await Event.findByIdAndUpdate(
@@ -54,7 +54,7 @@ export const updateEvent = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// DELETE event
+
 export const deleteEvent = async (req: Request, res: Response): Promise<void> => {
   try {
     const event: IEvent | null = await Event.findByIdAndDelete(req.params.id);

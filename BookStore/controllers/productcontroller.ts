@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { Product } from '../../BookStore/models/product';
+import { Product } from '../models/product';
 
-// POST /api/products - Create new product
+
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const { productName, price, inventory, description } = req.body;
@@ -23,7 +23,7 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// GET /api/products - Fetch all products
+
 export const getAllProducts = async (_req: Request, res: Response): Promise<void> => {
   try {
     const products = await Product.find();
@@ -33,7 +33,6 @@ export const getAllProducts = async (_req: Request, res: Response): Promise<void
   }
 };
 
-// PUT /api/products/:id - Update product
 export const updateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -56,7 +55,7 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// DELETE /api/products/:id - Delete product
+
 export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -74,7 +73,7 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// POST /api/products/bulk - Bulk create products
+
 export const bulkCreateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const { products } = req.body;

@@ -4,7 +4,7 @@ export interface IBookOrder extends Document {
   customerName: string;
   amount: number;
   date: Date;
-  status: string; // e.g. "Pending", "Completed", "Cancelled", "Refunded"
+  status: string; 
 }
 
 const BookOrderSchema = new Schema<IBookOrder>({

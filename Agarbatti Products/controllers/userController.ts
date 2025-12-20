@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UserModel } from "../models/RegisterUser";
 
-// Create User
+
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = new UserModel(req.body);
@@ -12,7 +12,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Get All Users
+
 export const getAllUsers = async (_req: Request, res: Response): Promise<void> => {
   try {
     const users = await UserModel.find();
@@ -22,7 +22,6 @@ export const getAllUsers = async (_req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get User by ID
 export const getUserById = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = await UserModel.findById(req.params.id);
@@ -33,7 +32,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Update User
+
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await UserModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -44,7 +43,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Delete User
+
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await UserModel.findByIdAndDelete(req.params.id);

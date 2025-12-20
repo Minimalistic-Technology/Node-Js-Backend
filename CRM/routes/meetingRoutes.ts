@@ -4,7 +4,7 @@ import {
   getAllMeetings,
   getMeetingById,
   updateMeeting,
-  deleteMeeting
+  deleteMeeting,
 } from "../controllers/meetingController";
 
 const router = express.Router();

@@ -1,24 +1,24 @@
 import { Request, Response } from 'express';
 import Review, { IReview } from '../models/review';
 
-// Create a new review
+
 export const createReview = async (req: Request, res: Response): Promise<void> => {
   try {
     const { nameOrInitials, department, review, rating, privacyAgreed } = req.body;
 
-    // Validate required fields
+   
     if (!nameOrInitials || !department || !review || !rating || privacyAgreed === undefined) {
       res.status(400).json({ message: 'All fields are required' });
       return;
     }
 
-    // Validate rating
+  
     if (rating < 1 || rating > 5) {
       res.status(400).json({ message: 'Rating must be between 1 and 5' });
       return;
     }
 
-    // Validate privacy agreement
+ 
     if (!privacyAgreed) {
       res.status(400).json({ message: 'You must agree to the privacy policy' });
       return;
@@ -39,7 +39,7 @@ export const createReview = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Fetch all reviews
+
 export const getReviews = async (req: Request, res: Response): Promise<void> => {
   try {
     const reviews = await Review.find().sort({ createdAt: -1 });
@@ -49,7 +49,6 @@ export const getReviews = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Fetch a review by ID
 export const getReviewById = async (req: Request, res: Response): Promise<void> => {
   try {
     const review = await Review.findById(req.params.id);
@@ -63,18 +62,18 @@ export const getReviewById = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Update a review by ID
+
 export const updateReview = async (req: Request, res: Response): Promise<void> => {
   try {
     const { nameOrInitials, department, review, rating, privacyAgreed } = req.body;
 
-    // Validate rating if provided
+   
     if (rating !== undefined && (rating < 1 || rating > 5)) {
       res.status(400).json({ message: 'Rating must be between 1 and 5' });
       return;
     }
 
-    // Validate privacy agreement if provided
+  
     if (privacyAgreed !== undefined && !privacyAgreed) {
       res.status(400).json({ message: 'You must agree to the privacy policy' });
       return;
@@ -97,7 +96,7 @@ export const updateReview = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Delete a review by ID
+
 export const deleteReview = async (req: Request, res: Response): Promise<void> => {
   try {
     const deletedReview = await Review.findByIdAndDelete(req.params.id);

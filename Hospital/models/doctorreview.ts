@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IReview extends Document {
-  doctor: string; // Name or ID of the selected doctor
+  doctor: string; 
   review: string;
   rating: number;
   privacyAgreed: boolean;
@@ -9,7 +9,7 @@ export interface IReview extends Document {
 }
 
 const DoctorReviewSchema: Schema = new Schema({
-  doctor: { type: String, required: true }, // Store the selected doctor's name or ID
+  doctor: { type: String, required: true }, 
   review: { type: String, required: true, maxLength: 500 },
   rating: { type: Number, required: true, min: 1, max: 5 },
   privacyAgreed: { type: Boolean, required: true },

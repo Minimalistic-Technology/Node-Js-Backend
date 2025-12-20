@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UpcomingProductModel } from '../models/upcomingProduct';
 
-// Create
+
 export const createUpcomingProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = new UpcomingProductModel(req.body);
@@ -12,7 +12,7 @@ export const createUpcomingProduct = async (req: Request, res: Response): Promis
   }
 };
 
-// Read All
+
 export const getAllUpcomingProducts = async (_req: Request, res: Response): Promise<void> => {
   try {
     const products = await UpcomingProductModel.find();
@@ -22,7 +22,7 @@ export const getAllUpcomingProducts = async (_req: Request, res: Response): Prom
   }
 };
 
-// Read by ID
+
 export const getUpcomingProductById = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await UpcomingProductModel.findById(req.params.id);
@@ -33,7 +33,7 @@ export const getUpcomingProductById = async (req: Request, res: Response): Promi
   }
 };
 
-// Update
+
 export const updateUpcomingProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await UpcomingProductModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -44,7 +44,7 @@ export const updateUpcomingProduct = async (req: Request, res: Response): Promis
   }
 };
 
-// Delete
+
 export const deleteUpcomingProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await UpcomingProductModel.findByIdAndDelete(req.params.id);

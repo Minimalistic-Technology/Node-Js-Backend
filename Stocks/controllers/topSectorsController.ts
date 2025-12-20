@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import TopSectors, { ITopSector } from '../models/topSectorsModel';
 
-// Add single or multiple sectors
 export const addTopSectors = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: ITopSector[] = Array.isArray(req.body) ? req.body : [req.body];
@@ -12,7 +11,7 @@ export const addTopSectors = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Get all sectors
+
 export const getTopSectors = async (_req: Request, res: Response): Promise<void> => {
   try {
     const data = await TopSectors.find();
@@ -22,7 +21,7 @@ export const getTopSectors = async (_req: Request, res: Response): Promise<void>
   }
 };
 
-// Update sector by ID
+
 export const updateTopSectors = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await TopSectors.findByIdAndUpdate(req.params.id, req.body, {
@@ -40,7 +39,7 @@ export const updateTopSectors = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// Delete sector by ID
+
 export const deleteTopSectors = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await TopSectors.findByIdAndDelete(req.params.id);

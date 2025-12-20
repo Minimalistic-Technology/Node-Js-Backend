@@ -21,7 +21,7 @@ export const createTeamMember = async (req: Request, res: Response): Promise<voi
 };
 
 
-// Get All
+
 export const getAllTeamMembers = async (
   _req: Request,
   res: Response
@@ -34,7 +34,7 @@ export const getAllTeamMembers = async (
   }
 };
 
-// Get By ID
+
 export const getTeamMemberById = async (
   req: Request,
   res: Response
@@ -48,7 +48,7 @@ export const getTeamMemberById = async (
   }
 };
 
-// Update
+
 export const updateTeamMember = async (
   req: Request,
   res: Response
@@ -64,7 +64,7 @@ export const updateTeamMember = async (
   }
 };
 
-// Delete
+
 export const deleteTeamMember = async (
   req: Request,
   res: Response

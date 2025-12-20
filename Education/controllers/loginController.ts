@@ -3,22 +3,21 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from '../models/login';
 
-// Inline type to include userID in Request
+
 interface AuthenticatedRequest extends Request {
   userID?: string;
 }
 
-// Generate access token
 const generateAccessToken = (userID: string): string => {
   return jwt.sign({ userID }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 };
 
-// Generate refresh token
+
 const generateRefreshToken = (userId: string): string => {
   return jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET!, { expiresIn: '7d' });
 };
 
-// Middleware to verify JWT token
+
 export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -37,7 +36,7 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
   }
 };
 
-// Signup
+
 export const signup = async (req: Request, res: Response): Promise<void> => {
   const { username, email, password, role } = req.body;
 
@@ -67,7 +66,7 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Login
+
 export const login = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
@@ -109,7 +108,7 @@ export const login = async (req: AuthenticatedRequest, res: Response): Promise<v
   }
 };
 
-// Refresh token
+
 export const refreshToken = (req: AuthenticatedRequest, res: Response): void => {
   const token = req.cookies.refreshToken;
 
@@ -127,13 +126,13 @@ export const refreshToken = (req: AuthenticatedRequest, res: Response): void => 
   }
 };
 
-// Logout
+
 export const logout = (req: AuthenticatedRequest, res: Response): void => {
   res.clearCookie('refreshToken');
   res.json({ message: 'Logged out successfully' });
 };
 
-// Get all users
+
 export const getAllUsers = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const users = await User.find({}, { password: 0 });
@@ -143,7 +142,7 @@ export const getAllUsers = async (req: AuthenticatedRequest, res: Response): Pro
   }
 };
 
-// Update user role
+
 export const updateUserRole = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -171,7 +170,7 @@ export const updateUserRole = async (req: AuthenticatedRequest, res: Response): 
   }
 };
 
-// Get user by token
+
 export const getUserByToken = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     if (!req.userID) {

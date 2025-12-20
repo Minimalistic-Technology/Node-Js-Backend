@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import ProductTool, { ProductToolDocument } from '../models/productTool';
 
-// Add one or multiple product tools
+
 export const addProductTool = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: ProductToolDocument[] = Array.isArray(req.body) ? req.body : [req.body];
@@ -12,7 +12,6 @@ export const addProductTool = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Get all product tools
 export const getAllProductTools = async (_req: Request, res: Response): Promise<void> => {
   try {
     const tools = await ProductTool.find();
@@ -22,7 +21,7 @@ export const getAllProductTools = async (_req: Request, res: Response): Promise<
   }
 };
 
-// Get a product tool by ID
+
 export const getProductToolById = async (req: Request, res: Response): Promise<void> => {
   try {
     const tool = await ProductTool.findById(req.params.id);
@@ -36,7 +35,7 @@ export const getProductToolById = async (req: Request, res: Response): Promise<v
   }
 };
 
-// Update a product tool by ID
+
 export const updateProductTool = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await ProductTool.findByIdAndUpdate(req.params.id, req.body, {
@@ -53,7 +52,7 @@ export const updateProductTool = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// Delete a product tool by ID
+
 export const deleteProductTool = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await ProductTool.findByIdAndDelete(req.params.id);

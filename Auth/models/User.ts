@@ -37,7 +37,7 @@ userSchema.methods.comparePassword = async function (
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// 🛑 This avoids OverwriteModelError in dev mode
+
 const User = models.User || model<IUser>('User', userSchema);
 export default User;
 

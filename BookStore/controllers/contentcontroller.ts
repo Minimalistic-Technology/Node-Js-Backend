@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Book } from '../../BookStore/models/content';
+import { Book } from '../models/content';
 import axios from 'axios';
 
 interface Category {
@@ -8,7 +8,7 @@ interface Category {
 }
 
 export class BookController {
-    // Get all books
+    
     static async getAllBooks(req: Request, res: Response): Promise<void> {
         try {
             const books = await Book.find();
@@ -18,7 +18,7 @@ export class BookController {
         }
     }
 
-    // Get single book
+  
     static async getBookById(req: Request, res: Response): Promise<void> {
         try {
             const book = await Book.findById(req.params.id);
@@ -32,7 +32,7 @@ export class BookController {
         }
     }
 
-    // Get all categories
+  
     static async getCategories(req: Request, res: Response): Promise<void> {
         try {
             const response = await axios.get('http://localhost:5000/api/bookstore/categories');
@@ -42,7 +42,7 @@ export class BookController {
         }
     }
 
-    // Create book (for /api/books and /api/bookstore/content)
+    
     static async createBook(req: Request, res: Response): Promise<void> {
         try {
             const bookData = {
@@ -62,7 +62,6 @@ export class BookController {
         }
     }
 
-    // Update book
     static async updateBook(req: Request, res: Response): Promise<void> {
         try {
             const book = await Book.findById(req.params.id);
@@ -85,7 +84,7 @@ export class BookController {
         }
     }
 
-    // Delete book
+    
     static async deleteBook(req: Request, res: Response): Promise<void> {
         try {
             const book = await Book.findById(req.params.id);

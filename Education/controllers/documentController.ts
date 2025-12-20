@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Document, { IDocument } from '../models/document';
 
-// Get all documents
+
 export const getAllDocuments = async (req: Request, res: Response): Promise<void> => {
   try {
     const documents = await Document.find().sort({ createdAt: -1 });
@@ -11,7 +11,7 @@ export const getAllDocuments = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Get document by ID
+
 export const getDocumentById = async (req: Request, res: Response): Promise<void> => {
   try {
     const document = await Document.findById(req.params.id);
@@ -25,12 +25,10 @@ export const getDocumentById = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Create a new document
 export const createDocument = async (req: Request, res: Response): Promise<void> => {
   try {
     const { studentId, documentType, fileUrl, fileFormat } = req.body;
 
-    // Validate required fields
     if (!studentId || !documentType || !fileUrl || !fileFormat) {
       res.status(400).json({ message: 'All fields are required' });
       return;
@@ -50,7 +48,7 @@ export const createDocument = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Update a document by ID
+
 export const updateDocument = async (req: Request, res: Response): Promise<void> => {
   try {
     const { studentId, documentType, fileUrl, fileFormat } = req.body;
@@ -72,7 +70,7 @@ export const updateDocument = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Delete a document by ID
+
 export const deleteDocument = async (req: Request, res: Response): Promise<void> => {
   try {
     const deletedDocument = await Document.findByIdAndDelete(req.params.id);

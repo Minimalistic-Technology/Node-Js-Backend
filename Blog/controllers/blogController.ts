@@ -1,9 +1,25 @@
-import { Request, Response } from 'express';
-import Blog from '../models/Blog';
+import { Request, Response, RequestHandler } from 'express';
+import Blog, { IBlog } from '../models/Blog';
+import { Types } from 'mongoose';
 
-export const createBlog = async (req: Request, res: Response): Promise<void> => {
+interface AuthenticatedRequest extends Request {
+  user?: {
+    userID: string;
+  };
+}
+
+export const createBlog: RequestHandler = async (req, res) => {
+  const userReq = req as AuthenticatedRequest;
+  if (!userReq.user?.userID) {
+    res.status(401).json({ error: 'User not authenticated' });
+    return;
+  }
+
   try {
-    const blog = new Blog(req.body);
+    const blog = new Blog({
+      ...req.body,
+      authorId: userReq.user.userID,
+    });
     await blog.save();
     res.status(201).json(blog);
   } catch (err: any) {
@@ -11,62 +27,143 @@ export const createBlog = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-export const getAllBlogs = async (req: Request, res: Response): Promise<void> => {
+export const getRelatedBlogs: RequestHandler = async (req, res) => {
+  const { category, excludeId } = req.query;
+
+  try {
+    const relatedBlogs = await Blog.find({
+      category,
+      _id: { $ne: excludeId },
+    }).limit(4);
+
+    res.status(200).json(relatedBlogs);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+export const getAllBlogs: RequestHandler = async (_req, res) => {
   try {
     const blogs = await Blog.find();
     res.json(blogs);
   } catch (err: any) {
-    res.status(500).json({ error: 'Failed to fetch blogs' });
+    res.status(500).json({ error: err.message });
   }
 };
 
-export const getBlogById = async (req: Request, res: Response): Promise<void> => {
+
+export const getBlogById: RequestHandler = async (req, res) => {
   try {
-    const blog = await Blog.findById(req.params.id);
+    const blog = await Blog.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    ).populate('authorId', 'name');
+
     if (!blog) {
-      res.status(404).json({ message: "Blog not found" });
+      res.status(404).json({ message: 'Blog not found' });
       return;
     }
+
     res.json(blog);
-  } catch (err: any) {
-    res.status(400).json({ error: 'Invalid blog ID' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 };
 
-export const updateBlog = async (req: Request, res: Response): Promise<void> => {
+export const getUserBlogs: RequestHandler = async (req, res) => {
+  const userReq = req as AuthenticatedRequest;
+  console.log('User ID:', userReq.user);
+  if (!userReq.user?.userID) {
+    res.status(401).json({ error: 'User not authenticated' });
+    return;
+  }
+
   try {
-    const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const blogs = await Blog.find({ authorId: userReq.user.userID
+     });
+    res.json(blogs);
+  } catch (err: any) {
+    res.status(500).json({ error: "Failed to fetch user's blogs" });
+  }
+};
+
+
+export const updateBlog: RequestHandler = async (req, res) => {
+  try {
+    if (req.body.date) {
+      req.body.date = new Date(req.body.date);
+    }
+
+    const blog = await Blog.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    ).populate('authorId', 'name');
+
     if (!blog) {
-      res.status(404).json({ message: "Blog not found" });
+      res.status(404).json({ message: 'Blog not found' });
       return;
     }
+
     res.json(blog);
-  } catch (err: any) {
-    res.status(400).json({ error: 'Failed to update blog' });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
   }
 };
 
-export const deleteBlog = async (req: Request, res: Response): Promise<void> => {
+
+export const deleteBlog: RequestHandler = async (req, res) => {
   try {
     const blog = await Blog.findByIdAndDelete(req.params.id);
     if (!blog) {
-      res.status(404).json({ message: "Blog not found" });
+      res.status(404).json({ message: 'Blog not found' });
       return;
     }
-    res.json({ message: "Blog deleted successfully" });
-  } catch (err: any) {
-    res.status(400).json({ error: 'Failed to delete blog' });
+
+    res.json({ message: 'Blog deleted successfully' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 };
-export function getMostViewedBlogs(arg0: string, getMostViewedBlogs: any) {
-    throw new Error('Function not implemented.');
-}
 
-export function getMostRecentBlogs(arg0: string, getMostRecentBlogs: any) {
-    throw new Error('Function not implemented.');
-}
 
-export function deleteAllBlogs(arg0: string, deleteAllBlogs: any) {
-    throw new Error('Function not implemented.');
-}
+export const deleteAllBlogs: RequestHandler = async (_req, res) => {
+  try {
+    const result = await Blog.deleteMany({});
+    res.json({ message: `${result.deletedCount} blogs deleted successfully` });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
+
+export const getMostViewedBlogs: RequestHandler = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string, 10) || 10;
+    const blogs = await Blog.find()
+      .sort({ views: -1 })
+      .limit(limit)
+      .populate('authorId', 'name');
+
+    res.json(blogs);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+export const getMostRecentBlogs: RequestHandler = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string, 10) || 10;
+    const blogs = await Blog.find()
+      .sort({ date: -1 })
+      .limit(limit)
+      .populate('authorId', 'name');
+
+    res.json(blogs);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};

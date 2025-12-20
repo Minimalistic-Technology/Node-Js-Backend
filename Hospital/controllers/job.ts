@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Job, { IJob } from '../models/job';
 
-// Search jobs
+
 export const searchJobs = async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, city } = req.query;
@@ -27,7 +27,6 @@ export const searchJobs = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Get job by ID
 export const getJobById = async (req: Request, res: Response): Promise<void> => {
   try {
     const job: IJob | null = await Job.findById(req.params.jobId);
@@ -41,7 +40,7 @@ export const getJobById = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Create a job
+
 export const createJob = async (req: Request, res: Response): Promise<void> => {
   try {
     const job = new Job(req.body);
@@ -52,7 +51,7 @@ export const createJob = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Update a job
+
 export const updateJob = async (req: Request, res: Response): Promise<void> => {
   try {
     const job: IJob | null = await Job.findByIdAndUpdate(
@@ -70,7 +69,7 @@ export const updateJob = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Delete a job
+
 export const deleteJob = async (req: Request, res: Response): Promise<void> => {
   try {
     const job: IJob | null = await Job.findByIdAndDelete(req.params.jobId);

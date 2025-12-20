@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Doctor, { IDoctor } from '../models/doctormodel';
 
-// GET all alphabets (A-Z)
+
 export const getAlphabets = async (_req: Request, res: Response): Promise<void> => {
   try {
     const alphabets = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
@@ -11,7 +11,7 @@ export const getAlphabets = async (_req: Request, res: Response): Promise<void> 
   }
 };
 
-// GET all doctors (limited fields)
+
 export const getAllDoctors = async (_req: Request, res: Response): Promise<void> => {
   try {
     const doctors = await Doctor.find({}, { photo: 1, name: 1, specialist: 1, location: 1 });
@@ -21,7 +21,7 @@ export const getAllDoctors = async (_req: Request, res: Response): Promise<void>
   }
 };
 
-// GET doctors by letter (e.g., Dr. A...) - limited fields
+
 export const getDoctorsByLetter = async (req: Request, res: Response): Promise<void> => {
   try {
     const letter = req.params.letter.toUpperCase();
@@ -33,7 +33,7 @@ export const getDoctorsByLetter = async (req: Request, res: Response): Promise<v
   }
 };
 
-// GET doctor details by ID
+
 export const getDoctorById = async (req: Request, res: Response): Promise<void> => {
   try {
     const doctor = await Doctor.findById(req.params.id);
@@ -60,7 +60,7 @@ export const getDoctorById = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// POST new doctor(s) under a letter
+
 export const createDoctorForLetter = async (req: Request, res: Response): Promise<void> => {
   try {
     const letter = req.params.letter.toUpperCase();
@@ -106,7 +106,7 @@ export const createDoctorForLetter = async (req: Request, res: Response): Promis
   }
 };
 
-// POST new doctor(s) irrespective of letter
+
 export const createDoctors = async (req: Request, res: Response): Promise<void> => {
   try {
     let doctors = Array.isArray(req.body) ? req.body : [req.body];
@@ -144,7 +144,7 @@ export const createDoctors = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// DELETE all doctors
+
 export const deleteAllDoctors = async (_req: Request, res: Response): Promise<void> => {
   try {
     const result = await Doctor.deleteMany({});

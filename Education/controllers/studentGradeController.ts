@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { StudentGradeModel } from "../models/studentGrade";
 
-// Create
+
 export const createGrade = async (req: Request, res: Response): Promise<void> => {
   try {
     const grade = new StudentGradeModel(req.body);
@@ -12,7 +12,6 @@ export const createGrade = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Get All
 export const getAllGrades = async (_req: Request, res: Response): Promise<void> => {
   try {
     const grades = await StudentGradeModel.find();
@@ -22,7 +21,7 @@ export const getAllGrades = async (_req: Request, res: Response): Promise<void> 
   }
 };
 
-// Get by ID
+
 export const getGradeById = async (req: Request, res: Response): Promise<void> => {
   try {
     const grade = await StudentGradeModel.findById(req.params.id);
@@ -33,7 +32,7 @@ export const getGradeById = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Update
+
 export const updateGrade = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await StudentGradeModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -44,7 +43,7 @@ export const updateGrade = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Delete
+
 export const deleteGrade = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await StudentGradeModel.findByIdAndDelete(req.params.id);

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Topmarket, { IStock } from '../models/topmarketModel';
 
-// Create stock(s)
+
 export const createStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: IStock[] = Array.isArray(req.body) ? req.body : [req.body];
@@ -12,7 +12,7 @@ export const createStock = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Get all stocks (basic info only)
+
 export const getAllStocks = async (_req: Request, res: Response): Promise<void> => {
   try {
     const data = await Topmarket.find({}, 'name price change image');
@@ -22,7 +22,7 @@ export const getAllStocks = async (_req: Request, res: Response): Promise<void> 
   }
 };
 
-// Get full stock details by ID (excluding basic info)
+
 export const getStockDetails = async (req: Request, res: Response): Promise<void> => {
   try {
     const stock = await Topmarket.findById(req.params.id, '-name -price -change -image -__v');
@@ -36,7 +36,7 @@ export const getStockDetails = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Update stock by ID
+
 export const updateStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await Topmarket.findByIdAndUpdate(req.params.id, req.body, {
@@ -53,7 +53,7 @@ export const updateStock = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Delete stock by ID
+
 export const deleteStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await Topmarket.findByIdAndDelete(req.params.id);
@@ -67,7 +67,7 @@ export const deleteStock = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Update stock by name
+
 export const updateStockByName = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await Topmarket.findOneAndUpdate(

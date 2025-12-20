@@ -3,8 +3,8 @@ import * as goldController from '../controllers/goldpriceController';
 
 const router: Router = express.Router();
 
-router.get('/today', goldController.getTodayPrice);
-router.post('/', goldController.addPrice);
-router.put('/:date', goldController.updatePrice);
+router.get('/goldprice/today', goldController.getTodayPrice);
+router.post('/goldprice', goldController.addPrice);
+router.put('/goldprice/:date', goldController.updatePrice);
 
 export default router;

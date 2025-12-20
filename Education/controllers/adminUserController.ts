@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { AdminUserModel } from "../models/adminUser";
 
-// Create
+
 export const createAdminUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = await AdminUserModel.create(req.body);
@@ -11,7 +11,7 @@ export const createAdminUser = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Read all
+
 export const getAllAdminUsers = async (_req: Request, res: Response): Promise<void> => {
   try {
     const users = await AdminUserModel.find();
@@ -21,7 +21,7 @@ export const getAllAdminUsers = async (_req: Request, res: Response): Promise<vo
   }
 };
 
-// Read by ID
+
 export const getAdminUserById = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = await AdminUserModel.findById(req.params.id);
@@ -32,7 +32,7 @@ export const getAdminUserById = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// Update
+
 export const updateAdminUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await AdminUserModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -43,7 +43,7 @@ export const updateAdminUser = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Delete
+
 export const deleteAdminUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await AdminUserModel.findByIdAndDelete(req.params.id);

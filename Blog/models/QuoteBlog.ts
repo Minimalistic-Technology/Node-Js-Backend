@@ -1,4 +1,5 @@
-import { Schema, model, Document } from 'mongoose';
+import mongoose, { Document, Schema, model } from 'mongoose';
+
 
 export interface IQuoteBlog extends Document {
   quote: string;
@@ -17,4 +18,6 @@ const quoteBlogSchema = new Schema<IQuoteBlog>({
   }
 });
 
-export default model<IQuoteBlog>('QuoteBlog', quoteBlogSchema);
+
+const QuoteBlog = model<IQuoteBlog>('QuoteBlog', quoteBlogSchema);
+export default QuoteBlog;

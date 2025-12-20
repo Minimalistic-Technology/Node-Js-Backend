@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import StocksInNews from '../models/StocksInNews';
 import { StocksInNewsDocument } from '../models/StocksInNews';
 
-// Add stock(s)
+
 export const addStocksInNews = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: StocksInNewsDocument[] = Array.isArray(req.body) ? req.body : [req.body];
@@ -13,7 +13,7 @@ export const addStocksInNews = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Get all stocks (only name, price, change, image)
+
 export const getAllStocksInNews = async (_req: Request, res: Response): Promise<void> => {
   try {
     const data = await StocksInNews.find({}, 'name price change image');
@@ -23,7 +23,6 @@ export const getAllStocksInNews = async (_req: Request, res: Response): Promise<
   }
 };
 
-// Get a stock by ID (excluding name, price, change, image, __v)
 export const getStockInNewsById = async (req: Request, res: Response): Promise<void> => {
   try {
     const stock = await StocksInNews.findById(req.params.id, '-name -price -change -image -__v');
@@ -37,7 +36,7 @@ export const getStockInNewsById = async (req: Request, res: Response): Promise<v
   }
 };
 
-// Update stock by ID
+
 export const updateStocksInNews = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await StocksInNews.findByIdAndUpdate(req.params.id, req.body, {
@@ -54,7 +53,7 @@ export const updateStocksInNews = async (req: Request, res: Response): Promise<v
   }
 };
 
-// Delete stock by ID
+
 export const deleteStocksInNews = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await StocksInNews.findByIdAndDelete(req.params.id);

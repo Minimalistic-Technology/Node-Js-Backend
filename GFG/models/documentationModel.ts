@@ -1,0 +1,29 @@
+import mongoose from 'mongoose';
+
+const quizSchema = new mongoose.Schema({
+  question: { type: String, required: true },
+  options: [{ type: String, required: true }],
+  correct: { type: Number, required: true },
+  explanation: { type: String, required: true },
+});
+
+const subtopicSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  theory: { type: String, required: true },
+  code: { type: String, required: true },
+  output: { type: String },
+  quiz: [quizSchema] 
+});
+
+const documentationSchema = new mongoose.Schema({
+  language: { type: String, required: true },
+  title: { type: String, required: true },
+  theory: { type: String, required: true },
+  code: { type: String, required: true },
+  output: { type: String },
+  quiz: [quizSchema], 
+  subtopics: [subtopicSchema]
+}, { timestamps: true });
+
+const Documentation = mongoose.model('Documentation', documentationSchema);
+export default Documentation;

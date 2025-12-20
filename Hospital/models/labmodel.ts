@@ -1,4 +1,4 @@
-// models/figma/labmodel.ts
+
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ILab extends Document {

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { SiteSettingsModel } from '../models/siteSettings';
 
-// POST (Create)
+
 export const createSettings = async (req: Request, res: Response): Promise<void> => {
   try {
     const existing = await SiteSettingsModel.findOne();
@@ -17,7 +17,7 @@ export const createSettings = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// GET
+
 export const getSettings = async (_req: Request, res: Response) => {
   try {
     const settings = await SiteSettingsModel.findOne();
@@ -28,7 +28,7 @@ export const getSettings = async (_req: Request, res: Response) => {
 };
 
 
-// PUT (Update)
+
 export const updateSettings = async (req: Request, res: Response) => {
   try {
     const updated = await SiteSettingsModel.findOneAndUpdate({}, req.body, { new: true });
@@ -38,7 +38,6 @@ export const updateSettings = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE
 export const deleteSettings = async (_req: Request, res: Response) => {
   try {
     await SiteSettingsModel.deleteMany({});

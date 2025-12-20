@@ -4,7 +4,7 @@ import {
   getAllLeads,
   getLeadById,
   updateLead,
-  deleteLead
+  deleteLead,
 } from "../controllers/leadController";
 
 const router = express.Router();

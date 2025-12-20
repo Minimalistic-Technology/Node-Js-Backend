@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Project, { IProject } from '../models/Project';
 
-// Create Project
+
 export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const project = new Project(req.body as IProject);
@@ -29,7 +29,7 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
   }
 };
 
-// Update Project
+
 export const updateProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -44,7 +44,6 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Delete Project
 export const deleteProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

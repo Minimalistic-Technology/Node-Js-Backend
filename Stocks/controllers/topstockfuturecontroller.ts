@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import TopStockFutureModel, { ITopStockFuture } from '../models/TopStockFuture';
 
-// Add single or multiple Top Stock Futures
+
 export const addTopStocks = async (req: Request, res: Response): Promise<void> => {
   try {
     const data: Partial<ITopStockFuture>[] = Array.isArray(req.body) ? req.body : [req.body];
@@ -12,7 +12,7 @@ export const addTopStocks = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Get all Top Stock Futures (selected fields)
+
 export const getTopStocks = async (_req: Request, res: Response): Promise<void> => {
   try {
     const data = await TopStockFutureModel.find({}, 'name price change image');
@@ -22,7 +22,7 @@ export const getTopStocks = async (_req: Request, res: Response): Promise<void> 
   }
 };
 
-// Get Top Stock Future by ID
+
 export const getTopStockById = async (req: Request, res: Response): Promise<void> => {
   try {
     const stock = await TopStockFutureModel.findById(req.params.id, '-name -price -change -image -__v');
@@ -36,7 +36,7 @@ export const getTopStockById = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Update Top Stock Future by ID
+
 export const updateTopStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await TopStockFutureModel.findByIdAndUpdate(req.params.id, req.body, {
@@ -53,7 +53,7 @@ export const updateTopStock = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Delete Top Stock Future by ID
+
 export const deleteTopStock = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await TopStockFutureModel.findByIdAndDelete(req.params.id);

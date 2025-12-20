@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
-// Define a minimal IUser interface if not available from another module
+
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
@@ -146,7 +146,7 @@ const courseSchema = new Schema<ICourse>({
    quizzes: [{ type: Schema.Types.ObjectId, ref: 'Quiz', required: false }], 
    task: {
     type: String,
-    required: false,  // Optional if tasks are not mandatory
+    required: false,  
   },
 },{timestamps: true});
 

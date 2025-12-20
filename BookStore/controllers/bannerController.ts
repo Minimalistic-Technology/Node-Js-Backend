@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { Banner } from '../../BookStore/models/banner';
+import { Banner } from '../models/banner';
 
 export class BannerController {
-    // Get all banners
+
     static async getAllBanners(req: Request, res: Response): Promise<void> {
         try {
             const banners = await Banner.find();
@@ -12,10 +12,10 @@ export class BannerController {
         }
     }
 
-    // Get active banners (based on current time: 04:25 PM IST, July 11, 2025)
+    
     static async getActiveBanners(req: Request, res: Response): Promise<void> {
         try {
-            const now = new Date('2025-07-11T10:55:00Z'); // 04:25 PM IST = 10:55 UTC
+            const now = new Date('2025-07-11T10:55:00Z');
             const activeBanners = await Banner.find({
                 isActive: true,
                 startTime: { $lte: now },
@@ -27,10 +27,10 @@ export class BannerController {
         }
     }
 
-    // Get inactive banners (based on current time: 04:25 PM IST, July 11, 2025)
+
     static async getInactiveBanners(req: Request, res: Response): Promise<void> {
         try {
-            const now = new Date('2025-07-11T10:55:00Z'); // 04:25 PM IST = 10:55 UTC
+            const now = new Date('2025-07-11T10:55:00Z'); 
             const inactiveBanners = await Banner.find({
                 $or: [
                     { isActive: false },
@@ -44,7 +44,7 @@ export class BannerController {
         }
     }
 
-    // Get single banner by ID
+   
     static async getBannerById(req: Request, res: Response): Promise<void> {
         try {
             const banner = await Banner.findById(req.params.id);
@@ -58,7 +58,7 @@ export class BannerController {
         }
     }
 
-    // Create new banner
+   
     static async createBanner(req: Request, res: Response): Promise<void> {
         try {
             const bannerData = {
@@ -76,7 +76,6 @@ export class BannerController {
         }
     }
 
-    // Update banner
     static async updateBanner(req: Request, res: Response): Promise<void> {
         try {
             const banner = await Banner.findById(req.params.id);
@@ -97,7 +96,7 @@ export class BannerController {
         }
     }
 
-    // Delete banner
+   
     static async deleteBanner(req: Request, res: Response): Promise<void> {
         try {
             const banner = await Banner.findById(req.params.id);

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import MostTradedOnGrow from '../models/mostTradedOnGrowModel';
 
-// Add one or more stocks
+
 export const addMostTradedOnGrow = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = Array.isArray(req.body) ? req.body : [req.body];
@@ -12,7 +12,7 @@ export const addMostTradedOnGrow = async (req: Request, res: Response): Promise<
   }
 };
 
-// Get all stocks with selected fields
+
 export const getAllMostTradedOnGrow = async (_req: Request, res: Response): Promise<void> => {
   try {
     const data = await MostTradedOnGrow.find({}, 'name price change image');
@@ -22,7 +22,7 @@ export const getAllMostTradedOnGrow = async (_req: Request, res: Response): Prom
   }
 };
 
-// Get stock by ID with selected fields excluded
+
 export const getMostTradedOnGrowById = async (req: Request, res: Response): Promise<void> => {
   try {
     const stock = await MostTradedOnGrow.findById(req.params.id, '-name -price -change -image');
@@ -36,7 +36,7 @@ export const getMostTradedOnGrowById = async (req: Request, res: Response): Prom
   }
 };
 
-// Update stock by ID
+
 export const updateMostTradedOnGrow = async (req: Request, res: Response): Promise<void> => {
   try {
     const updated = await MostTradedOnGrow.findByIdAndUpdate(req.params.id, req.body, {
@@ -53,7 +53,7 @@ export const updateMostTradedOnGrow = async (req: Request, res: Response): Promi
   }
 };
 
-// Delete stock by ID
+
 export const deleteMostTradedOnGrow = async (req: Request, res: Response): Promise<void> => {
   try {
     const deleted = await MostTradedOnGrow.findByIdAndDelete(req.params.id);

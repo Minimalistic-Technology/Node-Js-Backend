@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Schedule, { ISchedule } from '../models/schedule';
 
-// Get all schedules
+
 export const getAllSchedules = async (req: Request, res: Response): Promise<void> => {
   try {
     const schedules = await Schedule.find().sort({ createdAt: -1 });
@@ -11,7 +11,7 @@ export const getAllSchedules = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Get schedule by ID
+
 export const getScheduleById = async (req: Request, res: Response): Promise<void> => {
   try {
     const schedule = await Schedule.findById(req.params.id);
@@ -25,18 +25,18 @@ export const getScheduleById = async (req: Request, res: Response): Promise<void
   }
 };
 
-// Create a new schedule
+
 export const createSchedule = async (req: Request, res: Response): Promise<void> => {
   try {
     const { days, subject, startTime, endTime, faculty } = req.body;
 
-    // Validate required fields
+    
     if (!days || !subject || !startTime || !endTime || !faculty) {
       res.status(400).json({ message: 'All fields are required' });
       return;
     }
 
-    // Validate days array
+  
     if (!Array.isArray(days) || days.length === 0) {
       res.status(400).json({ message: 'Days must be a non-empty array' });
       return;
@@ -57,12 +57,12 @@ export const createSchedule = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Update a schedule by ID
+
 export const updateSchedule = async (req: Request, res: Response): Promise<void> => {
   try {
     const { days, subject, startTime, endTime, faculty } = req.body;
 
-    // Validate days array if provided
+    
     if (days && (!Array.isArray(days) || days.length === 0)) {
       res.status(400).json({ message: 'Days must be a non-empty array' });
       return;
@@ -85,7 +85,7 @@ export const updateSchedule = async (req: Request, res: Response): Promise<void>
   }
 };
 
-// Delete a schedule by ID
+
 export const deleteSchedule = async (req: Request, res: Response): Promise<void> => {
   try {
     const deletedSchedule = await Schedule.findByIdAndDelete(req.params.id);

@@ -1,4 +1,4 @@
-import mongoose, { Document, Model } from 'mongoose';
+import mongoose, { Document, Model } from "mongoose";
 
 export interface SubscriberDocument extends Document {
   name: string;
@@ -13,7 +13,7 @@ const subscriberSchema = new mongoose.Schema<SubscriberDocument>({
 });
 
 export const Subscriber: Model<SubscriberDocument> = mongoose.model<SubscriberDocument>(
-  'Subscriber',
+  "Subscriber",
   subscriberSchema
 );
 

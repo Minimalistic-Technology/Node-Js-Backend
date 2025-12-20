@@ -1,6 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, model } from 'mongoose';
 
-// Define the TypeScript interface for a Blog document
+
 export interface IBlog extends Document {
   title: string;
   description: string;
@@ -17,8 +17,8 @@ export interface IBlog extends Document {
   views: number;
 }
 
-// Define the schema
-const blogSchema: Schema = new Schema<IBlog>({
+
+const blogSchema = new Schema<IBlog>({
   title: { type: String, required: true },
   description: { type: String, required: true },
   category: { type: String },
@@ -34,6 +34,5 @@ const blogSchema: Schema = new Schema<IBlog>({
   views: { type: Number, default: 0, min: 0 },
 });
 
-// Export the model
-const Blog = mongoose.model<IBlog>('Blog', blogSchema);
+const Blog = model<IBlog>('Blog', blogSchema);
 export default Blog;

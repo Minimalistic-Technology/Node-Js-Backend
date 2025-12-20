@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// Define the user schema
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -11,16 +10,17 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    unique: true,
   },
   role: {
     type: String,
+    enum: ['user', 'admin'],
     default: 'user',
   },
   password: {
     type: String,
-    required: false, // Make password optional for bulk import
+    required: true,
   },
 }, { timestamps: true });
 
-// Export the User model, reusing it if already defined
 export const User = mongoose.models.User || mongoose.model('User', userSchema);
