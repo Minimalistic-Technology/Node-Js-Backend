@@ -1,35 +1,87 @@
-// middleware/authMiddleware.ts
-import { Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import { AuthRequest } from '../controllers/authAccessController';
+import { Request, Response, NextFunction } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import AuthUserModel from "../models/authUser";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret';
+
+const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
 
 interface DecodedToken extends JwtPayload {
   id: string;
-  role: string;
+  role: "user" | "admin" | "hr" | "super_admin";
+  companyID?: string;
 }
 
-export const isUser = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const isUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const token = req.cookies?.token; // cookie name: token
+    const token = req.cookies?.token;
 
-    if (!token) {
-      return res.status(401).json({ message: 'No token, authorization denied' });
+    if (!token || typeof token !== "string") {
+      res.status(401).json({ message: "No token, authorization denied" });
+      return;
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
 
+    const user = await AuthUserModel.findById(decoded.id).select(
+      "_id role companyID email name"
+    );
+
+    if (!user) {
+      res.status(401).json({ message: "Unauthorized: user not found" });
+      return;
+    }
+
     req.user = {
-      id: decoded.id,
-      role: decoded.role,
-      email: '', // optional, if you want you can add email to token as well
-      name: '',
+      id: user._id.toString(),
+      role: user.role,
+      companyID: user.companyID,
+      email: user.email,
+      name: user.name,
     };
 
     next();
   } catch (error) {
-    console.error('Auth middleware error:', error);
-    return res.status(401).json({ message: 'Token is not valid' });
+    console.error("Auth middleware error:", error);
+    res.status(401).json({ message: "Token is not valid" });
+  }
+};
+
+/**
+ * Admin only
+ */
+export const isAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (
+    req.user &&
+    (req.user.role === "admin" || req.user.role === "super_admin")
+  ) {
+    next();
+  } else {
+    res.status(403).json({ message: "Not authorized as admin" });
+  }
+};
+
+/**
+ * Admin or HR
+ */
+export const isAdminOrHr = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (
+    req.user &&
+    ["admin", "hr", "super_admin"].includes(req.user.role)
+  ) {
+    next();
+  } else {
+    res.status(403).json({ message: "Not authorized as admin or HR" });
   }
 };

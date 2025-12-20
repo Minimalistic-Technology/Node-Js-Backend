@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken , isAdmin } from "../middleware/authMiddleware";
+import { isUser, isAdmin, isAdminOrHr } from "../middleware/authMiddleware";
 import {
   applyLeave,
   editLeave,
@@ -12,14 +12,14 @@ import {
 
 const router = express.Router();
 
-router.post("/apply", verifyToken, applyLeave);           
-router.put("/edit/:id", verifyToken, editLeave);
-router.get("/myleaves", verifyToken, getLeaves);
+router.post("/apply", isUser, applyLeave);
+router.put("/edit/:id", isUser, editLeave);
+router.get("/myleaves", isUser, getLeaves);
 
-router.put("/handle/:id", verifyToken, isAdmin ,  handleLeave);
-router.get("/leaves", verifyToken, isAdmin , getLeavesAll);              
-router.get("/employee/:id", verifyToken, isAdmin , getLeaveById);   
+router.put("/handle/:id", isUser, isAdminOrHr, handleLeave);
+router.get("/leaves", isUser, isAdminOrHr, getLeavesAll);
+router.get("/employee/:id", isUser, isAdminOrHr, getLeaveById);
 
-router.delete("/delete/:id", verifyToken, isAdmin , deleteLeave);   
+router.delete("/delete/:id", isUser, isAdminOrHr, deleteLeave);
 
 export default router;

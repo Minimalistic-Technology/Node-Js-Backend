@@ -2,36 +2,35 @@ import { Request, Response } from "express";
 import { LeaveModel, ILeave } from "../models/leave";
 import { AuthUserModel } from "../models/authUser";
 import mongoose from "mongoose";
+import { AuthRequest } from "../utils/types";
 
-
-interface AuthRequest extends Request {
-  user?: any;
-}
-
-
-export const applyLeave = async (req: AuthRequest, res: Response): Promise<void> => {
+export const applyLeave = async (req: Request, res: Response): Promise<void> => {
   try {
-    const eid = req.user?.eid;
-    const email = req.user?.email;
+    const authReq = req as AuthRequest;
+    const userId = authReq.user?.id;
+    const email = authReq.user?.email;
+    const companyID = authReq.user?.companyID;
 
-    console.log(email)
-    if (!eid) {
+    console.log(userId , email , companyID);
+    if (!userId) {
       res.status(401).json({ message: "Unauthorized: user not found in token" });
       return;
     }
 
-    const { from, to, reason } = req.body;
-    if (!from || !to || !reason || !email ) {
+    const { from, to, reason , leaveType } = req.body;
+    if (!from || !to || !reason || !leaveType) {
       res.status(400).json({ message: "Missing required fields: from, to, reason" });
       return;
     }
 
     const leave = new LeaveModel({
-      eid,
+      user_id: userId,
       email,
+      companyID,
       from,
       to,
       reason,
+      leaveType,
       status: "Pending",
       appliedAt: new Date(),
     });
@@ -46,11 +45,12 @@ export const applyLeave = async (req: AuthRequest, res: Response): Promise<void>
 };
 
 
-export const editLeave = async (req: AuthRequest, res: Response): Promise<void> => {
+export const editLeave = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const eid = req.user?.eid;
-    if (!eid) {
+    const authReq = req as AuthRequest;
+    const userId = authReq.user?.id;
+    if (!userId) {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
@@ -66,12 +66,12 @@ export const editLeave = async (req: AuthRequest, res: Response): Promise<void> 
       return;
     }
 
-    if (leave.eid !== eid) {
+    if (leave.user_id !== userId) {
       res.status(403).json({ message: "Forbidden: cannot edit other's leave" });
       return;
     }
 
-    
+
 
     const { from, to, reason } = req.body;
     leave.from = from ?? leave.from;
@@ -86,11 +86,11 @@ export const editLeave = async (req: AuthRequest, res: Response): Promise<void> 
   }
 };
 
-export const handleLeave = async (req: AuthRequest, res: Response): Promise<void> => {
+export const handleLeave = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { action } = req.body; 
-    const handledBy = req.user?.eid;
+    const { action } = req.body;
+    const handledBy = (req as AuthRequest).user?.id;
 
 
     if (!handledBy) {
@@ -127,35 +127,18 @@ export const handleLeave = async (req: AuthRequest, res: Response): Promise<void
 
 
 
-export const getLeaves = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getLeaves = async (req: Request, res: Response): Promise<void> => {
   try {
-    const eid = req.user?.eid;
+    const authReq = req as AuthRequest;
+    const userId = authReq.user?.id;
 
     let leaves;
-    if (!eid) {
-      res.status(402).json({message:"User not found"});
-    } 
-
-     leaves = await LeaveModel.find({ eid }).sort({ appliedAt: -1 });
-
-    res.status(200).json(leaves);
-  } catch (error) {
-    console.error("Get leaves error:", error);
-    res.status(500).json({ message: "Server error fetching leaves" });
-  }
-};
-
-
-export const getLeavesAll = async (req: AuthRequest, res: Response): Promise<void> => {  // send by staus pending or all  
-  try {
-    const role = req.user?.role;
-
-    let leaves;
-    if (role !== "Admin") {
-      res.status(403).json({message:"Unauthorised access"});
+    if (!userId) {
+      res.status(402).json({ message: "User not found" });
+      return;
     }
 
-    leaves = await LeaveModel.find().sort({ appliedAt: -1 });
+    leaves = await LeaveModel.find({ user_id: userId }).sort({ appliedAt: -1 });
 
     res.status(200).json(leaves);
   } catch (error) {
@@ -165,7 +148,52 @@ export const getLeavesAll = async (req: AuthRequest, res: Response): Promise<voi
 };
 
 
-export const getLeaveById = async (req: AuthRequest, res: Response): Promise<void> => {
+
+export const getLeavesAll = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const user = (req as AuthRequest).user;
+
+    if (!user) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const { role, companyID, id: userId } = user;
+
+    // Only admin, hr, super_admin allowed
+    if (!["admin", "hr", "super_admin"].includes(role)) {
+      res.status(403).json({ message: "Unauthorized access" });
+      return;
+    }
+
+    const { status } = req.query;
+
+    let query: any = {};
+
+    // 🔹 Admin & HR → company leaves EXCEPT their own
+    if (role === "admin" || role === "hr") {
+      query.companyID = companyID;
+      query.user_id = { $ne: userId }; 
+    }
+
+    // 🔹 Super admin → no restriction
+    // (can see everything including own)
+
+    
+
+    const leaves = await LeaveModel.find(query).sort({ appliedAt: -1 });
+
+    res.status(200).json(leaves);
+  } catch (error) {
+    console.error("Get leaves error:", error);
+    res.status(500).json({ message: "Server error fetching leaves" });
+  }
+};
+
+export const getLeaveById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const leave = await LeaveModel.findById(id);
@@ -184,17 +212,17 @@ export const getLeaveById = async (req: AuthRequest, res: Response): Promise<voi
 
 
 
-export const deleteLeave = async (req: AuthRequest, res: Response): Promise<void> => {
+export const deleteLeave = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const eid = req.user?.eid;
+    const userId = (req as AuthRequest).user?.id;
 
     const leave = await LeaveModel.findById(id);
     if (!leave) {
       res.status(404).json({ message: "Leave not found" });
       return;
     }
-  // only user can delete if pending only 
+    // only user can delete if pending only 
     // if ( req.user?.role !== "Admin") {
     //   res.status(403).json({ message: "Forbidden: cannot delete this leave" });
     //   return;

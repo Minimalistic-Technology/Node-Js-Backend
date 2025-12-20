@@ -1,20 +1,18 @@
 import { Request, Response } from "express";
-import { AttendanceModel , IAttendance, ICheckInCheckOut } from "../models/attendance";
+import { AttendanceModel, IAttendance, ICheckInCheckOut } from "../models/attendance";
 import { AuthUserModel } from "../models/authUser";
 import mongoose from "mongoose";
 
 
-interface AuthRequest extends Request {
-  user?: any;
-}
 
 
 
-export const checkIn = async (req: AuthRequest, res: Response): Promise<void> => {
+
+export const checkIn = async (req: Request, res: Response): Promise<void> => {
   try {
-  
-    const userId = req.user?._id;
-    if (!userId ) {
+
+    const userId = req.user?.id;
+    if (!userId) {
       res.status(401).json({ message: "Unauthorized: user not found in token" });
       return;
     }
@@ -24,9 +22,9 @@ export const checkIn = async (req: AuthRequest, res: Response): Promise<void> =>
 
     const today = new Date().toISOString().split("T")[0];
 
-    let attendance = await AttendanceModel.findOne({  user : userId , date: today });
+    let attendance = await AttendanceModel.findOne({ user: userId, date: today });
 
-  
+
     const checkInData: ICheckInCheckOut = {
       dateTime: new Date(),
       city,
@@ -39,7 +37,7 @@ export const checkIn = async (req: AuthRequest, res: Response): Promise<void> =>
 
     if (!attendance) {
       attendance = new AttendanceModel({
-       user : userId,
+        user: userId,
         date: today,
         sessions: [{ checkIn: checkInData }],
       });
@@ -67,9 +65,9 @@ export const checkIn = async (req: AuthRequest, res: Response): Promise<void> =>
 };
 
 
-export const checkOut = async (req: AuthRequest, res: Response): Promise<void> => {
+export const checkOut = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?.id;
     if (!userId) {
       res.status(401).json({ message: "Unauthorized: user not found in token" });
       return;
@@ -78,8 +76,8 @@ export const checkOut = async (req: AuthRequest, res: Response): Promise<void> =
     const { city, state, country, ip, lat, long } = req.body;
     const today = new Date().toISOString().split("T")[0];
 
-   
-    const attendance = await AttendanceModel.findOne({ user:userId , date: today });
+
+    const attendance = await AttendanceModel.findOne({ user: userId, date: today });
     if (!attendance) {
       res.status(404).json({ message: "No attendance record found for today" });
       return;
@@ -110,7 +108,7 @@ export const checkOut = async (req: AuthRequest, res: Response): Promise<void> =
         const diff =
           new Date(session.checkOut.dateTime).getTime() -
           new Date(session.checkIn.dateTime).getTime();
-        total += diff / (1000 * 60 * 60); 
+        total += diff / (1000 * 60 * 60);
       }
     }
 
@@ -156,9 +154,9 @@ export const getAttendanceByEmployee = async (req: Request, res: Response): Prom
 };
 
 
-export const getAttendanceByEmployeeSelf = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getAttendanceByEmployeeSelf = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = req.user?._id;
+    const userId = req.user?.id;
     const records = await AttendanceModel.find({ user: userId }).sort({ date: -1 });
     res.status(200).json(records);
   } catch (error) {
@@ -168,15 +166,15 @@ export const getAttendanceByEmployeeSelf = async (req: AuthRequest, res: Respons
 };
 
 
-export const getAbsentEmployee = async (req: Request , res: Response): Promise<void> => {
+export const getAbsentEmployee = async (req: Request, res: Response): Promise<void> => {
   try {
     const { date } = req.params;
 
     const allUsers = await AuthUserModel.find({}, "_id username email");
-    
+
     const presentRecords = await AttendanceModel.find({ date }, "user");
     const presentUserIds = presentRecords.map((r) => r.user.toString());
-    
+
     const absentUsers = allUsers.filter(
       (user) => !presentUserIds.includes(user._id.toString())
     );
