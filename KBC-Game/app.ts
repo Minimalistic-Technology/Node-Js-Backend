@@ -66,14 +66,7 @@ app.get("/test-db", async (req: Request, res: Response) => {
   }
 });
 
-if (!process.env.MONGO_URI) {
-  throw new Error("MONGO_URI is not defined in environment variables");
-}
-
-mongoose
-  .connect(process.env.MONGO_URI as string)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+// MongoDB connection is handled in server.ts via connectDB()
 
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   const err = new Error(`Route ${req.originalUrl} not found`) as any;

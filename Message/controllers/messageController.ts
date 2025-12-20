@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import client from '../utils/whatsappClient';
 
 interface MessageEntry {
     number: string;
@@ -18,13 +17,14 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
     }
 
     try {
-        const waNumber = number.includes('@c.us') ? number : `${number}@c.us`;
-        await client.sendMessage(waNumber, message);
-
+        // WhatsApp functionality removed - message logging only
         messageLog.push({ number, message, timestamp: Date.now() });
 
-        res.status(200).json({ success: true, message: 'Message sent successfully!' });
+        res.status(200).json({ 
+            success: true, 
+            message: 'Message logged successfully (WhatsApp integration removed)' 
+        });
     } catch (error: any) {
-        res.status(500).json({ error: 'Failed to send message', details: error.message });
+        res.status(500).json({ error: 'Failed to process message', details: error.message });
     }
 };
